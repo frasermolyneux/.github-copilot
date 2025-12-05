@@ -6,7 +6,7 @@ applyTo: ".github/**/*.instructions.md,.github/copilot-instructions.md"
 2. Structure every file per the [VS Code custom instructions guide](https://code.visualstudio.com/docs/copilot/customization/custom-instructions); keep `applyTo` frontmatter accurate and explain how the scope interacts with prompts, agents, or MCP servers when relevant.
 3. Keep instructions ASCII unless editing a file that already contains non-ASCII characters.
 4. Reference files and folders using backticks (for example, `docs/overview.md`).
-5. Declare the default shell (`pwsh.exe`) and forbid destructive commands such as `git reset --hard`; restate these guardrails when instructions chain into prompts or agents.
+5. Declare VS Code as the source of truth, state the default shell (`pwsh.exe`), and forbid destructive commands such as `git reset --hard`; restate these guardrails whenever instructions chain into prompts or agents and cite [`../copilot-instructions.md`](../copilot-instructions.md) so downstream files can trace the requirement.
 6. Require verification steps (tests, linters, or checklist) before marking work complete.
 7. Split unrelated rules into separate files and target them with precise globs in `applyTo`.
 8. Link only to official GitHub or Microsoft resources when citing guidance.

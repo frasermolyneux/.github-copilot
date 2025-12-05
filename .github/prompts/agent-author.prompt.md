@@ -19,7 +19,7 @@ tools: ['edit', 'search', 'fetch', 'githubRepo']
 
 **Guardrails**
 1. Follow [.github/instructions/agent-files.instructions.md](../instructions/agent-files.instructions.md), the [VS Code custom agents documentation](https://code.visualstudio.com/docs/copilot/customization/custom-agents), and the [GitHub guidance on agents](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/).
-2. Declare prerequisites pulled from [.github/copilot-instructions.md](../copilot-instructions.md) so the agent explicitly states it runs inside VS Code on Windows with `pwsh.exe` and any required dependencies Copilot must verify.
+2. Declare prerequisites pulled from [.github/copilot-instructions.md](../copilot-instructions.md) so the agent explicitly states it runs inside VS Code on Windows with `pwsh.exe`, lists required dependencies Copilot must verify, and reiterates that destructive git commands (for example, `git reset --hard`, `git clean -fd`) are forbidden.
 3. Emit YAML frontmatter with `name`, `description`, `argument-hint`, `tools`, `model`, `target`, and optional `handoffs` or `mcp-servers` entries before the body so VS Code recognizes the agent metadata.
 4. Include explicit escalation triggers (for example, "stop if tests fail twice") and align them with the expectations modeled in [templates/agent.md](../../templates/agent.md).
 5. Keep the `.agent.md` body ASCII, under 400 lines, and structured as Mission, Capabilities, Guardrails, Prerequisites, Escalation, and Checklist.

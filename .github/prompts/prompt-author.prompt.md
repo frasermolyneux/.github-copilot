@@ -25,6 +25,7 @@ tools: ['edit', 'search', 'fetch', 'githubRepo']
 
 **Validation**
 - Summarize which inputs the prompt expects and how guardrails map to repo files/tools.
+- Require evidence before finishing by running `pwsh -c "git diff --stat"` on touched paths or citing a `#tool:githubRepo` diff when the change is read-only.
 - Call out any follow-up steps (tests, reviews) the user must run after applying the prompt.
 
 **Checklist**

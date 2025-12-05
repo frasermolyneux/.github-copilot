@@ -24,6 +24,7 @@ tools: ['edit', 'search', 'fetch', 'githubRepo']
 
 **Validation**
 - Provide a short summary of the new/updated instruction plus the files it covers.
+- Capture evidence by running `pwsh -c "git diff --stat {{target_scope}}"` or citing a `#tool:githubRepo` diff so reviewers can confirm the change footprint.
 - Suggest any tests or reviews that must run because of the change.
 
 **Checklist**
