@@ -22,6 +22,7 @@ tools: ['edit', 'search', 'fetch', 'githubRepo']
 2. Declare prerequisites pulled from [.github/copilot-instructions.md](../copilot-instructions.md) so the agent explicitly states it runs inside VS Code on Windows with `pwsh.exe` and any required dependencies Copilot must verify.
 3. Include explicit escalation triggers (e.g., "stop if tests fail twice") and align them with the expectations modeled in [templates/agent.md](../../templates/agent.md).
 4. Keep the `AGENTS.md` entry ASCII and under 400 lines to satisfy rule 3 in [.github/copilot-instructions.md](../copilot-instructions.md) and match the [templates/agent.md](../../templates/agent.md) structure.
+5. Save the finished agent entry under `.github/agents/{{agent_name}}.agent.md` (for example, `.github/my-agent.agent.md`) so it loads with the rest of the agents defined in `.github/agents/`.
 
 **Validation**
 - Summarize the mission, capabilities, guardrails, and prerequisite notes added to `AGENTS.md`, calling out any new sections or updates made.
