@@ -80,6 +80,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'deploy-dev')
     needs: build-and-test
     environment: Development
