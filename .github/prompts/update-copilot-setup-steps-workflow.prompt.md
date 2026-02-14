@@ -48,7 +48,10 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: frasermolyneux/.github-copilot
+          path: .github-copilot
 ```
+
+**IMPORTANT:** The `path: .github-copilot` parameter on the additional repo checkout is critical — without it, the second checkout will overwrite the main repository checkout. Always preserve this `path` parameter.
 
 ### Additional Steps
 

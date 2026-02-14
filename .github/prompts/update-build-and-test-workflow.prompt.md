@@ -12,6 +12,8 @@ All repositories should have a standardized build and test workflow `.github/wor
 
 A repository may contain multiple types of code, in which case combine the relevant templates into a single workflow, ensuring that all are aligned with the standardized practices.
 
+**IMPORTANT:** If the repository contains a `terraform/` folder, you **MUST** include the Terraform `terraform-plan-dev` job in addition to the build job. Both jobs should be present in the workflow — do not omit the Terraform job.
+
 ### Triggers
 ```yaml
 name: Build and Test
