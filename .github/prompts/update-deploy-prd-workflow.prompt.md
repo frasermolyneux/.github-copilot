@@ -15,9 +15,8 @@ A repository may contain multiple types of code and deployment targets, in which
 ### Key differences from Deploy Dev
 - Triggers include `push` to `main`, `workflow_dispatch`, and a weekly `schedule` cron.
 - A top-level `concurrency` group serializes the entire workflow run.
-- On `push` events, Dev environment is applied first, then Prd depends on Dev completing.
-- On `schedule` and `workflow_dispatch`, Dev jobs are skipped (guarded by `if: github.event_name == 'push'`) and Prd jobs use conditional `if` with `always()` to handle skipped Dev dependencies.
-- For Terraform-only repos without conditional Dev skipping, the Prd job simply uses `needs` to depend on the Dev job directly.
+- Dev environment is always deployed first regardless of trigger type, then Prd depends on Dev completing successfully.
+- Prd jobs use `needs` to depend on Dev jobs directly, requiring Dev success before Prd runs.
 
 ### Triggers
 ```yaml
@@ -224,7 +223,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.event_name == 'push'
     environment: Development
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -259,7 +257,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.event_name == 'push'
     environment: Development
     needs: [build-and-test, terraform-plan-and-apply-dev]
     runs-on: ubuntu-latest
@@ -289,10 +286,6 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
-    if: |
-      always() &&
-      needs.build-and-test.result == 'success' &&
-      (needs.terraform-plan-and-apply-dev.result == 'success' || needs.terraform-plan-and-apply-dev.result == 'skipped')
     steps:
       - uses: frasermolyneux/actions/terraform-plan-and-apply@main
         with:
@@ -330,10 +323,6 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
-    if: |
-      always() &&
-      needs.terraform-plan-and-apply-prd.result == 'success' &&
-      (needs.function-app-deploy-dev.result == 'success' || needs.function-app-deploy-dev.result == 'skipped')
     strategy:
       max-parallel: 1
       matrix:
@@ -385,7 +374,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.event_name == 'push'
     environment: Development
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -420,7 +408,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    if: github.event_name == 'push'
     environment: Development
     needs: [build-and-test, terraform-plan-and-apply-dev]
     runs-on: ubuntu-latest
@@ -468,10 +455,6 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
-    if: |
-      always() &&
-      needs.build-and-test.result == 'success' &&
-      (needs.terraform-plan-and-apply-dev.result == 'success' || needs.terraform-plan-and-apply-dev.result == 'skipped')
     steps:
       - uses: frasermolyneux/actions/terraform-plan-and-apply@main
         with:
@@ -509,10 +492,6 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
-    if: |
-      always() &&
-      needs.terraform-plan-and-apply-prd.result == 'success' &&
-      (needs.static-web-app-deploy-dev.result == 'success' || needs.static-web-app-deploy-dev.result == 'skipped')
     steps:
       - name: Download site artifact
         uses: actions/download-artifact@v4
