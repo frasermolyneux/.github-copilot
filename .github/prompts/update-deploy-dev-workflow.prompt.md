@@ -36,7 +36,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@main
+      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
@@ -54,7 +54,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-web-ci@main
+      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v1.4
         with:
           dotnet-project: "MyOrg.MyApp.Web"
           dotnet-version: 9.0.x
@@ -70,7 +70,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@main
+      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
@@ -106,7 +106,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@main
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
         with:
           web-artifact-name: "MyOrg.MyApp.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}
@@ -124,7 +124,7 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-func-ci@main
+      - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v1.4
         with:
           dotnet-project: "MyOrg.MyApp.Functions"
           dotnet-version: 9.0.x
@@ -140,7 +140,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@main
+      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
@@ -177,7 +177,7 @@ jobs:
       matrix:
         func_app: ${{ fromJSON(needs.terraform-plan-and-apply-dev.outputs.func_apps) }}
     steps:
-      - uses: frasermolyneux/actions/deploy-function-app@main
+      - uses: frasermolyneux/actions/deploy-function-app@deploy-function-app/v1.2
         with:
           function-app-artifact-name: "MyOrg.MyApp.Functions"
           function-app-name: ${{ matrix.func_app.name }}
@@ -228,7 +228,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@main
+      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"

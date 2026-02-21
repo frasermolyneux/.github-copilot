@@ -45,7 +45,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-${{ inputs.environment }}
     steps:
-      - uses: frasermolyneux/actions/terraform-destroy@main
+      - uses: frasermolyneux/actions/terraform-destroy@terraform-destroy/v1.2
         with:
           terraform-folder: "terraform"
           terraform-var-file: ${{ inputs.environment == 'prd' && 'tfvars/prd.tfvars' || 'tfvars/dev.tfvars' }}

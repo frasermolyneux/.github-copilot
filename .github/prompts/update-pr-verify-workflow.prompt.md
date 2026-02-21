@@ -51,7 +51,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-func-ci@main
+      - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v1.4
         with:
           dotnet-project: "MyOrg.MyApp.Functions"
           dotnet-version: 9.0.x
@@ -67,7 +67,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-web-ci@main
+      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v1.4
         with:
           dotnet-project: "MyOrg.MyApp.Web"
           dotnet-version: 9.0.x
@@ -92,7 +92,7 @@ jobs:
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
     steps:
-      - uses: frasermolyneux/actions/terraform-plan@main
+      - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v1.4
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
