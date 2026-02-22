@@ -13,12 +13,15 @@ All repositories should have a standardized code quality workflow `.github/workf
 A repository may contain multiple types of code, in which case combine the relevant templates into a single workflow, ensuring that all are aligned with the standardized practices.
 
 ### Triggers
+
+All repositories follow a centralised scheduling standard — see `docs/ops-clock.md` in the `.github-copilot` repository. Codequality scans run on **Monday**, staggered every 15 minutes from 01:00 to 08:00. Consult the ops clock for the repo's allocated time.
+
 ```yaml
 name: Code Quality
 
 on:
   schedule:
-    - cron: "0 3 * * 1" # Monday 3am UTC
+    - cron: "M H * * 1" # Monday — see ops clock for this repo's slot
   push:
     branches:
       - main

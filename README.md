@@ -8,7 +8,7 @@ Shared GitHub Copilot instructions, prompts, and agent specs for the frasermolyn
 - Document how to extend and validate the instruction set as requirements evolve.
 
 ## Structure
-- `docs/` – developer-facing documentation (overview, governance, change log).
+- `docs/` – developer-facing documentation (overview, governance, [ops clock](docs/ops-clock.md), change log).
 - `templates/` – starter files matching the Copilot guides.
 - `.github/copilot-instructions.md` – repository-wide guidance that always loads with Copilot.
 - `.github/instructions/*.instructions.md` – path-specific rules targeted through glob frontmatter.

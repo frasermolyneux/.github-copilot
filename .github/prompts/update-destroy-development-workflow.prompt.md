@@ -16,15 +16,17 @@ Review the existing `.github/workflows/destroy-development.yml` file in the repo
 
 ### Standardized Workflow
 
-This is a manual workflow (`workflow_dispatch`) that destroys the Development environment's Terraform state. It includes a commented-out nightly schedule that can be enabled if needed. The workflow uses `frasermolyneux/actions/terraform-destroy` with dev-specific tfvars and backend configuration.
+This is a manual workflow (`workflow_dispatch`) that destroys the Development environment's Terraform state. The schedule is **enabled by default** and staggered across repos (every 5 minutes from 23:00 UTC daily). Consult `docs/ops-clock.md` in the `.github-copilot` repository for the repo's allocated time slot.
+
+The workflow uses `frasermolyneux/actions/terraform-destroy` with dev-specific tfvars and backend configuration.
 
 ```yaml
 name: Destroy Development
 
 on:
   workflow_dispatch:
-  #schedule:
-  #  - cron: "0 1 * * *"
+  schedule:
+    - cron: "M 23 * * *"  # See ops clock for this repo's allocated minute
 
 permissions: {}
 
@@ -51,7 +53,8 @@ jobs:
 ```
 
 ### Notes
-- The commented-out schedule can be uncommented to enable nightly teardown of the Development environment for cost savings.
-- This workflow is identical across all Terraform repositories and should not require project-specific customization.
+- The schedule is enabled by default and staggered across repos to prevent runner contention (every 5 minutes from 23:00 UTC).
+- Consult `docs/ops-clock.md` in `.github-copilot` for the repo's allocated minute slot.
+- This workflow is identical across all Terraform repositories except for the cron minute.
 - The concurrency group prevents conflicts with other Dev environment workflows (deploy-dev, pr-verify, etc.).
 ```

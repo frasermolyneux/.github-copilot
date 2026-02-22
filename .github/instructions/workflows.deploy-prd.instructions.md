@@ -16,11 +16,12 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 4"
+    - cron: "0 X * * D"  # See docs/ops-clock.md for this repo's allocated slot
 ```
 
 - No `paths:` filter — change detection is handled at runtime by the `detect-changes` job.
 - `workflow_dispatch` and `schedule` triggers force all change flags to `true` (built into the `detect-changes` action).
+- **Schedule allocation**: each repo has an assigned day and hour in the ops clock. Portal stack deploys Wednesday, shared-plan stack Thursday, independent repos Friday. Staggered by 1 hour within each day. Consult `docs/ops-clock.md` in the `.github-copilot` repository for the exact cron.
 
 ## Change Detection
 
@@ -282,9 +283,40 @@ When creating or reviewing a `deploy-prd.yml`, verify each item:
 14. **Concurrency groups are correct** — `${{ github.repository }}-dev` for dev jobs, `${{ github.repository }}-prd` for prd jobs
 15. **Workflow-level concurrency** — `group: ${{ github.workflow }}` prevents overlapping runs
 
-## Terraform-only Repos
+## Skip-Dev-on-Schedule (Drift Prevention)
 
-Repos with **no source code** (only `terraform/`) do not need this pattern. They should use `paths:` filters on the trigger instead:
+Scheduled runs exist for drift prevention and must only target production. All `deploy-prd.yml` workflows implement the "Option 1" pattern to skip dev jobs on schedule:
+
+1. **Dev-only jobs** (`terraform-state-check-dev`, `terraform-plan-and-apply-dev`, app deploy dev): Add `if: github.event_name != 'schedule'`. If the job already has an `if:`, prepend `github.event_name != 'schedule' &&`.
+2. **`build-and-test`** (when it depends on a skippable dev job): Prepend `!failure() && !cancelled() &&` to its `if:` condition so it runs when its dev dependency is skipped.
+3. **Prd gateway** (first prd job depending on dev result): Add `|| github.event_name == 'schedule'` to the dev-result check:
+
+```yaml
+terraform-plan-and-apply-prd:
+  needs:
+    - detect-changes
+    - terraform-plan-and-apply-dev
+    - build-and-test
+    - app-service-deploy-dev
+  if: |
+    !failure() && !cancelled() &&
+    (needs.terraform-plan-and-apply-dev.result == 'success' || github.event_name == 'schedule')
+```
+
+### Why this works
+
+- Skipped dev jobs have `result == 'skipped'`, not `'success'`.
+- `!failure() && !cancelled()` passes for skipped upstream jobs, allowing `build-and-test` and other non-dev jobs to proceed.
+- The `|| github.event_name == 'schedule'` fallback lets the prd gateway bypass the dev-success check on scheduled runs.
+- The `detect-changes` action forces all outputs to `true` on schedule, so prd conditions based on change flags still pass.
+
+### Terraform-only repos
+
+For Terraform-only repos (e.g. `portal-environments`, `portal-core`), the pattern is simpler — just add `if: github.event_name != 'schedule'` to `terraform-plan-and-apply-dev`, and add the schedule fallback to the prd job's `if:`.
+
+## Terraform-only Repos (paths filter alternative)
+
+Repos with **no source code** (only `terraform/`) do not need the full detect-changes pattern. They should use `paths:` filters on the trigger instead:
 
 ```yaml
 on:

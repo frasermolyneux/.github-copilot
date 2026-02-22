@@ -8,10 +8,14 @@ Review the existing `.github/dependabot.yml` file in the repository. If it does 
 
 ## Dependabot
 
-- **nuget** package ecosystem for .NET dependencies in the `/src` directory, scheduled daily - *only* if the project contains .NET code.
-- **terraform** package ecosystem for Terraform dependencies in the `/terraform` directory, scheduled daily - *only* if the project contains Terraform code.
-- **github-actions** package ecosystem for GitHub Actions workflows in the root directory, scheduled daily - *only* if the project contains GitHub Actions workflows.
-- **devcontainers** package ecosystem for development container configurations in the root directory, scheduled weekly - *only* if the project contains development container configurations.
+All repositories follow a centralised scheduling standard — see `docs/ops-clock.md` in the `.github-copilot` repository. Dependabot runs weekly on **Sunday** at a time that matches the repo's Monday codequality slot (staggered every 15 minutes from 01:00 to 08:00). Consult the ops clock for the exact time.
+
+All ecosystems must use `groups` to batch updates into a single PR per ecosystem.
+
+- **nuget** package ecosystem for .NET dependencies in the `/src` directory — *only* if the project contains .NET code.
+- **terraform** package ecosystem for Terraform dependencies in the `/terraform` directory — *only* if the project contains Terraform code.
+- **github-actions** package ecosystem for GitHub Actions workflows in the root directory — *only* if the project contains GitHub Actions workflows.
+- **devcontainers** package ecosystem for development container configurations in the root directory — *only* if the project contains development container configurations.
 
 If the target project does not include the relevant package ecosystems, adjust the configuration accordingly while maintaining the standardized format and scheduling practices.
 
@@ -22,23 +26,47 @@ updates:
     assignees: ["frasermolyneux"]
     directory: "/src"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "HH:MM"  # Use this repo's ops clock time
+    groups:
+      all-updates:
+        patterns:
+          - "*"
 
   - package-ecosystem: "terraform"
     assignees: ["frasermolyneux"]
     directory: "/terraform"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "HH:MM"
+    groups:
+      all-updates:
+        patterns:
+          - "*"
 
   - package-ecosystem: "github-actions"
     assignees: ["frasermolyneux"]
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
+      time: "HH:MM"
+    groups:
+      all-updates:
+        patterns:
+          - "*"
 
   - package-ecosystem: "devcontainers"
     assignees: ["frasermolyneux"]
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "HH:MM"
+    groups:
+      all-updates:
+        patterns:
+          - "*"
 ```

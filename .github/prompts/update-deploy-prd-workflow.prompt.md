@@ -12,6 +12,16 @@ All repositories that have deployable components should have a standardized depl
 
 A repository may contain multiple types of code and deployment targets, in which case combine the relevant templates into a single workflow, ensuring that all are aligned with the standardized practices.
 
+### Scheduled Drift Prevention
+
+Scheduled runs are for **production drift prevention only**. All workflows must implement the "skip dev on schedule" pattern:
+
+- **Dev-only jobs** (`terraform-state-check-dev`, `terraform-plan-and-apply-dev`, app deploy dev): Add `if: github.event_name != 'schedule'`.
+- **`build-and-test`** (when depending on a skippable dev job): Prepend `!failure() && !cancelled() &&` to its `if:`.
+- **Prd gateway job**: Add `|| github.event_name == 'schedule'` to the dev-result check.
+
+See `.github/instructions/workflows.deploy-prd.instructions.md` and `.github/instructions/workflows.scheduling.instructions.md` for full details.
+
 ### Key differences from Deploy Dev
 - Triggers include `push` to `main`, `workflow_dispatch`, and a weekly `schedule` cron.
 - A top-level `concurrency` group serializes the entire workflow run.
@@ -19,6 +29,9 @@ A repository may contain multiple types of code and deployment targets, in which
 - Prd jobs use `needs` to depend on Dev jobs directly, requiring Dev success before Prd runs.
 
 ### Triggers
+
+All repositories follow a centralised scheduling standard — see `docs/ops-clock.md` in the `.github-copilot` repository. The deploy-prd schedule is staggered per repo: portal stack on Wednesday, shared-plan stack on Thursday, independent repos on Friday. Consult the ops clock for the exact cron.
+
 ```yaml
 name: Deploy Prd
 
@@ -28,7 +41,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 4"
+    - cron: "0 X * * D"  # See ops clock for this repo's allocated slot
 
 permissions: {}
 

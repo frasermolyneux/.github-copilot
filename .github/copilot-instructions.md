@@ -64,6 +64,7 @@ npm run watch:css  # live editing
 - **Tagging**: Always set `tags = var.tags` on every Terraform resource.
 - **Environment configs**: `terraform/tfvars/dev.tfvars` and `terraform/backends/dev.backend.hcl` per environment.
 - **Branch strategy**: `feature/*`, `bugfix/*`, `hotfix/*` → dev deploys; `main` → production deploys.
+- **Workflow scheduling**: All scheduled workflows follow a centralised ops clock (`docs/ops-clock.md`) with staggered times to prevent resource contention. Deploy-prd runs weekly for drift prevention (prd-only via skip-dev-on-schedule guards). Dependabot runs Sunday, codequality Monday, deploy-prd Wed/Thu/Fri by infrastructure group. See `.github/instructions/workflows.scheduling.instructions.md` for full rules.
 - **PR verification**: Dev Terraform plans run automatically on PRs. Prd plans require the `run-prd-plan` label. Dependabot/Copilot PRs skip Terraform plans unless explicitly labeled.
 - **Nullable reference types**: All .NET projects use `<Nullable>enable</Nullable>` with implicit usings.
 - **Test filtering**: CI excludes integration tests via `--filter "FullyQualifiedName!~IntegrationTests"`.
