@@ -88,6 +88,102 @@ terraform-plan-and-apply-<env>:
         ...
 ```
 
+## Dev Environment State Check (Idempotent Environments)
+
+Development environments are ephemeral — they may be destroyed by `destroy-development.yml` and must be fully rebuilt on the next pipeline run. The `detect-changes` job only inspects git diffs, so when no `.tf` files changed it would skip `terraform-plan-and-apply` and try to read outputs from an empty state, failing the pipeline.
+
+To handle this, add a `terraform-state-check-dev` job that runs the `frasermolyneux/actions/terraform-state-check` action. This action performs `terraform init` then `terraform state list` and outputs `has_resources` (`true`/`false`).
+
+### State-check job
+
+```yaml
+terraform-state-check-dev:
+  permissions:
+    contents: read
+    id-token: write
+  environment: Development
+  runs-on: ubuntu-latest
+  outputs:
+    has_resources: ${{ steps.state-check.outputs.has_resources }}
+  steps:
+    - id: state-check
+      uses: frasermolyneux/actions/terraform-state-check@terraform-state-check/v1.0
+      with:
+        terraform-folder: "terraform"
+        terraform-var-file: "tfvars/dev.tfvars"
+        terraform-backend-file: "backends/dev.backend.hcl"
+        AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+```
+
+### How it changes conditions
+
+The state-check output is combined with `detect-changes` using OR logic. When the dev state is empty (`has_resources != 'true'`), the pipeline behaves as if everything changed — terraform runs plan+apply, the app is built and deployed.
+
+**Terraform job steps:**
+
+```yaml
+terraform-plan-and-apply-dev:
+  needs:
+    - detect-changes
+    - terraform-state-check-dev
+  steps:
+    - if: needs.detect-changes.outputs.terraform == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true'
+      uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.x
+      ...
+
+    - if: needs.detect-changes.outputs.terraform != 'true' && needs.terraform-state-check-dev.outputs.has_resources == 'true'
+      uses: frasermolyneux/actions/terraform-output@terraform-output/v1.x
+      ...
+```
+
+**Build and deploy jobs** — also need to run when dev has no resources:
+
+```yaml
+build-and-test:
+  needs:
+    - detect-changes
+    - terraform-state-check-dev
+  if: needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true'
+
+app-service-deploy-dev:
+  needs:
+    - detect-changes
+    - terraform-state-check-dev
+    - build-and-test
+    - terraform-plan-and-apply-dev
+  if: |
+    !failure() && !cancelled() &&
+    (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
+```
+
+### Prd is not state-checked
+
+Production environments are never destroyed, so no state-check is needed for prd. The prd terraform and deploy jobs continue to use `detect-changes` outputs only. The prd app deploy condition remains `needs.detect-changes.outputs.src == 'true'` without the state-check OR clause.
+
+### Updated dependency chain
+
+```
+detect-changes ──────┬── build-and-test (if: src == 'true' || has_resources != 'true')
+                     │
+terraform-state-check-dev ┘
+                     ├── terraform-plan-and-apply-dev (always, step conditions)
+                     │     └── app-service-deploy-dev (if: src == 'true' || has_resources != 'true')
+                     │           └── terraform-plan-and-apply-prd (if: dev tf success)
+                     │                 └── app-service-deploy-prd (if: prd tf success && src == 'true')
+```
+
+### Updated scenario matrix
+
+| Scenario | build | tf-dev | app-dev | tf-prd | app-prd |
+|---|---|---|---|---|---|
+| **Dev destroyed, no changes** | ✅ | plan+apply | ✅ | output | skip |
+| Terraform only | skip | plan+apply | skip | plan+apply | skip |
+| Src only | ✅ | output | ✅ | output | ✅ |
+| All changes | ✅ | plan+apply | ✅ | plan+apply | ✅ |
+| schedule/dispatch | ✅ | plan+apply | ✅ | plan+apply | ✅ |
+
 ## Job Dependency Chain
 
 The standard chain for each environment is:
@@ -171,17 +267,20 @@ terraform-plan-and-apply-prd:
 When creating or reviewing a `deploy-prd.yml`, verify each item:
 
 1. **detect-changes job exists** — first job, no dependencies, outputs all required change flags
-2. **Filters are complete** — `src`, `terraform`, and `database` (if a SQL project exists) are all defined
-3. **build-and-test is conditional** — `if: needs.detect-changes.outputs.src == 'true'`
-4. **Terraform job always runs** — no `if` on the dev terraform job; uses step-level `if` for plan-and-apply vs output
-5. **Terraform output step always runs** — no `if` on the `terraform output -raw` step; works after either action
-6. **SQL deploy gated on database flag** — not on `src`; avoids unnecessary DACPAC deploys
-7. **App deploy and APIM gated on src flag** — with `!failure() && !cancelled()` to allow skipped SQL deploy
-8. **Prd jobs explicitly check terraform-prd success** — `needs.terraform-plan-and-apply-prd.result == 'success'`
-9. **Prd terraform depends on all dev jobs** — so dev failures block prd, but uses `!failure() && !cancelled()` to allow skipped dev deploy jobs
-10. **Block-style arrays** — all `needs` use YAML block style, not flow style
-11. **Concurrency groups are correct** — `${{ github.repository }}-dev` for dev jobs, `${{ github.repository }}-prd` for prd jobs
-12. **Workflow-level concurrency** — `group: ${{ github.workflow }}` prevents overlapping runs
+2. **terraform-state-check-dev job exists** — runs in parallel with detect-changes, outputs `has_resources` for the dev environment
+3. **Filters are complete** — `src`, `terraform`, and `database` (if a SQL project exists) are all defined
+4. **build-and-test uses state-check** — `if: src == 'true' || has_resources != 'true'` so it runs when dev was destroyed
+5. **Terraform job always runs** — no `if` on the dev terraform job; uses step-level `if` for plan-and-apply vs output
+6. **Terraform steps use state-check** — plan-and-apply runs when `terraform == 'true' || has_resources != 'true'`; output runs when `terraform != 'true' && has_resources == 'true'`
+7. **Terraform output step always runs** — no `if` on the `terraform output -raw` step; works after either action
+8. **SQL deploy gated on database flag** — not on `src`; avoids unnecessary DACPAC deploys
+9. **Dev app deploy uses state-check** — `src == 'true' || has_resources != 'true'` with `!failure() && !cancelled()`
+10. **Prd app deploy does NOT use state-check** — only `src == 'true'`; prd is never destroyed
+11. **Prd jobs explicitly check terraform-prd success** — `needs.terraform-plan-and-apply-prd.result == 'success'`
+12. **Prd terraform depends on all dev jobs** — so dev failures block prd, but uses `!failure() && !cancelled()` to allow skipped dev deploy jobs
+13. **Block-style arrays** — all `needs` use YAML block style, not flow style
+14. **Concurrency groups are correct** — `${{ github.repository }}-dev` for dev jobs, `${{ github.repository }}-prd` for prd jobs
+15. **Workflow-level concurrency** — `group: ${{ github.workflow }}` prevents overlapping runs
 
 ## Terraform-only Repos
 
