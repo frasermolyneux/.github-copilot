@@ -33,7 +33,7 @@ No scheduled activity. Buffer day for ad-hoc work.
 
 ### Wednesday — Deploy PRD: Portal Stack
 
-The 9 portal repositories deploy to production in dependency order, staggered 1 hour apart from 01:00 to 09:00:
+The 9 portal repositories deploy to production in dependency order from 01:00 to 09:00:
 
 | Time | Repo | Type |
 |------|------|------|
@@ -41,10 +41,10 @@ The 9 portal repositories deploy to production in dependency order, staggered 1 
 | 02:00 | portal-core | Terraform only |
 | 03:00 | portal-repository | Full pipeline |
 | 04:00 | portal-repository-func | Full pipeline |
-| 05:00 | portal-event-ingest | Full pipeline |
+| 05:00 | portal-server-agent | Full pipeline |
+| 05:00 | portal-server-events | Full pipeline |
 | 06:00 | portal-servers-integration | Full pipeline |
 | 07:00 | portal-sync | Full pipeline |
-| 08:00 | portal-bots | Terraform only |
 | 09:00 | portal-web | Full pipeline |
 
 ### Thursday — Deploy PRD: Shared App Service Plan Stack
@@ -90,7 +90,8 @@ When adding or modifying scheduled workflows:
 
 | Time | Repo |
 |------|------|
-| 23:00 | portal-event-ingest |
+| 23:00 | portal-server-agent |
+| 23:00 | portal-server-events |
 | 23:05 | portal-repository |
 | 23:10 | portal-repository-func |
 | 23:15 | portal-servers-integration |
@@ -110,10 +111,10 @@ When adding or modifying scheduled workflows:
 | 01:15 | portal-core |
 | 01:30 | portal-repository |
 | 01:45 | portal-repository-func |
-| 02:00 | portal-event-ingest |
 | 02:15 | portal-servers-integration |
 | 02:30 | portal-sync |
-| 02:45 | portal-bots |
+| 02:45 | portal-server-agent |
+| 02:45 | portal-server-events |
 | 03:00 | portal-web |
 | 03:15 | platform-hosting |
 | 03:30 | geo-location |
