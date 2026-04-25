@@ -1,0 +1,34 @@
+{
+  "folders": [
+    { "name": ".github-copilot",          "path": "."                            },
+    { "name": "platform-connectivity",    "path": "../platform-connectivity"     },
+    { "name": "platform-hosting",         "path": "../platform-hosting"          },
+    { "name": "platform-landing-zones",   "path": "../platform-landing-zones"    },
+    { "name": "platform-letsencrypt-iis", "path": "../platform-letsencrypt-iis"  },
+    { "name": "platform-monitoring",      "path": "../platform-monitoring"       },
+    { "name": "platform-notifications",   "path": "../platform-notifications"    },
+    { "name": "platform-registry",        "path": "../platform-registry"         },
+    { "name": "platform-sitewatch-func",  "path": "../platform-sitewatch-func"   },
+    { "name": "platform-workloads",       "path": "../platform-workloads"        }
+  ],
+  "settings": {
+    "chat.promptFiles": true,
+    "chat.agent.enabled": true,
+    "chat.promptFilesLocations": {
+      "./.github/prompts": true
+    },
+    "chat.instructionsFilesLocations": {
+      "./.github/instructions": true,
+      "./.github": true
+    },
+    "chat.agentFilesLocations": {
+      "./.github/agents": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "github.copilot",
+      "github.copilot-chat"
+    ]
+  }
+}
