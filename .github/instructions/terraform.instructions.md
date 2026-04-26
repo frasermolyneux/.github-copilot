@@ -36,7 +36,7 @@ Other providers (`azapi`, `azuredevops`, `github`, `cloudflare`, `google`, `time
 
 - `workload_name` — always use this name (not `workload`). The value matches the repository name (e.g. `platform-hosting`, `geo-location`).
 - `environment` — typically `dev` or `prd`.
-- `location` — typically `uksouth`.
+- `location` — `swedencentral` for new workloads (dev and prd) and all dev environments; `uksouth` for existing prd. See `tenant.regions.instructions.md`.
 - `subscription_id` — required (no default).
 - `tags` — map; merged with computed tags in `locals.tf`.
 

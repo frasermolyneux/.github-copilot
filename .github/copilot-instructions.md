@@ -51,34 +51,39 @@ npm run watch:css  # live editing
 
 ## Architecture Patterns
 
-- **API Client Pattern**: Typed HTTP clients with abstractions for testability. Consumer repos reference NuGet packages containing `I*ApiClient` interfaces, generated clients, and `*Testing` packages with in-memory fakes and DTO factories.
-- **Repository Pattern**: Data access through repository interfaces (e.g., Table Storage, MaxMind) with DI registration and cache-first flows.
-- **Versioned APIs**: Namespace-based controllers (`Controllers.V1`, `Controllers.V1_1`) with APIM segment versioning. OpenAPI specs served at runtime, imported into APIM via `az apim api import` in deploy workflows.
-- **Remote State Dependencies**: Terraform stacks reference upstream state via `terraform_remote_state` data sources (e.g., `platform-workloads` → `portal-core` → `portal-web`).
-- **Workload Identity**: `platform-workloads` auto-provisions Azure AD apps, service principals with OIDC federation, GitHub repo secrets, and Azure DevOps service connections from JSON definitions.
+Each pattern below has a dedicated `patterns.*.instructions.md` file with full detail and applyTo scoping:
+
+- **Typed API client** — `patterns.api-client.instructions.md`
+- **Repository pattern** — `patterns.repository.instructions.md`
+- **Versioned APIs** — `patterns.versioned-apis.instructions.md`
+- **Terraform remote state** — `patterns.terraform-remote-state.instructions.md`
+- **Workload identity provisioning** — `patterns.workload-identity-provisioning.instructions.md`
+- **NBGV versioning** — `patterns.nbgv-versioning.instructions.md`
+- **SCSS build** — `patterns.scss-build.instructions.md`
 
 ## Key Conventions
 
-- **OIDC everywhere** — No client secrets. GitHub Actions and Azure DevOps authenticate via OIDC federated credentials.
-- **Resource naming**: `{resource}-{project}-{environment}-{location}-{instance}`. Globally unique resources append `random_id.environment_id.hex`.
-- **Tagging**: Always set `tags = var.tags` on every Terraform resource.
-- **Environment configs**: `terraform/tfvars/dev.tfvars` and `terraform/backends/dev.backend.hcl` per environment.
-- **Branch strategy**: `feature/*`, `bugfix/*`, `hotfix/*` → dev deploys; `main` → production deploys.
-- **Workflow scheduling**: All scheduled workflows follow a centralised ops clock (`docs/ops-clock.md`) with staggered times to prevent resource contention. Deploy-prd runs weekly for drift prevention (prd-only via skip-dev-on-schedule guards). Dependabot runs Sunday, codequality Monday, deploy-prd Wed/Thu/Fri by infrastructure group. See `.github/instructions/workflows.scheduling.instructions.md` for full rules.
-- **PR verification**: Dev Terraform plans run automatically on PRs. Prd plans require the `run-prd-plan` label. Dependabot/Copilot PRs skip Terraform plans unless explicitly labeled.
-- **Nullable reference types**: All .NET projects use `<Nullable>enable</Nullable>` with implicit usings.
+Each standard below has a dedicated `standards.*.instructions.md` file with full detail and compliance checks:
+
+- **Azure naming** — `standards.azure-naming.instructions.md`
+- **Azure tagging** — `standards.azure-tagging.instructions.md`
+- **OIDC and no-secrets** — `standards.oidc-and-secrets.instructions.md`
+- **Terraform style** — `standards.terraform-style.instructions.md`
+- **.NET project files** — `standards.dotnet-project.instructions.md`
+- **Branching and PRs** — `standards.branching-and-prs.instructions.md`
+- **Workflow scheduling** — `workflows.scheduling.instructions.md` (centralised ops-clock; deploy-prd weekly drift prevention; Dependabot Sunday, codequality Monday, deploy-prd Wed/Thu/Fri)
 - **Test filtering**: CI excludes integration tests via `--filter "FullyQualifiedName!~IntegrationTests"`.
-- **Managed identities over secrets**: Always prefer managed identities for Azure resource access.
 
 ## Reusable Actions (`actions/` repo)
 
-Workflows across all repos consume shared composites:
+Quick reference of headline composites — full contract for each is in `shared.actions.instructions.md`; **pinned tag versions** are in `workflows.frasermolyneux-actions.instructions.md`:
+
 - `frasermolyneux/actions/dotnet-ci` — Restore, build, test, package .NET solutions
-- `frasermolyneux/actions/dotnet-web-ci` — Web app build with publish output
-- `frasermolyneux/actions/dotnet-func-ci` — Azure Functions build
-- `frasermolyneux/actions/terraform-plan` — Init, validate, plan with OIDC and PR commenting
-- `frasermolyneux/actions/terraform-apply` — Download plan artifact and apply
+- `frasermolyneux/actions/dotnet-web-ci` / `dotnet-func-ci` — Web/Function app builds with publish output
+- `frasermolyneux/actions/terraform-plan` / `terraform-apply` — IaC with OIDC and PR commenting
 - `frasermolyneux/actions/deploy-app-service` / `deploy-function-app` / `deploy-sql-database` — Azure deployment helpers
+- `frasermolyneux/actions/apim-api-import` / `wait-for-version` — APIM import paired with version verification
+- `frasermolyneux/actions/publish-nuget-packages` — NuGet/symbol push (NUGET_API_KEY via `env:`, not `with:`)
 - `frasermolyneux/actions/nbgv-metadata` — Export Nerdbank.GitVersioning build versions
 
 ## Prompts and Agents
@@ -88,6 +93,7 @@ Use the prompts and agents defined in this repo (`.github-copilot/.github/prompt
 - **`@workspace /align-project-workflows`** — Aligns GitHub Actions workflows, Dependabot config, and related files to org standards
 - **`@workspace /audit-project-workflows`** — Read-only drift report for all workflows in a target repo
 - **`@workspace /create-workflow`** — Bootstraps a single new canonical workflow in a target repo
+- **`@workspace /audit-project-alignment`** — Read-only drift report against tenant/standards/patterns/platform/shared contracts
 
 ## Workflow Instructions Hierarchy
 
@@ -121,3 +127,32 @@ Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot i
    - `metadata.copilot-instructions.instructions.md` — generation guidelines for the target repo's `.github/copilot-instructions.md`
 
 Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates all four in order.
+
+## Tenant, Standards, Patterns, Platform, Shared Hierarchy
+
+Five further instruction prefixes encode org-wide context that applies beyond a single file type:
+
+| Prefix | Purpose | applyTo strategy |
+|---|---|---|
+| `tenant.*` | **Facts** about the Azure tenant (subscriptions, regions, network, identity, DNS) | `'**'` — always-on |
+| `standards.*` | **Binary, enforceable rules** (naming, tagging, OIDC, Terraform style, .NET project, branching) | File-type scoped |
+| `patterns.*` | **Reusable approaches** (API client, repository, versioned APIs, remote state, workload identity, NBGV, SCSS) | File-type scoped |
+| `platform.*` | **Consumption contracts** for `platform-*` infra repos | `'**'` — always-on |
+| `shared.*` | **Consumption contracts** for shared library/automation repos (`actions/`, NuGets, ADO templates, `portal-core`) | `'**'` — always-on |
+
+**`tenant.*` files** (5):
+- `tenant.subscriptions.instructions.md`, `tenant.regions.instructions.md`, `tenant.network-topology.instructions.md`, `tenant.identity.instructions.md`, `tenant.dns.instructions.md`
+
+**`standards.*` files** (6):
+- `standards.azure-naming.instructions.md`, `standards.azure-tagging.instructions.md`, `standards.oidc-and-secrets.instructions.md`, `standards.terraform-style.instructions.md`, `standards.dotnet-project.instructions.md`, `standards.branching-and-prs.instructions.md`
+
+**`patterns.*` files** (7):
+- `patterns.api-client.instructions.md`, `patterns.repository.instructions.md`, `patterns.versioned-apis.instructions.md`, `patterns.terraform-remote-state.instructions.md`, `patterns.workload-identity-provisioning.instructions.md`, `patterns.nbgv-versioning.instructions.md`, `patterns.scss-build.instructions.md`
+
+**`platform.*` files** (8 — Layer-1 catalog plus 7 per-repo):
+- `platform.instructions.md` (catalog), `platform.landing-zones.instructions.md`, `platform.connectivity.instructions.md`, `platform.hosting.instructions.md`, `platform.monitoring.instructions.md`, `platform.registry.instructions.md`, `platform.workloads.instructions.md`, `platform.notifications.instructions.md`
+
+**`shared.*` files** (7 — Layer-1 catalog plus 6 per-repo):
+- `shared.instructions.md` (catalog), `shared.actions.instructions.md`, `shared.ado-pipeline-templates.instructions.md`, `shared.api-client-abstractions.instructions.md`, `shared.observability-appinsights.instructions.md`, `shared.invision-api-client.instructions.md`, `shared.portal-core.instructions.md`
+
+**Companion agent**: `audit-project-alignment.agent.md` produces a read-only drift report for a target repo against these layers.
