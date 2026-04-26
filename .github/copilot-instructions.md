@@ -107,3 +107,17 @@ Workflow standards are encoded in `.github-copilot/.github/instructions/` as thr
 Each per-workflow file contains the canonical YAML template plus a compliance checklist. The matching `update-*-workflow.prompt.md` is a thin shim that delegates to it.
 
 Bespoke single-repo workflows (`actions-versioning.yml`, `code-quality.yml`, `devops-secure-scanning.yml`, `estate-sync.yml`, `feature-development.yml`, `decommission-state-rm.yml`, `update-dashboard-from-staging.yml`) have no per-workflow file; they still inherit the universal and category layers.
+
+## Metadata Instructions Hierarchy
+
+Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot instructions) are encoded in `.github-copilot/.github/instructions/` as two layers (more specific layers override less specific):
+
+1. **Universal** (`applyTo: '{README,CONTRIBUTING,SECURITY}.md,.github/copilot-instructions.md'`)
+   - `metadata.instructions.md` — workspace targeting, editing principles, personal-project framing, `docs/` folder requirement, pointer to canonical text blocks
+2. **Per-file** (one per metadata file)
+   - `metadata.readme.instructions.md` — structure (badges, Documentation, Overview, verbatim Contributing/Security)
+   - `metadata.contributing.instructions.md` — canonical verbatim content
+   - `metadata.security.instructions.md` — canonical verbatim content
+   - `metadata.copilot-instructions.instructions.md` — generation guidelines for the target repo's `.github/copilot-instructions.md`
+
+Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates all four in order.
