@@ -1,63 +1,22 @@
 ---
 name: update-destroy-environment-workflow
-description: Align the repository's Destroy Environment GitHub Actions workflow with the standardized format. This workflow should exist in all repositories that contain Terraform infrastructure.
+description: Align the repository's `.github/workflows/destroy-environment.yml` with the canonical pattern defined in `workflows.destroy-environment.instructions.md`.
 ---
-Before updating the workflow, identify the target repository folder within the workspace. Ask the user which folder to target or infer it from context (open file paths, workspace roots) and operate against that folder.
+
+Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
 
 ## Applicability
 
-This workflow should exist in **all repositories that contain Terraform infrastructure** (i.e., a `terraform/` folder with backend configs and tfvars for dev/prd environments).
+This workflow applies to **repos that contain Terraform infrastructure** (a `terraform/` folder with `dev` and `prd` backend/tfvars). If the repo has no Terraform, do not create this workflow.
 
-If the repository does not contain Terraform, do **not** create this workflow.
+## Source of truth
 
-## Destroy Environment
+`.github-copilot/.github/instructions/workflows.destroy-environment.instructions.md` is the canonical pattern. The file is identical across Terraform repos.
 
-Review the existing `.github/workflows/destroy-environment.yml` file in the repository. If it does not exist and the project contains Terraform, create a new one with the standardized configuration. If it does exist, update it to match the standardized configuration.
+## Action
 
-### Standardized Workflow
-
-This is a manual workflow (`workflow_dispatch`) with an environment choice input (`dev` or `prd`). It dynamically selects the correct GitHub environment, tfvars, and backend config based on the user's selection. The workflow uses `frasermolyneux/actions/terraform-destroy`.
-
-```yaml
-name: Destroy Environment
-
-on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to destroy"
-        required: true
-        type: choice
-        default: dev
-        options:
-          - dev
-          - prd
-
-permissions: {}
-
-jobs:
-  terraform-destroy:
-    permissions:
-      contents: read
-      id-token: write
-    environment: ${{ inputs.environment == 'prd' && 'Production' || 'Development' }}
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.repository }}-${{ inputs.environment }}
-    steps:
-      - uses: frasermolyneux/actions/terraform-destroy@terraform-destroy/v1.2
-        with:
-          terraform-folder: "terraform"
-          terraform-var-file: ${{ inputs.environment == 'prd' && 'tfvars/prd.tfvars' || 'tfvars/dev.tfvars' }}
-          terraform-backend-file: ${{ inputs.environment == 'prd' && 'backends/prd.backend.hcl' || 'backends/dev.backend.hcl' }}
-          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-```
-
-### Notes
-- This workflow is identical across all Terraform repositories and should not require project-specific customization.
-- The default environment selection is `dev` to reduce the risk of accidental production destruction.
-- The `Production` environment in GitHub should have required reviewers configured as an additional safeguard.
-- The concurrency group prevents conflicts with other workflows targeting the same environment.
-```
+1. Confirm the repo contains `terraform/` with `dev` and `prd` configurations.
+2. If `.github/workflows/destroy-environment.yml` exists, align it with the instructions file.
+3. If it doesn't exist, create it using the canonical content.
+4. The default environment input must be `dev` to reduce risk of accidental prd destruction.
+5. Verify the file against the compliance checklist in the instructions file before considering the task complete.

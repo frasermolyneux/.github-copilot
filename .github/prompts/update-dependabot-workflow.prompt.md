@@ -1,72 +1,21 @@
 ---
 name: update-dependabot-workflow
-description: Align the repository's Dependabot configuration with the standardized format, ensuring that it includes appropriate package ecosystems and scheduling based on the project's contents.
+description: Align the repository's `.github/dependabot.yml` configuration with the canonical pattern defined in `workflows.dependabot-config.instructions.md`.
 ---
-Before updating the workflow, identify the target repository folder within the workspace. Ask the user which folder to target or infer it from context (open file paths, workspace roots) and operate against that folder.
 
-Review the existing `.github/dependabot.yml` file in the repository. If it does not exist, create a new one with the standardized configuration for Dependabot to automate dependency updates. If it does exist, update it to match the standardized configuration, adjusting package ecosystems and directories as needed based on the project contents.
+Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
 
-## Dependabot
+> Note: this prompt targets the **config file** (`.github/dependabot.yml`), not a workflow. The auto-merge workflow has its own prompt (`update-dependabot-automerge`).
 
-All repositories follow a centralised scheduling standard — see `docs/ops-clock.md` in the `.github-copilot` repository. Dependabot runs weekly on **Sunday** at a time that matches the repo's Monday codequality slot (staggered every 15 minutes from 01:00 to 08:00). Consult the ops clock for the exact time.
+## Source of truth
 
-All ecosystems must use `groups` to batch updates into a single PR per ecosystem.
+`.github-copilot/.github/instructions/workflows.dependabot-config.instructions.md` is the canonical pattern for this file. Schedule rules come from `workflows.scheduling.instructions.md`.
 
-- **nuget** package ecosystem for .NET dependencies in the `/src` directory — *only* if the project contains .NET code.
-- **terraform** package ecosystem for Terraform dependencies in the `/terraform` directory — *only* if the project contains Terraform code.
-- **github-actions** package ecosystem for GitHub Actions workflows in the root directory — *only* if the project contains GitHub Actions workflows.
-- **devcontainers** package ecosystem for development container configurations in the root directory — *only* if the project contains development container configurations.
+## Action
 
-If the target project does not include the relevant package ecosystems, adjust the configuration accordingly while maintaining the standardized format and scheduling practices.
-
-```yaml
-version: 2
-updates:
-  - package-ecosystem: "nuget"
-    assignees: ["frasermolyneux"]
-    directory: "/src"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "HH:MM"  # Use this repo's ops clock time
-    groups:
-      all-updates:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "terraform"
-    assignees: ["frasermolyneux"]
-    directory: "/terraform"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "HH:MM"
-    groups:
-      all-updates:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "github-actions"
-    assignees: ["frasermolyneux"]
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "HH:MM"
-    groups:
-      all-updates:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "devcontainers"
-    assignees: ["frasermolyneux"]
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "HH:MM"
-    groups:
-      all-updates:
-        patterns:
-          - "*"
-```
+1. Inspect the target repo to determine which package ecosystems apply (`nuget`, `terraform`, `github-actions`, `devcontainers`, `npm`).
+2. If `.github/dependabot.yml` exists, align it with the instructions file.
+3. If it doesn't exist, create it using the canonical template restricted to the applicable ecosystems.
+4. Look up the repo's Sunday slot from `docs/ops-clock.md` (must match the repo's Monday codequality slot).
+5. Every ecosystem must have `groups.all-updates.patterns: ["*"]`.
+6. Verify the file against the compliance checklist in the instructions file before considering the task complete.

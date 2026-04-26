@@ -86,3 +86,24 @@ Workflows across all repos consume shared composites:
 Use the prompts and agents defined in this repo (`.github-copilot/.github/prompts/` and `.github-copilot/.github/agents/`) for standardized updates:
 - **`@workspace /update-project-metadata`** — Updates README, CONTRIBUTING, SECURITY, and copilot-instructions for a target repo
 - **`@workspace /align-project-workflows`** — Aligns GitHub Actions workflows, Dependabot config, and related files to org standards
+- **`@workspace /audit-project-workflows`** — Read-only drift report for all workflows in a target repo
+- **`@workspace /create-workflow`** — Bootstraps a single new canonical workflow in a target repo
+
+## Workflow Instructions Hierarchy
+
+Workflow standards are encoded in `.github-copilot/.github/instructions/` as three layers (more specific layers override less specific):
+
+1. **Universal** (`applyTo: '.github/workflows/**/*.yml'`)
+   - `workflows.instructions.md` — permissions, runners, action pins, OIDC, concurrency, YAML style, triggers
+   - `workflows.scheduling.instructions.md` — ops-clock cron rules and skip-dev-on-schedule pattern (also applies to `dependabot.yml`)
+2. **Category** (group of workflows or by content type)
+   - `workflows.frasermolyneux-actions.instructions.md` — composite-action catalog and pinned tags (single source of truth)
+   - `workflows.terraform.instructions.md` — Terraform conventions
+   - `workflows.dotnet.instructions.md` — .NET conventions
+   - `workflows.security.instructions.md` — Sonar / scanning / dependency-review
+3. **Per-workflow** (one per canonical workflow filename)
+   - `workflows.build-and-test.instructions.md`, `workflows.pr-verify.instructions.md`, `workflows.codequality.instructions.md`, `workflows.copilot-setup-steps.instructions.md`, `workflows.dependabot-automerge.instructions.md`, `workflows.dependabot-config.instructions.md`, `workflows.deploy-dev.instructions.md`, `workflows.deploy-prd.instructions.md`, `workflows.destroy-environment.instructions.md`, `workflows.destroy-development.instructions.md`, `workflows.release-version-and-tag.instructions.md`, `workflows.release-publish-nuget.instructions.md`
+
+Each per-workflow file contains the canonical YAML template plus a compliance checklist. The matching `update-*-workflow.prompt.md` is a thin shim that delegates to it.
+
+Bespoke single-repo workflows (`actions-versioning.yml`, `code-quality.yml`, `devops-secure-scanning.yml`, `estate-sync.yml`, `feature-development.yml`, `decommission-state-rm.yml`, `update-dashboard-from-staging.yml`) have no per-workflow file; they still inherit the universal and category layers.

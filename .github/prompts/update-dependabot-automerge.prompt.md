@@ -1,41 +1,17 @@
 ---
 name: update-dependabot-automerge
-description: Align the repository's Dependabot automerge with the standardized format, ensuring that it includes appropriate package ecosystems and scheduling based on the project's contents.
+description: Align the repository's `.github/workflows/dependabot-automerge.yml` with the canonical pattern defined in `workflows.dependabot-automerge.instructions.md`.
 ---
-Before updating the workflow, identify the target repository folder within the workspace. Ask the user which folder to target or infer it from context (open file paths, workspace roots) and operate against that folder.
 
-Review the existing `.github/workflows/dependabot-automerge.yml` file in the repository. If it does not exist, create a new one with the standardized configuration for Dependabot to automate dependency updates. If it does exist, update it to match the standardized configuration, adjusting package ecosystems and directories as needed based on the project contents.
+Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
 
-## Dependabot
+## Source of truth
 
-This workflow can be created verbatim as below.
+`.github-copilot/.github/instructions/workflows.dependabot-automerge.instructions.md` is the canonical pattern for this workflow. The file is identical across all repos.
 
-```yaml
-name: Dependabot Auto-Merge
-on:
-  pull_request:
-    branches:
-      - main
+## Action
 
-permissions: {}
-
-jobs:
-  dependabot:
-    permissions:
-      contents: write
-      pull-requests: write
-    runs-on: ubuntu-latest
-
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    steps:
-    - name: Dependabot metadata
-      id: metadata
-      uses: dependabot/fetch-metadata@v2
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
-    - name: Enable auto-merge for Dependabot PRs
-      run: gh pr merge --auto --squash "$PR_URL"
-      env:
-        PR_URL: ${{github.event.pull_request.html_url}}
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-```
+1. If `.github/workflows/dependabot-automerge.yml` exists, replace it with the canonical content from the instructions file.
+2. If it doesn't exist (and the repo has a `.github/dependabot.yml`), create it using the canonical content.
+3. No project-specific customisation is expected — the file should be byte-identical across repos.
+4. Verify the file against the compliance checklist in the instructions file before considering the task complete.
