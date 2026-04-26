@@ -2,6 +2,16 @@
 
 This workspace contains 30+ repositories for the frasermolyneux GitHub organization. These instructions apply across all projects opened alongside this `.github-copilot` folder.
 
+## ⚠️ Read first — Personal Working Preferences
+
+Fraser's personal rules for working with Copilot are in `.github/instructions/personal.working-preferences.instructions.md` (always-on, `applyTo: '**'`). Headlines:
+
+- **Don't** run `git commit`, `git push`, `merge`, `rebase`, `reset --hard`, or branch create/delete on your own initiative — only when Fraser explicitly asks.
+- **Default to working on `main`.** Do not create feature branches or PRs unless Fraser asks.
+- **Run the `code-review` sub-agent** before declaring non-trivial work "done".
+
+These preferences override conflicting defaults. Read the full file for the complete rules.
+
 ## Workspace Navigation
 
 When working in this multi-root workspace, always identify the target repository folder first. The prompts and agents in `.github-copilot` operate against other workspace folders — do not mix context between repos.
