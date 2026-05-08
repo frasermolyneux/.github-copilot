@@ -1,39 +1,145 @@
 {
   "folders": [
-    { "name": ".github-copilot",            "path": "."                                  },
-    { "name": "actions",                    "path": "../actions"                         },
-    { "name": "ado-pipeline-templates",     "path": "../ado-pipeline-templates"          },
-    { "name": "api-client-abstractions",    "path": "../api-client-abstractions"         },
-    { "name": "cod-demo-reader",            "path": "../cod-demo-reader"                 },
-    { "name": "craftpledge",                "path": "../craftpledge"                     },
-    { "name": "demo-manager",               "path": "../demo-manager"                    },
-    { "name": "geo-location",               "path": "../geo-location"                    },
-    { "name": "invision-api-client",        "path": "../invision-api-client"             },
-    { "name": "molyneux-me",                "path": "../molyneux-me"                     },
-    { "name": "observability-appinsights",  "path": "../observability-appinsights"       },
-    { "name": "platform-connectivity",      "path": "../platform-connectivity"           },
-    { "name": "platform-hosting",           "path": "../platform-hosting"                },
-    { "name": "platform-landing-zones",     "path": "../platform-landing-zones"          },
-    { "name": "platform-letsencrypt-iis",   "path": "../platform-letsencrypt-iis"        },
-    { "name": "platform-monitoring",        "path": "../platform-monitoring"             },
-    { "name": "platform-notifications",     "path": "../platform-notifications"          },
-    { "name": "platform-registry",          "path": "../platform-registry"               },
-    { "name": "platform-sitewatch-func",    "path": "../platform-sitewatch-func"         },
-    { "name": "platform-workloads",         "path": "../platform-workloads"              },
-    { "name": "polly-test",                 "path": "../polly-test"                      },
-    { "name": "portal-core",                "path": "../portal-core"                     },
-    { "name": "portal-environments",        "path": "../portal-environments"             },
-    { "name": "portal-repository",          "path": "../portal-repository"               },
-    { "name": "portal-repository-func",     "path": "../portal-repository-func"          },
-    { "name": "portal-server-agent",        "path": "../portal-server-agent"             },
-    { "name": "portal-server-events",       "path": "../portal-server-events"            },
-    { "name": "portal-servers-integration", "path": "../portal-servers-integration"      },
-    { "name": "portal-sync",                "path": "../portal-sync"                     },
-    { "name": "portal-web",                 "path": "../portal-web"                      },
-    { "name": "runbooks",                   "path": "../runbooks"                        },
-    { "name": "talkwithtiles",              "path": "../talkwithtiles"                   },
-    { "name": "travel-itinerary",           "path": "../travel-itinerary"                },
-    { "name": "twenty-one",                 "path": "../twenty-one"                      }
+    {
+      "name": ".github-copilot",
+      "path": "."
+    },
+    {
+      "name": "actions",
+      "path": "../actions"
+    },
+    {
+      "name": "ado-pipeline-templates",
+      "path": "../ado-pipeline-templates"
+    },
+    {
+      "name": "api-client-abstractions",
+      "path": "../api-client-abstractions"
+    },
+    {
+      "name": "cod-demo-reader",
+      "path": "../cod-demo-reader"
+    },
+    {
+      "name": "craftpledge",
+      "path": "../craftpledge"
+    },
+    {
+      "name": "demo-manager",
+      "path": "../demo-manager"
+    },
+    {
+      "name": "geo-location",
+      "path": "../geo-location"
+    },
+    {
+      "name": "invision-api-client",
+      "path": "../invision-api-client"
+    },
+    {
+      "name": "molyneux-me",
+      "path": "../molyneux-me"
+    },
+    {
+      "name": "observability-appinsights",
+      "path": "../observability-appinsights"
+    },
+    {
+      "name": "platform-connectivity",
+      "path": "../platform-connectivity"
+    },
+    {
+      "name": "platform-hosting",
+      "path": "../platform-hosting"
+    },
+    {
+      "name": "platform-landing-zones",
+      "path": "../platform-landing-zones"
+    },
+    {
+      "name": "platform-letsencrypt-iis",
+      "path": "../platform-letsencrypt-iis"
+    },
+    {
+      "name": "platform-monitoring",
+      "path": "../platform-monitoring"
+    },
+    {
+      "name": "platform-notifications",
+      "path": "../platform-notifications"
+    },
+    {
+      "name": "platform-registry",
+      "path": "../platform-registry"
+    },
+    {
+      "name": "platform-sitewatch-func",
+      "path": "../platform-sitewatch-func"
+    },
+    {
+      "name": "platform-workloads",
+      "path": "../platform-workloads"
+    },
+    {
+      "name": "polly-test",
+      "path": "../polly-test"
+    },
+    {
+      "name": "portal-core",
+      "path": "../portal-core"
+    },
+    {
+      "name": "portal-environments",
+      "path": "../portal-environments"
+    },
+    {
+      "name": "portal-repository",
+      "path": "../portal-repository"
+    },
+    {
+      "name": "portal-repository-func",
+      "path": "../portal-repository-func"
+    },
+    {
+      "name": "portal-server-agent",
+      "path": "../portal-server-agent"
+    },
+    {
+      "name": "portal-server-events",
+      "path": "../portal-server-events"
+    },
+    {
+      "name": "portal-servers-integration",
+      "path": "../portal-servers-integration"
+    },
+    {
+      "name": "portal-sync",
+      "path": "../portal-sync"
+    },
+    {
+      "name": "portal-web",
+      "path": "../portal-web"
+    },
+    {
+      "name": "runbooks",
+      "path": "../runbooks"
+    },
+    {
+      "name": "talkwithtiles",
+      "path": "../talkwithtiles"
+    },
+    {
+      "name": "travel-itinerary",
+      "path": "../travel-itinerary"
+    },
+    {
+      "name": "twenty-one",
+      "path": "../twenty-one"
+    },
+    {
+      "name": "observability-opentelemetry",
+      "path": "../observability-opentelemetry"
+    }
   ],
   "settings": {
     "chat.promptFiles": true,
