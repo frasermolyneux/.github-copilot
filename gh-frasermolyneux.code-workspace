@@ -45,6 +45,10 @@
       "path": "../observability-appinsights"
     },
     {
+      "name": "observability-opentelemetry",
+      "path": "../observability-opentelemetry"
+    },
+    {
       "name": "platform-connectivity",
       "path": "../platform-connectivity"
     },
@@ -135,10 +139,6 @@
     {
       "name": "twenty-one",
       "path": "../twenty-one"
-    },
-    {
-      "name": "observability-opentelemetry",
-      "path": "../observability-opentelemetry"
     }
   ],
   "settings": {
