@@ -67,22 +67,41 @@ A short, blunt list of things the agent must not do. Standard items:
 
 Append repo-specific "do nots" (e.g. portal-repository-func: "Do not add FTP/RCON/Service Bus dependencies — wrong repo").
 
-### 6. Validation before opening PR
+### 6. Opening the PR
 
-Concrete checklist the agent runs through and confirms in the PR body:
+A blunt, non-negotiable mandate that the agent uses the org PR template verbatim — **not** a freeform body. This is the section that prevents `Coding-Agent PR Gate` failures.
 
 ```markdown
-## Validation before opening PR
+## Opening the PR
+
+You MUST use `.github/PULL_REQUEST_TEMPLATE.md` as your PR body — do **not** write a freeform body. The org template is inherited from `frasermolyneux/.github` and GitHub pre-populates it when you open the PR. Concretely:
+
+1. Fill `## Summary` (one line) and `Closes #<issue>`.
+2. Tick the relevant `## Type of change` box.
+3. Paste the **actual command output** from your Build, Tests, and Format check runs into `## Validation evidence`. Show the real summary line, not "tests passed".
+4. Fill `## Risk and rollout` — blast radius, auto-deploy?, manual steps post-merge, rollback plan.
+5. Tick **every** box in `## Agent attestation`.
+6. Delete `## Consumer impact` only if no published contract (Abstractions / Client NuGet / Service Bus DTO / Terraform output) changed.
+
+The **`Coding-Agent PR Gate / PR body checklist gate`** workflow will **fail the PR** if the `## Agent attestation` section is missing or any box in it is unticked. This gate is required for merge — there is no override.
+```
+
+### 7. Pre-PR checks
+
+Concrete checklist of commands the agent runs **before** opening the PR. Distinct from the PR body — these are the things the agent verifies locally so it can paste the output into `## Validation evidence`.
+
+```markdown
+## Pre-PR checks (run before you open the PR)
 
 - [ ] Build succeeds
 - [ ] Tests pass (excluding integration tests where applicable)
 - [ ] Format check passes
 - [ ] No new secrets / GUIDs / connection strings introduced
 - [ ] Changes match the conventions referenced in Required reading
-- [ ] PR description fills in the `.github/PULL_REQUEST_TEMPLATE.md` sections (acceptance criteria, validation evidence, risk)
+- [ ] `code-review` sub-agent run; High/Medium findings resolved or justified in the PR body
 ```
 
-### 7. Escalation
+### 8. Escalation
 
 A short list of conditions under which the agent must **stop and ask** rather than push forward.
 
