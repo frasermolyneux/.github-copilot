@@ -25,6 +25,7 @@ Required sections (in order):
 6. **Consumer impact** — optional. Required when a PR touches a published contract (Abstractions / Api.Client NuGet packages, Service Bus DTO / queue-name constants). Lists downstream consumers, whether the change is breaking, and migration notes. Authors delete the section entirely when no contract changed. The `contract-changed.yml` workflow enforces presence of this section on PRs that modify contract paths (see `workflows.contract-changed.instructions.md`).
 7. **Linked issues** — `Closes #N` or `Refs #N`.
 8. **Reviewer focus areas** — explicit asks (e.g. "double-check the role-assignment scope on line X").
+9. **Agent attestation** — five checkboxes the PR author ticks before marking ready for review: read `AGENTS.md` and its Required reading, followed `personal.working-preferences.instructions.md` (no unsolicited git ops), ran `code-review` sub-agent, PR body cites each acceptance criterion, no client secrets / GUIDs / connection strings introduced. The `coding-agent-pr-gate.yml` workflow fails on agent-authored PRs until every box is ticked (see `workflows.coding-agent-pr-gate.instructions.md`). Humans can tick all five and the gate passes — same shape, no special-casing.
 
 ## Style
 
