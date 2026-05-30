@@ -104,6 +104,7 @@ Use the prompts and agents defined in this repo (`.github-copilot/.github/prompt
 - **`@workspace /audit-project-workflows`** — Read-only drift report for all workflows in a target repo
 - **`@workspace /create-workflow`** — Bootstraps a single new canonical workflow in a target repo
 - **`@workspace /audit-project-alignment`** — Read-only drift report against tenant/standards/patterns/platform/shared contracts
+- **`code-review` sub-agent** (`.github-copilot/.github/agents/code-review.agent.md`) — Read-only review of in-progress changes before declaring non-trivial work done. Required by `personal.working-preferences.instructions.md`; invoked via `runSubagent` with `agentName: code-review`.
 
 ## Workflow Instructions Hierarchy
 
@@ -118,7 +119,7 @@ Workflow standards are encoded in `.github-copilot/.github/instructions/` as thr
    - `workflows.dotnet.instructions.md` — .NET conventions
    - `workflows.security.instructions.md` — Sonar / scanning / dependency-review
 3. **Per-workflow** (one per canonical workflow filename)
-   - `workflows.build-and-test.instructions.md`, `workflows.pr-verify.instructions.md`, `workflows.codequality.instructions.md`, `workflows.copilot-setup-steps.instructions.md`, `workflows.dependabot-automerge.instructions.md`, `workflows.dependabot-config.instructions.md`, `workflows.deploy-dev.instructions.md`, `workflows.deploy-prd.instructions.md`, `workflows.destroy-environment.instructions.md`, `workflows.destroy-development.instructions.md`, `workflows.release-version-and-tag.instructions.md`, `workflows.release-publish-nuget.instructions.md`
+   - `workflows.build-and-test.instructions.md`, `workflows.pr-verify.instructions.md`, `workflows.codequality.instructions.md`, `workflows.coding-agent-pr-gate.instructions.md`, `workflows.contract-changed.instructions.md`, `workflows.copilot-setup-steps.instructions.md`, `workflows.dependabot-automerge.instructions.md`, `workflows.dependabot-config.instructions.md`, `workflows.deploy-dev.instructions.md`, `workflows.deploy-prd.instructions.md`, `workflows.destroy-environment.instructions.md`, `workflows.destroy-development.instructions.md`, `workflows.release-version-and-tag.instructions.md`, `workflows.release-publish-nuget.instructions.md`
 
 Each per-workflow file contains the canonical YAML template plus a compliance checklist. The matching `update-*-workflow.prompt.md` is a thin shim that delegates to it.
 
@@ -126,7 +127,7 @@ Bespoke single-repo workflows (`actions-versioning.yml`, `code-quality.yml`, `de
 
 ## Metadata Instructions Hierarchy
 
-Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot instructions) are encoded in `.github-copilot/.github/instructions/` as two layers (more specific layers override less specific):
+Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot instructions, agent brief, code-owners, and GitHub PR/issue templates) are encoded in `.github-copilot/.github/instructions/` as two layers (more specific layers override less specific):
 
 1. **Universal** (`applyTo: '{README,CONTRIBUTING,SECURITY}.md,.github/copilot-instructions.md'`)
    - `metadata.instructions.md` — workspace targeting, editing principles, personal-project framing, `docs/` folder requirement, pointer to canonical text blocks
@@ -135,8 +136,14 @@ Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot i
    - `metadata.contributing.instructions.md` — canonical verbatim content
    - `metadata.security.instructions.md` — canonical verbatim content
    - `metadata.copilot-instructions.instructions.md` — generation guidelines for the target repo's `.github/copilot-instructions.md`
+   - `metadata.agents.instructions.md` — generation guidelines for the per-repo `AGENTS.md` (cloud coding-agent brief)
+   - `metadata.codeowners.instructions.md` — canonical content rules for `.github/CODEOWNERS`
+   - `metadata.pull-request-template.instructions.md` — canonical content rules for `.github/PULL_REQUEST_TEMPLATE.md` (org-default in `.github` repo + per-repo override)
+   - `metadata.issue-templates.instructions.md` — canonical content rules for `.github/ISSUE_TEMPLATE/` (org-default in `.github` repo + per-repo override; includes the `delegate-to-agent` form)
 
-Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates all four in order.
+Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates all four legacy files in order; `AGENTS.md` / `CODEOWNERS` / PR + issue templates are currently rolled out manually or via per-repo prompts.
+
+Canonical reusable content for the four new metadata files lives in `.github-copilot/templates/`: `AGENTS.md`, `CODEOWNERS`, `PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/{config,delegate-to-agent,bug_report,feature_request}.yml`. The org-wide `frasermolyneux/.github` repo holds the deployed PR template + issue templates — every repo inherits those automatically. `AGENTS.md` and `CODEOWNERS` must be present **per repo** (no org-level inheritance).
 
 ## Tenant, Standards, Patterns, Platform, Shared Hierarchy
 

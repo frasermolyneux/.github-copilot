@@ -1,15 +1,48 @@
 {
   "folders": [
-    { "name": ".github-copilot",            "path": "."                              },
-    { "name": "portal-core",                "path": "../portal-core"                 },
-    { "name": "portal-environments",        "path": "../portal-environments"         },
-    { "name": "portal-repository",          "path": "../portal-repository"           },
-    { "name": "portal-repository-func",     "path": "../portal-repository-func"      },
-    { "name": "portal-server-agent",        "path": "../portal-server-agent"         },
-    { "name": "portal-server-events",       "path": "../portal-server-events"        },
-    { "name": "portal-servers-integration", "path": "../portal-servers-integration"  },
-    { "name": "portal-sync",                "path": "../portal-sync"                 },
-    { "name": "portal-web",                 "path": "../portal-web"                  }
+    {
+      "name": ".github-copilot",
+      "path": "."
+    },
+    {
+      "name": "portal-core",
+      "path": "../portal-core"
+    },
+    {
+      "name": "portal-environments",
+      "path": "../portal-environments"
+    },
+    {
+      "name": "portal-repository",
+      "path": "../portal-repository"
+    },
+    {
+      "name": "portal-repository-func",
+      "path": "../portal-repository-func"
+    },
+    {
+      "name": "portal-server-agent",
+      "path": "../portal-server-agent"
+    },
+    {
+      "name": "portal-server-events",
+      "path": "../portal-server-events"
+    },
+    {
+      "name": "portal-servers-integration",
+      "path": "../portal-servers-integration"
+    },
+    {
+      "name": "portal-sync",
+      "path": "../portal-sync"
+    },
+    {
+      "name": "portal-web",
+      "path": "../portal-web"
+    },
+    {
+      "path": "../.github"
+    }
   ],
   "settings": {
     "chat.promptFiles": true,

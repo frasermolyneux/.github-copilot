@@ -37,8 +37,8 @@ If you think a commit/push would be helpful, **say so in chat** and let me run i
 
 Before telling me a piece of work is "done", "complete", "ready", or otherwise signalling completion:
 
-1. **Run the `code-review` sub-agent** (via the `task` tool, `agent_type: code-review`) over the changes.
-2. Address any genuine issues it surfaces (bugs, logic errors, security issues). Use judgement on style/nit findings per the standard rubber-duck guidance.
+1. **Run the `code-review` sub-agent** (`runSubagent` with `agentName: code-review`, defined at `.github-copilot/.github/agents/code-review.agent.md`) over the changes. Brief it with: what changed, why, stack-mix scope hint, and anything I excluded from scope.
+2. Address any genuine **High / Medium** issues it surfaces (bugs, logic errors, security issues, standards violations). Use judgement on Low / Notes findings per the standard rubber-duck guidance.
 3. **Then** report completion to me, with a brief summary of what the review found and how it was addressed (or why a finding was set aside).
 
 This applies to any non-trivial change — code edits, Terraform changes, workflow updates, instruction-file authoring. It does **not** apply to:

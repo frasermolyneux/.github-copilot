@@ -48,6 +48,7 @@ Use these exact pinned versions across all workflows:
 | `actions/upload-artifact` | `@v7` |
 | `actions/download-artifact` | `@v7` |
 | `actions/dependency-review-action` | `@v4` |
+| `actions/github-script` | `@v7` |
 | `azure/login` | `@v3` |
 | `azure/CLI` | `@v2` |
 | `dependabot/fetch-metadata` | `@v3` |
