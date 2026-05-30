@@ -28,9 +28,17 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 ```
 
 The Monday cron slot is allocated in `docs/ops-clock.md` — see `workflows.scheduling.instructions.md`. Do not invent a time.
+
+The workflow-level `concurrency:` block cancels superseded PR runs when an agent or human pushes a new revision — see the PR-check concurrency rule in `workflows.instructions.md`. The `|| github.ref` fallback keeps `push` and `schedule` runs serialised per ref.
+
+All three jobs must skip drafts. Use `if: github.event_name != 'pull_request' || github.event.pull_request.draft == false` on the `quality` and `devops-secure-scanning` jobs (so `push`/`schedule` runs proceed), and combine with the existing PR guard on `dependency-review`.
 
 ## Required jobs
 
@@ -48,6 +56,7 @@ quality:
     contents: read
     actions: read
     security-events: write
+  if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
   uses: frasermolyneux/actions/.github/workflows/codequality.yml@main
   with:
     sonar-project-key: <org>_<project>
@@ -70,6 +79,7 @@ quality:
     contents: read
     actions: read
     security-events: write
+  if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
   uses: frasermolyneux/actions/.github/workflows/codequality.yml@main
   with:
     sonar-project-key: <org>_<project>
@@ -91,6 +101,7 @@ quality:
     contents: read
     actions: read
     security-events: write
+  if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
   uses: frasermolyneux/actions/.github/workflows/codequality.yml@main
   with:
     sonar-project-key: <org>_<project>
@@ -113,6 +124,7 @@ devops-secure-scanning:
     actions: read
     id-token: write
     security-events: write
+  if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
   uses: frasermolyneux/actions/.github/workflows/devops-secure-scanning.yml@main
 ```
 
@@ -123,7 +135,7 @@ dependency-review:
   permissions:
     contents: read
     pull-requests: write
-  if: github.event_name == 'pull_request'
+  if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v6
@@ -136,8 +148,10 @@ dependency-review:
 
 1. Triggers include schedule (Monday), push to main, and PR types.
 2. Cron matches the repo's allocated Monday slot in `docs/ops-clock.md`.
-3. `quality` job uses the reusable codequality workflow with the right `build-target` for project type.
-4. `devops-secure-scanning` job always present.
-5. `dependency-review` job always present, gated on `pull_request`.
-6. `SONAR_TOKEN` secret threaded into the `quality` job.
-7. Top-level `permissions: {}`; per-job permissions declared.
+3. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
+4. Every job skips drafts: `quality` and `devops-secure-scanning` guard with `github.event_name != 'pull_request' || github.event.pull_request.draft == false`; `dependency-review` guard combines `github.event_name == 'pull_request'` with the draft check.
+5. `quality` job uses the reusable codequality workflow with the right `build-target` for project type.
+6. `devops-secure-scanning` job always present.
+7. `dependency-review` job always present, gated on `pull_request` and not draft.
+8. `SONAR_TOKEN` secret threaded into the `quality` job.
+9. Top-level `permissions: {}`; per-job permissions declared.

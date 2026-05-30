@@ -59,6 +59,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   consumer-impact-gate:
     name: Consumer impact section gate
@@ -129,11 +133,12 @@ When templating into a target repo, replace the `paths:` block with the matching
 3. `on.pull_request.paths:` lists exactly the published-contract paths for that repo.
 4. `on.pull_request.types:` includes `edited` (so re-saving the PR body re-runs the gate).
 5. Workflow-level `permissions: {}` and job-level `permissions: pull-requests: read`.
-6. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
-7. Strips HTML comments before scanning so template guidance doesn't pass the gate.
-8. Fails with a message that mentions the `breaking-contract` label and the option to revert path changes if no contract change was intended.
-9. Does **not** require the `breaking-contract` label — label is for triage only. The gate enforces section presence.
-10. Job is skipped for draft PRs (`github.event.pull_request.draft == false`).
+6. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
+7. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
+8. Strips HTML comments before scanning so template guidance doesn't pass the gate.
+9. Fails with a message that mentions the `breaking-contract` label and the option to revert path changes if no contract change was intended.
+10. Does **not** require the `breaking-contract` label — label is for triage only. The gate enforces section presence.
+11. Job is skipped for draft PRs (`github.event.pull_request.draft == false`).
 
 ## Cross-references
 

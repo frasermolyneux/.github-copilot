@@ -21,9 +21,15 @@ on:
     types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 ```
 
 `labeled, unlabeled` are required so the `run-prd-plan` and `deploy-dev` labels can re-trigger Terraform behaviour.
+
+The workflow-level `concurrency:` block cancels superseded PR runs when an agent or human pushes a new revision — see the PR-check concurrency rule in `workflows.instructions.md`. This is independent of the per-job environment-scoped concurrency groups (`${{ github.repository }}-dev` / `-prd`) on Terraform jobs.
 
 ## Required jobs (by project content)
 
@@ -137,10 +143,11 @@ terraform-plan-prd:
 ## Compliance checklist
 
 1. Trigger types include `[opened, synchronize, reopened, ready_for_review, labeled, unlabeled]`.
-2. Every job guards with `if: github.event.pull_request.draft == false`.
-3. Build job present matching project type.
-4. Terraform `dev` plan job present if `terraform/` exists; uses `pull-requests: write`.
-5. `terraform-plan-dev` includes the `!contains(..., 'deploy-dev')` label guard.
-6. `terraform-plan-prd` (opt-in by `run-prd-plan` label) present for Terraform repos.
-7. Composite versions match `workflows.frasermolyneux-actions.instructions.md`.
-8. Concurrency group `${{ github.repository }}-<env>` on Terraform jobs.
+2. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
+3. Every job guards with `if: github.event.pull_request.draft == false`.
+4. Build job present matching project type.
+5. Terraform `dev` plan job present if `terraform/` exists; uses `pull-requests: write`.
+6. `terraform-plan-dev` includes the `!contains(..., 'deploy-dev')` label guard.
+7. `terraform-plan-prd` (opt-in by `run-prd-plan` label) present for Terraform repos.
+8. Composite versions match `workflows.frasermolyneux-actions.instructions.md`.
+9. Per-job concurrency group `${{ github.repository }}-<env>` on Terraform jobs (independent of the workflow-level group).

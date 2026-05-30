@@ -28,6 +28,10 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   checklist-gate:
     name: PR body checklist gate
@@ -75,11 +79,12 @@ jobs:
 1. Filename is exactly `coding-agent-pr-gate.yml`.
 2. Trigger `types` includes `opened, edited, reopened, ready_for_review, synchronize, labeled, unlabeled` — `edited` is required so re-ticking a box re-runs the gate.
 3. Workflow-level `permissions: {}`.
-4. Job-level `permissions: pull-requests: read` (read-only — no comments, no statuses).
-5. `if:` guard combines `draft == false` AND `contains(... 'coding-agent')` so the gate is silent on human-authored or draft PRs.
-6. HTML comments are stripped before scanning — the org PR template uses them for guidance and they may contain example unticked boxes.
-7. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
-8. Failure message lists the unticked lines so the agent can self-remediate.
+4. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
+5. Job-level `permissions: pull-requests: read` (read-only — no comments, no statuses).
+6. `if:` guard combines `draft == false` AND `contains(... 'coding-agent')` so the gate is silent on human-authored or draft PRs.
+7. HTML comments are stripped before scanning — the org PR template uses them for guidance and they may contain example unticked boxes.
+8. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
+9. Failure message lists the unticked lines so the agent can self-remediate.
 
 ## Cross-references
 

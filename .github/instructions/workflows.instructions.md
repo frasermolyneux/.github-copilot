@@ -80,6 +80,16 @@ For `frasermolyneux/actions/*` composites see `workflows.frasermolyneux-actions.
     group: ${{ github.workflow }}
   ```
 
+- **PR-check workflows** (`pr-verify.yml`, `codequality.yml`, `coding-agent-pr-gate.yml`, `contract-changed.yml`) must set workflow-level concurrency that cancels superseded runs when an agent or human pushes a new revision to the same PR:
+
+  ```yaml
+  concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+  ```
+
+  This is workflow-level only — it does not replace the environment-scoped job-level groups above. For `codequality.yml`, which also triggers on `push` to `main` and `schedule`, the `|| github.ref` fallback keeps non-PR runs serialised per ref instead of per PR number.
+
 ## Triggers
 
 - `workflow_dispatch` is allowed on any operational workflow to enable manual runs.
