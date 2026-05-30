@@ -33,6 +33,21 @@ If you think a commit/push would be helpful, **say so in chat** and let me run i
 - I will tell you when a change warrants a feature branch + PR. At that point you may suggest a branch name and PR description, but I still do the git operations.
 - This overrides any default "branch + PR" guidance in `standards.branching-and-prs.instructions.md` for **my** workflow choices — that file still describes how branches/PRs should look **when** we use them.
 
+## Marking your own draft PR ready (cloud-agent only)
+
+This is a narrow carve-out to the "git — hands off" rule, and it applies **only** to cloud coding agents (GitHub Copilot coding agent / `copilot-swe-agent[bot]`) working on an assigned branch with their own open draft PR.
+
+If you are such an agent, you **may** run `gh pr ready` on **your own** draft PR — and only your own — once **all** of the following are true:
+
+1. Every acceptance criterion in the originating issue is met.
+2. Every checkbox in the `## Agent attestation` section of the PR body is ticked.
+3. The `code-review` sub-agent has been run and any High / Medium findings have been resolved (or explicitly justified in the PR body).
+4. The `Coding-Agent PR Gate` workflow and all other required status checks are passing.
+
+If any of those is not true, leave the PR as draft and let me flip it.
+
+This is the **only** `gh` / git write operation a cloud agent may perform without an explicit ask. It does **not** apply to the local VS Code Copilot session — that context still defaults to working on `main` and never opens PRs.
+
 ## Task completion — review first
 
 Before telling me a piece of work is "done", "complete", "ready", or otherwise signalling completion:
@@ -62,4 +77,5 @@ If the code-review agent is unavailable or fails, tell me — don't silently ski
 | Create / delete / switch branches | ❌ Unless I ask |
 | Work on `main` by default | ✅ Yes |
 | Create feature branch / PR | ❌ Unless I ask |
+| Cloud agent: `gh pr ready` on own draft PR | ✅ When all completion criteria met |
 | Run `code-review` agent before declaring done | ✅ Required for non-trivial work |
