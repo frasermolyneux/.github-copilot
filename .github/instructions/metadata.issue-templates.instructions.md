@@ -40,9 +40,11 @@ This form is the single biggest leverage point for safe remote-agent delegation.
 7. **Validation expectations** — which build/test/format commands must pass; whether integration tests are in scope.
 8. **Labels** — auto-apply `coding-agent`, `needs-triage`.
 
+`needs-triage` means a developer triages first and decides whether to hand the issue to Copilot.
+
 > **Agent-side attestation lives in the PR template, not here.** The `## Agent attestation` checkbox block is part of `PULL_REQUEST_TEMPLATE.md` so the gate runs against the PR body regardless of how the work was kicked off (issue form, direct prompt, manual dispatch). See `metadata.pull-request-template.instructions.md`.
 
-The form is filed in the target repo (so a "which repo?" dropdown is unnecessary), and should be **assignable to `Copilot`** so submitting the issue and assigning it kicks off the cloud agent. The user can then track progress and review the resulting PR.
+The form is filed in the target repo (so a "which repo?" dropdown is unnecessary). Do **not** auto-assign Copilot in the form. Keep triage ownership with developers: `needs-triage` flags the issue for review, and `coding-agent` signals it is likely suitable for Copilot once triaged.
 
 ## Style
 
