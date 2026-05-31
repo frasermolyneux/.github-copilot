@@ -7,7 +7,7 @@ applyTo: '**/mirror-issue-labels.yml'
 
 A small helper for PRs authored by the GitHub Copilot coding agent (and any other agent that follows the [agents.md](https://agents.md) convention). The workflow:
 
-1. **Auto-detects** agent PRs by author (`Copilot` user, `copilot-swe-agent[bot]` actor) **or** the `coding-agent` label — same guard as `coding-agent-pr-gate.yml`.
+1. **Auto-detects** agent PRs by author (`Copilot` user, `copilot-swe-agent[bot]` actor) **or** the `coding-agent` label.
 2. Parses `Closes #N` / `Fixes #N` / `Resolves #N` references from the PR body.
 3. Fetches each referenced issue and copies any labels it has onto the PR.
 
@@ -15,7 +15,7 @@ This carries `bug`, `enhancement`, `infra`, `security`, etc. forward from the is
 
 ## Applicability
 
-Every repo that has an `AGENTS.md` brief and accepts cloud-agent-authored PRs — same scope as `coding-agent-pr-gate.yml`. In this org, that means all `portal-*` repos.
+Every repo that has an `AGENTS.md` brief and accepts cloud-agent-authored PRs. In this org, that means all `portal-*` repos.
 
 ## Canonical template
 
@@ -116,10 +116,10 @@ jobs:
 3. Workflow-level `permissions: {}`.
 4. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
 5. Job-level `permissions: pull-requests: write` + `issues: read`. **Nothing else** — the workflow does not need contents, statuses, or comments scopes.
-6. `if:` guard matches the `coding-agent-pr-gate.yml` shape: `coding-agent` label **or** `Copilot` author **or** `copilot-swe-agent[bot]` actor. Human-authored PRs are intentionally untouched — humans curate their own labels.
+6. `if:` guard uses `coding-agent` label **or** `Copilot` author **or** `copilot-swe-agent[bot]` actor. Human-authored PRs are intentionally untouched — humans curate their own labels.
 7. The script strips HTML comments and fenced code blocks before matching `Closes #N`, so template guidance and pasted command output don't trigger spurious lookups.
 8. Existing PR labels are **never removed** — only additive. Labels the PR already has are skipped (no API churn).
 9. Cross-repo references (`owner/repo#N`) are intentionally **not** supported — labels are repo-local and copying foreign labels would create new noise labels in this repo.
 10. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
 
-> **Non-goals.** This workflow does not: tick checkboxes, set draft/ready state, post comments, request reviewers, or remove labels. Those decisions stay with the human or with other workflows (`coding-agent-pr-gate.yml`).
+> **Non-goals.** This workflow does not: tick checkboxes, set draft/ready state, post comments, request reviewers, or remove labels. Those decisions stay with the human.

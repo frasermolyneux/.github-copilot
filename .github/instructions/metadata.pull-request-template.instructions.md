@@ -22,10 +22,10 @@ Required sections (in order):
 3. **Required reading consulted** — checkboxes for `.github/copilot-instructions.md`, relevant `.github-copilot/.github/instructions/*` files. The Copilot coding agent uses this to attest it followed the workflow.
 4. **Validation evidence** — what the author ran locally / in CI, with paste blocks for command output where applicable. Includes build, test, format-check (and `terraform fmt -check -recursive` / `terraform validate` for IaC).
 5. **Risk and rollout** — blast radius, whether deploy-dev / deploy-prd are auto-triggered, manual steps required, rollback plan.
-6. **Consumer impact** — optional. Required when a PR touches a published contract (Abstractions / Api.Client NuGet packages, Service Bus DTO / queue-name constants). Lists downstream consumers, whether the change is breaking, and migration notes. Authors delete the section entirely when no contract changed. The `contract-changed.yml` workflow enforces presence of this section on PRs that modify contract paths (see `workflows.contract-changed.instructions.md`).
+6. **Consumer impact** — optional. Required when a PR touches a published contract (Abstractions / Api.Client NuGet packages, Service Bus DTO / queue-name constants). Lists downstream consumers, whether the change is breaking, and migration notes. Authors delete the section entirely when no contract changed.
 7. **Linked issues** — `Closes #N` or `Refs #N`.
 8. **Reviewer focus areas** — explicit asks (e.g. "double-check the role-assignment scope on line X").
-9. **Agent attestation** — five checkboxes the PR author ticks before marking ready for review: read `AGENTS.md` and its Required reading, followed `personal.working-preferences.instructions.md` (no unsolicited git ops), ran `code-review` sub-agent, PR body cites each acceptance criterion, no client secrets / GUIDs / connection strings introduced. The `coding-agent-pr-gate.yml` workflow fails on agent-authored PRs until every box is ticked (see `workflows.coding-agent-pr-gate.instructions.md`). Humans can tick all five and the gate passes — same shape, no special-casing.
+9. **Agent attestation** — checkboxes the PR author ticks before marking ready for review: read `AGENTS.md` and its Required reading, followed `personal.working-preferences.instructions.md` (no unsolicited git ops), ran `code-review` sub-agent, PR body cites each acceptance criterion, no client secrets / GUIDs / connection strings introduced.
 
 ## Style
 

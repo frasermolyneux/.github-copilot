@@ -69,7 +69,7 @@ Append repo-specific "do nots" (e.g. portal-repository-func: "Do not add FTP/RCO
 
 ### 6. Opening the PR
 
-A blunt, non-negotiable mandate that the agent uses the org PR template verbatim — **not** a freeform body. This is the section that prevents `Coding-Agent PR Gate` failures.
+A blunt, non-negotiable mandate that the agent uses the org PR template verbatim — **not** a freeform body.
 
 ```markdown
 ## Opening the PR
@@ -83,7 +83,7 @@ You MUST use `.github/PULL_REQUEST_TEMPLATE.md` as your PR body — do **not** w
 5. Tick **every** box in `## Agent attestation`.
 6. Delete `## Consumer impact` only if no published contract (Abstractions / Client NuGet / Service Bus DTO / Terraform output) changed.
 
-The **`Coding-Agent PR Gate / PR body checklist gate`** workflow will **fail the PR** if the `## Agent attestation` section is missing or any box in it is unticked. This gate is required for merge — there is no override.
+Complete the `## Agent attestation` section before requesting review; reviewers use it as a readiness checklist.
 ```
 
 ### 7. Pre-PR checks

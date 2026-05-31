@@ -80,7 +80,7 @@ For `frasermolyneux/actions/*` composites see `workflows.frasermolyneux-actions.
     group: ${{ github.workflow }}
   ```
 
-- **PR-check workflows** (`pr-verify.yml`, `codequality.yml`, `coding-agent-pr-gate.yml`, `contract-changed.yml`) must set workflow-level concurrency that cancels superseded runs when an agent or human pushes a new revision to the same PR:
+- **PR-check workflows** (`pr-verify.yml`, `codequality.yml`) must set workflow-level concurrency that cancels superseded runs when an agent or human pushes a new revision to the same PR:
 
   ```yaml
   concurrency:

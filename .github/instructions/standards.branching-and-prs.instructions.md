@@ -38,8 +38,8 @@ The skip is implemented via a `if: github.actor != 'dependabot[bot]' && github.a
 | `run-dev-plan` | Force dev Terraform plan on Dependabot/Copilot PRs |
 | `run-prd-plan` | Run prd Terraform plan on any PR |
 | `auto-merge` | Eligible for Dependabot auto-merge after checks pass |
-| `coding-agent` | Auto-applied by the `delegate-to-agent` issue template. PRs descending from these issues are subject to `coding-agent-pr-gate.yml` — fails until every checkbox in the PR body is ticked. |
-| `breaking-contract` | Apply when a PR changes a published API/NuGet contract (Abstractions / Api.Client paths) in a non-backwards-compatible way and the package major version must bump. Independent of `contract-changed.yml` — that gate is path-triggered, not label-triggered. This label is a reviewer/agent signal for triage and changelog automation. |
+| `coding-agent` | Auto-applied by the `delegate-to-agent` issue template. Signals that the PR was created through the coding-agent flow and should include the completed agent attestation section in the PR template. |
+| `breaking-contract` | Apply when a PR changes a published API/NuGet contract (Abstractions / Api.Client paths) in a non-backwards-compatible way and the package major version must bump. This label is a reviewer/agent signal for triage and changelog automation. |
 | `needs-decision` | Applied by the cloud coding agent (and by humans) when a PR is blocked on a human decision. PRs with this label stay in **draft**. Humans triage these before other PRs. See per-repo `AGENTS.md` Escalation section. |
 
 ## Deployment triggers

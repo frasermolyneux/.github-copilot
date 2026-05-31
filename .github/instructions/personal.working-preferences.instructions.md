@@ -42,7 +42,7 @@ If you are such an agent, you **may** run `gh pr ready` on **your own** draft PR
 1. Every acceptance criterion in the originating issue is met.
 2. Every checkbox in the `## Agent attestation` section of the PR body is ticked.
 3. The `code-review` sub-agent has been run and any High / Medium findings have been resolved (or explicitly justified in the PR body).
-4. The `Coding-Agent PR Gate` workflow and all other required status checks are passing.
+4. All required status checks are passing.
 
 If any of those is not true, leave the PR as draft and let me flip it.
 
