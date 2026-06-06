@@ -58,9 +58,27 @@ When planning or implementing a feature, if completing the work depends on a **n
 	1. Phase 1 — contract/package change in the owning repo.
 	2. Wait for me to review/publish/provide the version.
 	3. Phase 2 — consume the published version and complete downstream implementation.
+- ✅ **Hard-stop rule:** if downstream completion depends on an unpublished NuGet version, stop at the phase boundary and wait for me. Do not continue into consumer completion.
+- ✅ **Mandatory gate message (use this shape):**
+	- `NuGet dependency gate reached.`
+	- `Package: <id>`
+	- `Required version: <version or TBD>`
+	- `Owner repo: <repo>`
+	- `Consumer repo(s): <repo list>`
+	- `Status: Phase 1 complete, waiting for publish/review before Phase 2.`
 - ❌ Do **not** bypass package/version boundaries with temporary hacks (for example direct project references across repos, copied contracts, or ad-hoc direct HTTP calls replacing typed clients) unless I explicitly ask for that fallback in the current message.
+- ❌ Do **not** duplicate cross-repo contracts/constants in a consumer as a bridge to avoid waiting for package publication unless I explicitly ask for a temporary bridge in the current message.
 
 If blocked on a package version, report the block clearly and pause at the phase boundary rather than implementing a workaround.
+
+### Completion gate for package-dependent work
+
+Before declaring completion on work that crosses package boundaries, Copilot must confirm one of these is true:
+
+1. The required package version is published and the consumer has been updated to use it, or
+2. I explicitly approved stopping at the phase boundary.
+
+If neither is true, do not mark the task complete.
 
 ## Task completion — review first
 
@@ -92,6 +110,9 @@ If the code-review agent is unavailable or fails, tell me — don't silently ski
 | Work on `main` by default | ✅ Yes |
 | Create feature branch / PR | ❌ Unless I ask |
 | Feature needs NuGet upgrade: surface early + phase the work | ✅ Required |
+| Unpublished NuGet required for downstream work: stop and wait at phase boundary | ✅ Required |
+| Emit mandatory NuGet dependency gate message at boundary | ✅ Required |
 | Work around missing NuGet version with direct refs / ad-hoc HTTP | ❌ Unless I ask |
+| Duplicate shared contracts in consumer to bypass package wait | ❌ Unless I ask |
 | Cloud agent: `gh pr ready` on own draft PR | ✅ When all completion criteria met |
 | Run `code-review` agent before declaring done | ✅ Required for non-trivial work |
