@@ -48,6 +48,20 @@ If any of those is not true, leave the PR as draft and let me flip it.
 
 This is the **only** `gh` / git write operation a cloud agent may perform without an explicit ask. It does **not** apply to the local VS Code Copilot session — that context still defaults to working on `main` and never opens PRs.
 
+## NuGet dependencies — surface early, no workarounds
+
+When planning or implementing a feature, if completing the work depends on a **new NuGet package version** (for example a contract/client change in another repo), Copilot must surface that dependency explicitly and immediately.
+
+- ✅ During planning: call out required package/version upgrades up front (what package, why, and which repo owns the change).
+- ✅ During execution: if discovered mid-task, stop and reframe into phases.
+- ✅ Use phased delivery by default:
+	1. Phase 1 — contract/package change in the owning repo.
+	2. Wait for me to review/publish/provide the version.
+	3. Phase 2 — consume the published version and complete downstream implementation.
+- ❌ Do **not** bypass package/version boundaries with temporary hacks (for example direct project references across repos, copied contracts, or ad-hoc direct HTTP calls replacing typed clients) unless I explicitly ask for that fallback in the current message.
+
+If blocked on a package version, report the block clearly and pause at the phase boundary rather than implementing a workaround.
+
 ## Task completion — review first
 
 Before telling me a piece of work is "done", "complete", "ready", or otherwise signalling completion:
@@ -77,5 +91,7 @@ If the code-review agent is unavailable or fails, tell me — don't silently ski
 | Create / delete / switch branches | ❌ Unless I ask |
 | Work on `main` by default | ✅ Yes |
 | Create feature branch / PR | ❌ Unless I ask |
+| Feature needs NuGet upgrade: surface early + phase the work | ✅ Required |
+| Work around missing NuGet version with direct refs / ad-hoc HTTP | ❌ Unless I ask |
 | Cloud agent: `gh pr ready` on own draft PR | ✅ When all completion criteria met |
 | Run `code-review` agent before declaring done | ✅ Required for non-trivial work |
