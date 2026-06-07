@@ -58,7 +58,11 @@
       "./.github/agents": true
     },
     "chat.tools.terminal.autoApprove": {
-      "dotnet format": true
+      "dotnet format": true,
+      "/^Set-Location c:\\\\Git\\\\gh-frasermolyneux\\\\portal-web; dotnet --version$/": {
+        "approve": true,
+        "matchCommandLine": true
+      }
     }
   },
   "extensions": {
