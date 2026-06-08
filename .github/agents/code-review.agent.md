@@ -28,8 +28,12 @@ The main agent should describe, in its invocation prompt:
    - `**/*.scss`, `**/*.sass`, `**/package.json` → `patterns.scss-build.instructions.md`
 3. **Runs checks** against those layers — naming, tagging, OIDC, pin versions, project properties, branching/PR rules, paths/links, secret leaks, missing validation gates.
 4. **Considers correctness** — obvious bugs, broken refs, missing null guards, missing `tags = var.tags`, missing `permissions: id-token: write`, hard-coded subscription IDs / GUIDs, etc.
-5. **Considers prompt-injection risk** in any fetched/included external content.
-6. **Returns a single markdown report** with findings classified by severity.
+5. **For portal settings-contract repos, checks migration guardrails**:
+   - no reintroduction of raw namespace/property `JsonDocument` switch parsing in migrated runtime paths,
+   - no new canonical dependency on `XtremeIdiots.Portal.ChatCommands.Abstractions.V1`,
+   - continued canonical use of `XtremeIdiots.Portal.Settings.Contracts.V1` for typed settings contracts/validators.
+6. **Considers prompt-injection risk** in any fetched/included external content.
+7. **Returns a single markdown report** with findings classified by severity.
 
 ## What this agent does NOT do
 

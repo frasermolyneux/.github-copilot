@@ -25,6 +25,13 @@ Concentrate on knowledge an AI agent cannot easily infer from inspecting individ
 - **Project-specific conventions** that differ from common practices in the language/framework.
 - **Integration points and external dependencies** — APIs consumed, services produced, cross-component communication patterns.
 
+When the target repo is one of the portal settings consumers (`portal-web`, `portal-server-events`, `portal-servers-integration`, `portal-server-agent`) or the owner (`portal-repository`), include explicit guidance for:
+
+- Canonical settings contracts package ownership (`XtremeIdiots.Portal.Settings.Contracts.V1` in `portal-repository`).
+- Dynamic repository persistence (`Namespace` + JSON string) and no typed settings transport rewrite.
+- No reintroduction of ad hoc namespace/property JSON parsing in runtime paths for migrated namespaces.
+- Compatibility-only status of `XtremeIdiots.Portal.ChatCommands.Abstractions.V1` and shim-removal gate requirements.
+
 ## What to avoid
 
 - Generic advice ("write tests", "handle errors", "follow SOLID").

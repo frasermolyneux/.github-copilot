@@ -71,6 +71,16 @@ Each pattern below has a dedicated `patterns.*.instructions.md` file with full d
 - **NBGV versioning** — `patterns.nbgv-versioning.instructions.md`
 - **SCSS build** — `patterns.scss-build.instructions.md`
 
+## Platform Settings Contracts (Portal Repos)
+
+For portal settings work (`portal-web`, `portal-server-events`, `portal-servers-integration`, `portal-server-agent`, `portal-repository`):
+
+- Canonical typed contracts are in `XtremeIdiots.Portal.Settings.Contracts.V1` (owner: `portal-repository`).
+- Repository persistence remains dynamic (`Namespace` + JSON string). Do not introduce typed settings transport DTO endpoints.
+- Do not reintroduce raw namespace/property JSON parsing in runtime controller/provider/resolver paths for migrated namespaces.
+- Treat `XtremeIdiots.Portal.ChatCommands.Abstractions.V1` as compatibility-only during migration; do not use it as canonical source for new settings behavior.
+- Remove compatibility shims only when the implementation-plan gate criteria are fully evidenced across all section 6.2 consumers.
+
 ## Key Conventions
 
 Each standard below has a dedicated `standards.*.instructions.md` file with full detail and compliance checks:
