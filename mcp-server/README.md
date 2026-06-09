@@ -51,7 +51,7 @@ Add a Copilot setup step that builds the server, then declare it in the agent's 
 - name: Install frasermolyneux-copilot MCP server
   shell: bash
   run: |
-    git clone --depth 1 https://github.com/frasermolyneux/.github-copilot /tmp/gh-copilot
+    git clone --depth 1 --branch v0.1.0 https://github.com/frasermolyneux/.github-copilot /tmp/gh-copilot
     cd /tmp/gh-copilot/mcp-server
     npm ci
     npm run build
@@ -259,7 +259,7 @@ mcp-server/
 ## Caveats
 
 - **MCP clients don't auto-load catalog content.** Tools must be called explicitly. The bootstrap snippet above tells the agent to do that — without it, the agent will happily ignore the catalog.
-- **Pin a tag or commit SHA** in `copilot-setup-steps.yml` (`git clone --branch v0.1.0 …` or `git checkout <sha>` after clone). `main` will drift; pinning avoids surprise behavioural changes inside CI runs.
+- **The cloud-agent example above pins the `v0.1.0` tag.** `main` will drift; the pin avoids surprise behavioural changes inside CI runs. Bump the tag (or swap in a commit SHA via `git checkout <sha>` after clone) as new releases of `.github-copilot` ship.
 - **No `npx` / `github:` install path.** There is no root `package.json` in the catalog repo and no `prepare` script that builds the server post-install, so `npx github:frasermolyneux/.github-copilot` does not work. Use the clone + build path above until a published artifact exists.
 - **Cloud agent MCP support is evolving.** The wire-up above reflects the current `.github/copilot/mcp_config.json` convention. Re-check the [GitHub docs on Copilot coding agent MCP](https://docs.github.com/en/copilot) before relying on it for production workflows.
 - **No CI workflow ships with this server yet.** Build/lint/publish workflows for `mcp-server/` are a deliberate follow-up.
