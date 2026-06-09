@@ -37,6 +37,18 @@ Standard required reads:
 4. Stack-specific instruction files for the work area (see Stack guardrails below)
 ```
 
+### 2a. Catalog via MCP (when available)
+
+Immediately after the Required reading list, insert the bootstrap snippet below verbatim. It tells MCP-capable agents to call the org catalog server when one is wired into the client/runner. The snippet is intentionally **conditional** — it reads as a no-op in a repo where no MCP server is configured, and activates cleanly once one is. Do not rephrase it to claim a server "is" configured (consumer-repo MCP wiring is a separate, in-progress rollout). Keep this byte-identical to the version in `metadata.copilot-instructions.instructions.md` (that file is the source-of-truth).
+
+````markdown
+## Org conventions via MCP (when available)
+
+If a `frasermolyneux-copilot` MCP server is configured in your client (`.vscode/mcp.json`, the GitHub Copilot coding-agent MCP config at `.github/copilot/mcp_config.json`, or an equivalent stdio MCP wire-up), **prefer its tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The tool surface is `list_instructions`, `get_instruction`, `search_instructions`, plus the matching `_prompts` and `_agents` equivalents (seven tools total). The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
+
+This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
+````
+
 ### 3. Stack guardrails
 
 Per-stack lists of which `standards.*` / `patterns.*` / `platform.*` / `shared.*` files apply to this repo. Pull from `.github-copilot/.github/copilot-instructions.md` and only include the layers this repo actually consumes (discovered via `terraform_remote_state` blocks, `<PackageReference>` entries, etc.).
@@ -140,3 +152,4 @@ See `.github-copilot/templates/AGENTS.md` for the canonical skeleton.
 - `metadata.copilot-instructions.instructions.md` — sister file for `.github/copilot-instructions.md`
 - `personal.working-preferences.instructions.md` — always-on git/branching/code-review rules
 - [agents.md](https://agents.md) — the cross-tool convention this file implements
+- `mcp-server/README.md` — MCP server install / wire-up / tool contract

@@ -32,6 +32,24 @@ When the target repo is one of the portal settings consumers (`portal-web`, `por
 - No reintroduction of ad hoc namespace/property JSON parsing in runtime paths for migrated namespaces.
 - Compatibility-only status of `XtremeIdiots.Portal.ChatCommands.Abstractions.V1` and shim-removal gate requirements.
 
+## MCP catalog snippet
+
+Every generated `.github/copilot-instructions.md` **must include** the bootstrap snippet below, verbatim, as a top-level section. It tells MCP-capable agents (VS Code Copilot Chat, the GitHub Copilot coding agent, Copilot CLI, Claude Desktop, etc.) to call the org catalog server when one is wired into the client.
+
+The snippet is intentionally **conditional**: it reads as a no-op in a repo where no MCP server is configured, and activates cleanly once one is. Do not rephrase it to claim a server "is" configured — at the time of writing, consumer-repo MCP wiring (`.vscode/mcp.json`, `copilot-setup-steps.yml` install step, `.github/copilot/mcp_config.json`) is a separate, in-progress rollout.
+
+Use this exact text (this file is the source-of-truth; future wording changes flow through here and the parallel section in `metadata.agents.instructions.md`):
+
+````markdown
+## Org conventions via MCP (when available)
+
+If a `frasermolyneux-copilot` MCP server is configured in your client (`.vscode/mcp.json`, the GitHub Copilot coding-agent MCP config at `.github/copilot/mcp_config.json`, or an equivalent stdio MCP wire-up), **prefer its tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The tool surface is `list_instructions`, `get_instruction`, `search_instructions`, plus the matching `_prompts` and `_agents` equivalents (seven tools total). The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
+
+This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
+````
+
+See `mcp-server/README.md` in `frasermolyneux/.github-copilot` for the tool surface details, content-root resolution, and wire-up snippets per client.
+
 ## What to avoid
 
 - Generic advice ("write tests", "handle errors", "follow SOLID").

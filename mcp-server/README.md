@@ -29,7 +29,7 @@ All snippets assume you have cloned and built the server somewhere on disk and s
 ```json
 {
   "servers": {
-    "gh-copilot": {
+    "frasermolyneux-copilot": {
       "command": "node",
       "args": ["${userHome}/code/.github-copilot/mcp-server/dist/index.js"],
       "env": {
@@ -47,7 +47,7 @@ Add a Copilot setup step that builds the server, then declare it in the agent's 
 `.github/workflows/copilot-setup-steps.yml`:
 
 ```yaml
-- name: Install gh-copilot MCP server
+- name: Install frasermolyneux-copilot MCP server
   shell: bash
   run: |
     git clone --depth 1 https://github.com/frasermolyneux/.github-copilot /tmp/gh-copilot
@@ -61,7 +61,7 @@ Add a Copilot setup step that builds the server, then declare it in the agent's 
 ```json
 {
   "mcpServers": {
-    "gh-copilot": {
+    "frasermolyneux-copilot": {
       "command": "node",
       "args": ["/tmp/gh-copilot/mcp-server/dist/index.js"],
       "env": {
@@ -77,7 +77,7 @@ Add a Copilot setup step that builds the server, then declare it in the agent's 
 ```json
 {
   "mcpServers": {
-    "gh-copilot": {
+    "frasermolyneux-copilot": {
       "command": "node",
       "args": ["/absolute/path/to/.github-copilot/mcp-server/dist/index.js"],
       "env": {
@@ -112,9 +112,9 @@ Each file is also exposed as an MCP resource, so clients that browse `resources/
 
 | Scheme | Example URI |
 |---|---|
-| `gh-copilot://instructions/{name}` | `gh-copilot://instructions/patterns.api-client` |
-| `gh-copilot://prompts/{name}` | `gh-copilot://prompts/update-build-and-test-workflow` |
-| `gh-copilot://agents/{name}` | `gh-copilot://agents/code-review` |
+| `frasermolyneux-copilot://instructions/{name}` | `frasermolyneux-copilot://instructions/patterns.api-client` |
+| `frasermolyneux-copilot://prompts/{name}` | `frasermolyneux-copilot://prompts/update-build-and-test-workflow` |
+| `frasermolyneux-copilot://agents/{name}` | `frasermolyneux-copilot://agents/code-review` |
 
 Resource bodies are the raw `.md` file (frontmatter included), MIME type `text/markdown`.
 
@@ -134,7 +134,7 @@ Drop the following into a consumer repo's `.github/copilot-instructions.md` so a
 ```markdown
 ## Org conventions via MCP
 
-A `gh-copilot` MCP server is configured for this repo. **Before answering questions
+A `frasermolyneux-copilot` MCP server is configured for this repo. **Before answering questions
 about org standards, branching, workflows, Terraform, .NET projects, or Azure
 patterns, call its tools** (`list_instructions`, `search_instructions`,
 `get_instruction`, plus the `_prompts` and `_agents` equivalents) and prefer
