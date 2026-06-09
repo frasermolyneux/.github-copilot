@@ -24,23 +24,24 @@ Pin a tag or commit SHA in any production wire-up (see **Caveats**).
 
 All snippets assume you have cloned and built the server somewhere on disk and substitute the absolute path to `mcp-server/dist/index.js` below. Set `GH_COPILOT_CONTENT_ROOT` to the repo root (the folder containing `.github/`) so the server does not fall back to walk-up discovery.
 
-### VS Code (`.vscode/mcp.json`)
+Pick the scope based on who you want the wire-up to apply to:
 
-```json
-{
-  "servers": {
-    "frasermolyneux-copilot": {
-      "command": "node",
-      "args": ["${userHome}/code/.github-copilot/mcp-server/dist/index.js"],
-      "env": {
-        "GH_COPILOT_CONTENT_ROOT": "${userHome}/code/.github-copilot"
-      }
-    }
-  }
-}
-```
+| Surface | Scope | Config path (Windows / macOS / Linux) |
+|---|---|---|
+| GitHub Copilot coding agent | Per-repo (committed) | `.github/copilot/mcp_config.json` |
+| VS Code (workspace, advanced) | Per-repo (committed) | `.vscode/mcp.json` |
+| GitHub Copilot CLI | User-level | `%USERPROFILE%\.copilot\mcp-config.json` / `~/.copilot/mcp-config.json` |
+| GitHub Copilot App | User-level | shared with CLI — `%USERPROFILE%\.copilot\mcp-config.json` / `~/.copilot/mcp-config.json` |
+| VS Code (user profile) | User-level | `%APPDATA%\Code\User\mcp.json` / `~/Library/Application Support/Code/User/mcp.json` / `~/.config/Code/User/mcp.json` |
+| Generic stdio (Claude Desktop, etc.) | User-level | client-specific |
 
-### GitHub Copilot coding agent
+Note the shape difference: VS Code uses `servers`; Copilot CLI / Copilot App / Claude Desktop use `mcpServers`. Don't mix them.
+
+### Per-repo (committed to the consumer repo)
+
+Per-repo wire-ups live alongside the consumer's source and apply to every dev / CI run that opens the repo. Use these for the **coding agent** (where wire-up has to be in the repo because the runner has no home directory state) and, in rare cases, when you want to pin a VS Code workspace config for a team.
+
+#### GitHub Copilot coding agent
 
 Add a Copilot setup step that builds the server, then declare it in the agent's MCP config file (`.github/copilot/mcp_config.json` at the repo root).
 
@@ -72,7 +73,98 @@ Add a Copilot setup step that builds the server, then declare it in the agent's 
 }
 ```
 
-### Generic stdio MCP client (Copilot CLI, Claude Desktop, etc.)
+#### VS Code (workspace, advanced)
+
+`.vscode/mcp.json` pins the server to a specific workspace. **For personal use, prefer the user-profile snippet below** — it covers every repo you open. Reach for the workspace file only when a team wants a shared config committed alongside the code.
+
+```json
+{
+  "servers": {
+    "frasermolyneux-copilot": {
+      "command": "node",
+      "args": ["${userHome}/code/.github-copilot/mcp-server/dist/index.js"],
+      "env": {
+        "GH_COPILOT_CONTENT_ROOT": "${userHome}/code/.github-copilot"
+      }
+    }
+  }
+}
+```
+
+### User-level (per-dev, applies across all your repos)
+
+User-level wire-ups live in your home directory and apply to every repo you open in the surface, with no per-repo plumbing. Standardise on these for personal day-to-day use.
+
+#### GitHub Copilot CLI
+
+Edit `~/.copilot/mcp-config.json` directly (Windows: `%USERPROFILE%\.copilot\mcp-config.json`), or run `/mcp add` inside an interactive `copilot` session and let it write the file for you.
+
+```jsonc
+// ~/.copilot/mcp-config.json
+{
+  "mcpServers": {
+    "frasermolyneux-copilot": {
+      "type": "local",
+      "command": "node",
+      "args": ["/absolute/path/to/.github-copilot/mcp-server/dist/index.js"],
+      "env": {
+        "GH_COPILOT_CONTENT_ROOT": "/absolute/path/to/.github-copilot"
+      },
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+No restart needed — the CLI picks up the change immediately. Verify with `/mcp show frasermolyneux-copilot`; it should list the seven `*_instructions` / `*_prompts` / `*_agents` tools. `PATH` is inherited; any other env var the server needs must be set in `env`. Reference: [Adding MCP servers for GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers).
+
+#### GitHub Copilot App
+
+The Copilot desktop App shares the same `~/.copilot/` engine directory as the CLI, so the **same `mcp-config.json` applies** — wire it up once and both surfaces see it. There is no separate App-specific MCP docs page at the time of writing; the file above is the practical answer, but verify against your App version's settings UI / release notes if anything looks off.
+
+```jsonc
+// %USERPROFILE%\.copilot\mcp-config.json  (Windows)
+// ~/.copilot/mcp-config.json              (macOS / Linux)
+{
+  "mcpServers": {
+    "frasermolyneux-copilot": {
+      "type": "local",
+      "command": "node",
+      "args": ["/absolute/path/to/.github-copilot/mcp-server/dist/index.js"],
+      "env": {
+        "GH_COPILOT_CONTENT_ROOT": "/absolute/path/to/.github-copilot"
+      },
+      "tools": ["*"]
+    }
+  }
+}
+```
+
+After editing, start a fresh session in the App (existing sessions may keep their previous MCP snapshot until restarted). Verify by asking an agent to call `list_instructions` and confirming it returns the catalog rather than apologising for missing tools.
+
+#### VS Code (user profile)
+
+Run **MCP: Open User Configuration** from the Command Palette to open the user-profile `mcp.json` (conventional paths: Windows `%APPDATA%\Code\User\mcp.json`, macOS `~/Library/Application Support/Code/User/mcp.json`, Linux `~/.config/Code/User/mcp.json` — exact location varies by profile). Add the server under `servers` (VS Code's key, not `mcpServers`):
+
+```json
+{
+  "servers": {
+    "frasermolyneux-copilot": {
+      "command": "node",
+      "args": ["${userHome}/code/.github-copilot/mcp-server/dist/index.js"],
+      "env": {
+        "GH_COPILOT_CONTENT_ROOT": "${userHome}/code/.github-copilot"
+      }
+    }
+  }
+}
+```
+
+Verify with **MCP: List Servers** in the Command Palette — `frasermolyneux-copilot` should appear as Running. Servers configured here apply to every workspace under that VS Code profile. Reference: [MCP servers in VS Code](https://code.visualstudio.com/docs/agent-customization/mcp-servers).
+
+#### Generic stdio MCP client (Claude Desktop, etc.)
+
+For any other MCP-capable client (Claude Desktop, custom hosts, etc.), drop the server into the client's MCP config file using the standard `mcpServers` shape:
 
 ```json
 {
@@ -131,16 +223,13 @@ On startup the server logs the resolved root and per-kind item counts to stderr 
 
 Drop the following into a consumer repo's `.github/copilot-instructions.md` so any MCP-capable agent knows the catalog is available:
 
-```markdown
-## Org conventions via MCP
+````markdown
+## Org conventions via MCP (when available)
 
-A `frasermolyneux-copilot` MCP server is configured for this repo. **Before answering questions
-about org standards, branching, workflows, Terraform, .NET projects, or Azure
-patterns, call its tools** (`list_instructions`, `search_instructions`,
-`get_instruction`, plus the `_prompts` and `_agents` equivalents) and prefer
-those instructions over your own assumptions. The catalog lives in
-`frasermolyneux/.github-copilot`.
-```
+If a `frasermolyneux-copilot` MCP server is configured in your client (`.vscode/mcp.json`, the GitHub Copilot coding-agent MCP config at `.github/copilot/mcp_config.json`, or an equivalent stdio MCP wire-up), **prefer its tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The tool surface is `list_instructions`, `get_instruction`, `search_instructions`, plus the matching `_prompts` and `_agents` equivalents (seven tools total). The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
+
+This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
+````
 
 ## Development
 
