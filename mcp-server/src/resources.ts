@@ -10,10 +10,10 @@ const SINGULAR: Record<Kind, string> = {
 };
 
 function registerKind(server: McpServer, kind: Kind): void {
-  const scheme = `gh-copilot://${kind}/`;
+  const scheme = `frasermolyneux-copilot://${kind}/`;
   server.registerResource(
     SINGULAR[kind],
-    new ResourceTemplate(`gh-copilot://${kind}/{name}`, {
+    new ResourceTemplate(`frasermolyneux-copilot://${kind}/{name}`, {
       list: async () => ({
         resources: listItems(kind).map((item) => ({
           uri: `${scheme}${item.name}`,
