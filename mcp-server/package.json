@@ -1,7 +1,7 @@
 {
   "name": "frasermolyneux-copilot-mcp-server",
   "version": "0.1.0",
-  "description": "stdio MCP server exposing the frasermolyneux/.github-copilot instruction, prompt, and agent catalog to MCP-capable clients (VS Code, GitHub Copilot cloud agent, Copilot CLI, Claude Desktop, etc.).",
+  "description": "stdio MCP server exposing the frasermolyneux/.github-copilot instruction, prompt, agent, and skill catalog to MCP-capable clients (VS Code, Copilot CLI/App, Claude Desktop, etc.).",
   "type": "module",
   "bin": {
     "gh-copilot-mcp": "dist/index.js"
@@ -14,7 +14,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "install-local": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/install-local.ps1"
   },
   "engines": {
     "node": ">=20"

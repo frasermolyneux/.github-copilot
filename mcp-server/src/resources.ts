@@ -7,6 +7,7 @@ const SINGULAR: Record<Kind, string> = {
   instructions: "instruction",
   prompts: "prompt",
   agents: "agent",
+  skills: "skill",
 };
 
 function registerKind(server: McpServer, kind: Kind): void {
@@ -49,7 +50,7 @@ function registerKind(server: McpServer, kind: Kind): void {
 }
 
 export function registerResources(server: McpServer): void {
-  for (const kind of ["instructions", "prompts", "agents"] as const) {
+  for (const kind of ["instructions", "prompts", "agents", "skills"] as const) {
     registerKind(server, kind);
   }
 }

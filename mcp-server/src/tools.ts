@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
   getItem,
+  getCatalogSummary,
   listItems,
   searchItems,
   type ItemFull,
@@ -53,22 +54,35 @@ function registerGetTool(server: McpServer, kind: Kind) {
   );
 }
 
-export function registerTools(server: McpServer): void {
-  for (const kind of ["instructions", "prompts", "agents"] as const) {
-    registerListTool(server, kind);
-    registerGetTool(server, kind);
-  }
-
+function registerSearchTool(server: McpServer, kind: Kind) {
   server.registerTool(
-    "search_instructions",
+    `search_${kind}`,
     {
       description:
-        "Case-insensitive substring search across instruction files. Scores: +3 per match in name, +2 in description/applyTo, +1 in body. Returns [{ name, snippet, score }] sorted by score.",
+        `Case-insensitive substring search across ${kind}. Scores: +3 per match in name, +2 in description/applyTo, +1 in body. Returns [{ name, snippet, score }] sorted by score.`,
       inputSchema: {
-        query: z.string().min(1).describe("Substring to search for"),
+        query: z.string().min(1).describe(`Substring to search for in ${kind}`),
         limit: z.number().int().positive().max(50).optional().describe("Max results, default 10"),
       },
     },
-    async ({ query, limit }) => asJson(searchItems("instructions", query, limit ?? 10) satisfies SearchHit[])
+    async ({ query, limit }) => asJson(searchItems(kind, query, limit ?? 10) satisfies SearchHit[])
+  );
+}
+
+export function registerTools(server: McpServer): void {
+  for (const kind of ["instructions", "prompts", "agents", "skills"] as const) {
+    registerListTool(server, kind);
+    registerGetTool(server, kind);
+    registerSearchTool(server, kind);
+  }
+
+  server.registerTool(
+    "get_catalog",
+    {
+      description:
+        "Return a token-efficient summary of the catalog: item counts, instruction taxonomy by prefix, and freshness metadata (git SHA + last commit date).",
+      inputSchema: {},
+    },
+    async () => asJson(getCatalogSummary())
   );
 }

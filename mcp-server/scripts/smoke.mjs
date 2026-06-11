@@ -16,8 +16,14 @@ const EXPECTED_TOOLS = [
   "search_instructions",
   "list_prompts",
   "get_prompt",
+  "search_prompts",
   "list_agents",
   "get_agent",
+  "search_agents",
+  "list_skills",
+  "get_skill",
+  "search_skills",
+  "get_catalog",
 ];
 
 const child = spawn(process.execPath, [serverPath], {
@@ -112,6 +118,23 @@ async function run() {
     throw new Error(`list_instructions returned no items (content root resolution likely failed)`);
   }
   console.log(`list_instructions returned ${items.length} items (first: ${items[0]?.name})`);
+
+  const catalogResp = await send("tools/call", {
+    name: "get_catalog",
+    arguments: {},
+  });
+  if (catalogResp.error) throw new Error(`tools/call get_catalog failed: ${JSON.stringify(catalogResp.error)}`);
+  const catalogText = catalogResp.result?.content?.[0]?.text ?? "{}";
+  const catalog = JSON.parse(catalogText);
+  if (!catalog?.counts || typeof catalog.counts.instructions !== "number") {
+    throw new Error("get_catalog returned invalid counts payload");
+  }
+  if (!Array.isArray(catalog.instructionsByPrefix)) {
+    throw new Error("get_catalog returned invalid instructionsByPrefix payload");
+  }
+  console.log(
+    `get_catalog counts: instructions=${catalog.counts.instructions}, prompts=${catalog.counts.prompts}, agents=${catalog.counts.agents}, skills=${catalog.counts.skills}`
+  );
 
   console.log("SMOKE OK");
 }

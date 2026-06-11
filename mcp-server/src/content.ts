@@ -1,14 +1,16 @@
 import { readdirSync, readFileSync, existsSync, statSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { dirname, join, resolve, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 
-export type Kind = "instructions" | "prompts" | "agents";
+export type Kind = "instructions" | "prompts" | "agents" | "skills";
 
 const SUFFIX: Record<Kind, string> = {
   instructions: ".instructions.md",
   prompts: ".prompt.md",
   agents: ".agent.md",
+  skills: ".skill.md",
 };
 
 export interface ItemSummary {
@@ -29,7 +31,24 @@ export interface SearchHit {
   score: number;
 }
 
+export interface CatalogSummary {
+  generatedAtUtc: string;
+  freshness: {
+    gitSha: string | null;
+    lastCommitDateUtc: string | null;
+  };
+  counts: Record<Kind, number>;
+  instructionsByPrefix: Array<{
+    prefix: string;
+    description: string;
+    count: number;
+    examples: string[];
+  }>;
+}
+
 let cachedRoot: string | null = null;
+let cachedFreshness: { value: { gitSha: string | null; lastCommitDateUtc: string | null }; fetchedAtMs: number } | null = null;
+const FRESHNESS_TTL_MS = 30_000;
 
 /**
  * Resolves the content root containing `.github/instructions/`, `.github/prompts/`,
@@ -67,13 +86,13 @@ export function resolveContentRoot(): string {
 
   throw new Error(
     "Unable to locate the .github-copilot content root. Set GH_COPILOT_CONTENT_ROOT to the repository root, " +
-      "or install this server inside a folder under .github-copilot."
+    "or install this server inside a folder under .github-copilot."
   );
 }
 
 /**
  * Recognises a directory as a `.github-copilot` content root only when it has all
- * three sibling catalogs (`instructions`, `prompts`, `agents`). Requiring all
+ * three core sibling catalogs (`instructions`, `prompts`, `agents`). Requiring all
  * three makes accidental collision with a consumer repo's own `.github/instructions/`
  * during walk-up resolution effectively impossible.
  */
@@ -195,6 +214,90 @@ export function searchItems(kind: Kind, query: string, limit = 10): SearchHit[] 
   }
   hits.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
   return hits.slice(0, Math.max(1, limit));
+}
+
+export function getCatalogSummary(): CatalogSummary {
+  const generatedAtUtc = new Date().toISOString();
+  const counts = {
+    instructions: listItems("instructions").length,
+    prompts: listItems("prompts").length,
+    agents: listItems("agents").length,
+    skills: listItems("skills").length,
+  };
+
+  const instructions = listItems("instructions");
+  const prefixMap = new Map<string, { count: number; examples: string[] }>();
+  for (const item of instructions) {
+    const firstDot = item.name.indexOf(".");
+    const prefix = firstDot > 0 ? item.name.slice(0, firstDot) : "other";
+    const bucket = prefixMap.get(prefix) ?? { count: 0, examples: [] };
+    bucket.count++;
+    if (bucket.examples.length < 3) {
+      bucket.examples.push(item.name);
+    }
+    prefixMap.set(prefix, bucket);
+  }
+
+  const descriptions = new Map<string, string>();
+  for (const prefix of prefixMap.keys()) {
+    const primary = getItem("instructions", `${prefix}.instructions`);
+    if (primary && primary.description) {
+      descriptions.set(prefix, primary.description);
+      continue;
+    }
+    const fallback = getItem("instructions", `${prefix}`);
+    if (fallback && fallback.description) {
+      descriptions.set(prefix, fallback.description);
+      continue;
+    }
+    descriptions.set(prefix, "No prefix summary available.");
+  }
+
+  const instructionsByPrefix = Array.from(prefixMap.entries())
+    .map(([prefix, data]) => ({
+      prefix,
+      description: descriptions.get(prefix) ?? "No prefix summary available.",
+      count: data.count,
+      examples: data.examples,
+    }))
+    .sort((a, b) => b.count - a.count || a.prefix.localeCompare(b.prefix));
+
+  return {
+    generatedAtUtc,
+    freshness: getGitFreshness(),
+    counts,
+    instructionsByPrefix,
+  };
+}
+
+function getGitFreshness(): { gitSha: string | null; lastCommitDateUtc: string | null } {
+  const now = Date.now();
+  if (cachedFreshness && now - cachedFreshness.fetchedAtMs < FRESHNESS_TTL_MS) {
+    return cachedFreshness.value;
+  }
+
+  try {
+    const root = resolveContentRoot();
+    const sha = execSync("git rev-parse --short HEAD", { cwd: root, stdio: ["ignore", "pipe", "ignore"] })
+      .toString("utf8")
+      .trim();
+    const date = execSync("git log -1 --format=%cI", { cwd: root, stdio: ["ignore", "pipe", "ignore"] })
+      .toString("utf8")
+      .trim();
+    const value = {
+      gitSha: sha.length > 0 ? sha : null,
+      lastCommitDateUtc: date.length > 0 ? date : null,
+    };
+    cachedFreshness = { value, fetchedAtMs: now };
+    return value;
+  } catch {
+    const value = {
+      gitSha: null,
+      lastCommitDateUtc: null,
+    };
+    cachedFreshness = { value, fetchedAtMs: now };
+    return value;
+  }
 }
 
 function countOccurrences(haystack: string, needle: string): number {

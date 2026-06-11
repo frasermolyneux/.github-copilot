@@ -12,9 +12,10 @@ async function main(): Promise<void> {
     instructions: listItems("instructions").length,
     prompts: listItems("prompts").length,
     agents: listItems("agents").length,
+    skills: listItems("skills").length,
   };
   process.stderr.write(
-    `[gh-copilot-mcp] content root: ${root} (instructions=${counts.instructions}, prompts=${counts.prompts}, agents=${counts.agents})\n`
+    `[gh-copilot-mcp] content root: ${root} (instructions=${counts.instructions}, prompts=${counts.prompts}, agents=${counts.agents}, skills=${counts.skills})\n`
   );
 
   const server = new McpServer({
