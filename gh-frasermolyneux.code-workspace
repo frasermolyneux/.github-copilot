@@ -164,5 +164,28 @@
       "github.copilot",
       "github.copilot-chat"
     ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "MCP: Install local catalog server",
+        "type": "shell",
+        "command": "npm run install-local",
+        "options": {
+          "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "MCP: Reinstall local catalog server (skip build)",
+        "type": "shell",
+        "command": "npm run install-local -- --SkipBuild",
+        "options": {
+          "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
+        },
+        "problemMatcher": []
+      }
+    ]
   }
 }

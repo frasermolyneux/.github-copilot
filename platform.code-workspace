@@ -1,15 +1,45 @@
 {
   "folders": [
-    { "name": ".github-copilot",          "path": "."                            },
-    { "name": "platform-connectivity",    "path": "../platform-connectivity"     },
-    { "name": "platform-hosting",         "path": "../platform-hosting"          },
-    { "name": "platform-landing-zones",   "path": "../platform-landing-zones"    },
-    { "name": "platform-letsencrypt-iis", "path": "../platform-letsencrypt-iis"  },
-    { "name": "platform-monitoring",      "path": "../platform-monitoring"       },
-    { "name": "platform-notifications",   "path": "../platform-notifications"    },
-    { "name": "platform-registry",        "path": "../platform-registry"         },
-    { "name": "platform-sitewatch-func",  "path": "../platform-sitewatch-func"   },
-    { "name": "platform-workloads",       "path": "../platform-workloads"        }
+    {
+      "name": ".github-copilot",
+      "path": "."
+    },
+    {
+      "name": "platform-connectivity",
+      "path": "../platform-connectivity"
+    },
+    {
+      "name": "platform-hosting",
+      "path": "../platform-hosting"
+    },
+    {
+      "name": "platform-landing-zones",
+      "path": "../platform-landing-zones"
+    },
+    {
+      "name": "platform-letsencrypt-iis",
+      "path": "../platform-letsencrypt-iis"
+    },
+    {
+      "name": "platform-monitoring",
+      "path": "../platform-monitoring"
+    },
+    {
+      "name": "platform-notifications",
+      "path": "../platform-notifications"
+    },
+    {
+      "name": "platform-registry",
+      "path": "../platform-registry"
+    },
+    {
+      "name": "platform-sitewatch-func",
+      "path": "../platform-sitewatch-func"
+    },
+    {
+      "name": "platform-workloads",
+      "path": "../platform-workloads"
+    }
   ],
   "settings": {
     "chat.promptFiles": true,
@@ -29,6 +59,29 @@
     "recommendations": [
       "github.copilot",
       "github.copilot-chat"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "MCP: Install local catalog server",
+        "type": "shell",
+        "command": "npm run install-local",
+        "options": {
+          "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "MCP: Reinstall local catalog server (skip build)",
+        "type": "shell",
+        "command": "npm run install-local -- --SkipBuild",
+        "options": {
+          "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
+        },
+        "problemMatcher": []
+      }
     ]
   }
 }
