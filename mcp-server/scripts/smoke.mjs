@@ -11,6 +11,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const serverPath = join(__dirname, "..", "dist", "index.js");
 
 const EXPECTED_TOOLS = [
+  "get_quickstart",
+  "list_instruction_groups",
+  "recommend_entries",
   "list_instructions",
   "get_instruction",
   "search_instructions",
@@ -109,15 +112,27 @@ async function run() {
   // Bonus: exercise list_instructions to confirm content loading works end-to-end.
   const callResp = await send("tools/call", {
     name: "list_instructions",
-    arguments: {},
+    arguments: { limit: 5, offset: 0 },
   });
   if (callResp.error) throw new Error(`tools/call list_instructions failed: ${JSON.stringify(callResp.error)}`);
   const text = callResp.result?.content?.[0]?.text ?? "[]";
   const items = JSON.parse(text);
-  if (!Array.isArray(items) || items.length === 0) {
+  if (!Array.isArray(items?.items) || items.items.length === 0) {
     throw new Error(`list_instructions returned no items (content root resolution likely failed)`);
   }
-  console.log(`list_instructions returned ${items.length} items (first: ${items[0]?.name})`);
+  console.log(`list_instructions returned ${items.items.length} items out of ${items.total} (first: ${items.items[0]?.name})`);
+
+  const groupsResp = await send("tools/call", {
+    name: "list_instruction_groups",
+    arguments: {},
+  });
+  if (groupsResp.error) throw new Error(`tools/call list_instruction_groups failed: ${JSON.stringify(groupsResp.error)}`);
+  const groupsText = groupsResp.result?.content?.[0]?.text ?? "[]";
+  const groups = JSON.parse(groupsText);
+  if (!Array.isArray(groups) || groups.length === 0) {
+    throw new Error("list_instruction_groups returned no groups");
+  }
+  console.log(`list_instruction_groups returned ${groups.length} groups (largest: ${groups[0]?.prefix})`);
 
   const catalogResp = await send("tools/call", {
     name: "get_catalog",
@@ -132,9 +147,36 @@ async function run() {
   if (!Array.isArray(catalog.instructionsByPrefix)) {
     throw new Error("get_catalog returned invalid instructionsByPrefix payload");
   }
+  if (!catalog?.kindHelp || typeof catalog.kindHelp.instructions !== "string") {
+    throw new Error("get_catalog returned invalid kindHelp payload");
+  }
   console.log(
     `get_catalog counts: instructions=${catalog.counts.instructions}, prompts=${catalog.counts.prompts}, agents=${catalog.counts.agents}, skills=${catalog.counts.skills}`
   );
+
+  const quickstartResp = await send("tools/call", {
+    name: "get_quickstart",
+    arguments: {},
+  });
+  if (quickstartResp.error) throw new Error(`tools/call get_quickstart failed: ${JSON.stringify(quickstartResp.error)}`);
+  const quickstartText = quickstartResp.result?.content?.[0]?.text ?? "{}";
+  const quickstart = JSON.parse(quickstartText);
+  if (!Array.isArray(quickstart?.startHere) || quickstart.startHere.length === 0) {
+    throw new Error("get_quickstart returned invalid startHere payload");
+  }
+  console.log(`get_quickstart returned ${quickstart.startHere.length} startHere steps`);
+
+  const recommendResp = await send("tools/call", {
+    name: "recommend_entries",
+    arguments: { task: "update build-and-test workflow" },
+  });
+  if (recommendResp.error) throw new Error(`tools/call recommend_entries failed: ${JSON.stringify(recommendResp.error)}`);
+  const recommendText = recommendResp.result?.content?.[0]?.text ?? "{}";
+  const recommend = JSON.parse(recommendText);
+  if (!Array.isArray(recommend?.instructions) || !Array.isArray(recommend?.agents) || !Array.isArray(recommend?.prompts)) {
+    throw new Error("recommend_entries returned invalid grouped recommendations");
+  }
+  console.log(`recommend_entries returned instructions=${recommend.instructions.length}, prompts=${recommend.prompts.length}, agents=${recommend.agents.length}`);
 
   console.log("SMOKE OK");
 }

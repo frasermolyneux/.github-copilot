@@ -60,6 +60,9 @@ Edit `%USERPROFILE%\.copilot\mcp-config.json` (or `~/.copilot/mcp-config.json`):
       },
       "tools": [
         "get_catalog",
+        "get_quickstart",
+        "list_instruction_groups",
+        "recommend_entries",
         "list_instructions", "get_instruction", "search_instructions",
         "list_prompts", "get_prompt", "search_prompts",
         "list_agents", "get_agent", "search_agents",
@@ -86,6 +89,9 @@ Run **MCP: Open User Configuration** from the Command Palette to open the user-p
       },
       "tools": [
         "get_catalog",
+        "get_quickstart",
+        "list_instruction_groups",
+        "recommend_entries",
         "list_instructions", "get_instruction", "search_instructions",
         "list_prompts", "get_prompt", "search_prompts",
         "list_agents", "get_agent", "search_agents",
@@ -102,25 +108,35 @@ Verify with **MCP: List Servers** (VS Code) or `/mcp show frasermolyneux-copilot
 
 All tools return a single text block whose body is JSON.
 
-| Tool                  | Input                               | Returns                                                       |
-| --------------------- | ----------------------------------- | ------------------------------------------------------------- |
-| `get_catalog`         | `{}`                                | `{ generatedAtUtc, freshness, counts, instructionsByPrefix }` |
-| `list_instructions`   | `{}`                                | `Array<{ name, description, applyTo, path }>`                 |
-| `get_instruction`     | `{ name: string }`                  | `{ name, description, applyTo, path, frontmatter, content }`  |
-| `search_instructions` | `{ query: string, limit?: number }` | `Array<{ name, snippet, score }>`                             |
-| `list_prompts`        | `{}`                                | Same shape as `list_instructions` (no `applyTo`)              |
-| `get_prompt`          | `{ name: string }`                  | Same shape as `get_instruction`                               |
-| `search_prompts`      | `{ query: string, limit?: number }` | Same shape as `search_instructions`                           |
-| `list_agents`         | `{}`                                | Same shape as `list_instructions`                             |
-| `get_agent`           | `{ name: string }`                  | Same shape as `get_instruction`                               |
-| `search_agents`       | `{ query: string, limit?: number }` | Same shape as `search_instructions`                           |
-| `list_skills`         | `{}`                                | Same shape as `list_instructions`                             |
-| `get_skill`           | `{ name: string }`                  | Same shape as `get_instruction`                               |
-| `search_skills`       | `{ query: string, limit?: number }` | Same shape as `search_instructions`                           |
+| Tool                      | Input                                                                            | Returns                                                                             |
+| ------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `get_catalog`             | `{}`                                                                             | `{ generatedAtUtc, freshness, counts, kindHelp, quickstart, instructionsByPrefix }` |
+| `get_quickstart`          | `{}`                                                                             | `{ startHere, kindHelp, taskRouting, referenceInstruction }`                        |
+| `list_instruction_groups` | `{}`                                                                             | `Array<{ prefix, description, count, examples }>`                                   |
+| `recommend_entries`       | `{ task: string }`                                                               | `{ inferredFocus, recommendedFlow, instructions, prompts, agents }`                 |
+| `list_instructions`       | `{ prefix?: string, applyToContains?: string, limit?: number, offset?: number }` | `{ total, offset, limit, hasMore, items }`                                          |
+| `get_instruction`         | `{ name: string }`                                                               | `{ name, description, applyTo, path, frontmatter, content }`                        |
+| `search_instructions`     | `{ query: string, limit?: number }`                                              | `Array<{ name, snippet, score }>`                                                   |
+| `list_prompts`            | `{}`                                                                             | `Array<{ name, description, path }>`                                                |
+| `get_prompt`              | `{ name: string }`                                                               | Same shape as `get_instruction`                                                     |
+| `search_prompts`          | `{ query: string, limit?: number }`                                              | Same shape as `search_instructions`                                                 |
+| `list_agents`             | `{}`                                                                             | `Array<{ name, description, path }>`                                                |
+| `get_agent`               | `{ name: string }`                                                               | Same shape as `get_instruction`                                                     |
+| `search_agents`           | `{ query: string, limit?: number }`                                              | Same shape as `search_instructions`                                                 |
+| `list_skills`             | `{}`                                                                             | `Array<{ name, description, path }>`                                                |
+| `get_skill`               | `{ name: string }`                                                               | Same shape as `get_instruction`                                                     |
+| `search_skills`           | `{ query: string, limit?: number }`                                              | Same shape as `search_instructions`                                                 |
 
 `name` accepts either the bare name (`patterns.api-client`) or the full filename (`patterns.api-client.instructions.md`).
 
 Search scoring: `+3` per case-insensitive substring match in `name`, `+2` in `description` / `applyTo`, `+1` in body. Results sorted by score, tie-broken alphabetically. Default `limit` 10, max 50.
+
+Suggested discovery flow:
+
+1. Call `get_catalog` for the top-level map, freshness, and the machine-readable quickstart pointer.
+2. Call `get_quickstart` if you want guidance on whether to use instructions, prompts, or agents.
+3. Call `list_instruction_groups` or `list_instructions({ prefix: ... })` to browse a focused domain.
+4. Call `recommend_entries({ task: ... })` when you know the task but not the right entrypoints.
 
 ## Resources
 
@@ -185,6 +201,7 @@ mcp-server/
 ## Caveats
 
 - **MCP clients don't auto-load catalog content.** Tools must be called explicitly. The bootstrap snippet above tells the agent to do that — without it, the agent will happily ignore the catalog.
+- **`list_instructions` is intentionally paged.** Use `limit` / `offset` for browsing and `prefix` / `applyToContains` to stay out of truncation territory in chat clients.
 - **Use user-level config for local surfaces.** Keep catalog MCP config out of committed `.vscode/mcp.json` in consumer repos unless you have a deliberate team-shared reason.
 - **No `npx` / `github:` install path.** There is no root `package.json` in the catalog repo and no `prepare` script that builds the server post-install, so `npx github:frasermolyneux/.github-copilot` does not work. Use the clone + build path above until a published artifact exists.
 - **CI is build + smoke only.** Expand to lint/release automation if package publishing is introduced.

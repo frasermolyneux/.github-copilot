@@ -31,6 +31,41 @@ export interface SearchHit {
   score: number;
 }
 
+export interface BrowseResult<T> {
+  total: number;
+  offset: number;
+  limit: number;
+  hasMore: boolean;
+  items: T[];
+}
+
+export interface InstructionGroupSummary {
+  prefix: string;
+  description: string;
+  count: number;
+  examples: string[];
+}
+
+export interface QuickstartSummary {
+  generatedAtUtc: string;
+  startHere: string[];
+  kindHelp: Record<Kind, string>;
+  taskRouting: Array<{
+    task: string;
+    use: string[];
+  }>;
+  referenceInstruction: { name: string; description: string; path: string } | null;
+}
+
+export interface RecommendationResult {
+  task: string;
+  inferredFocus: string[];
+  recommendedFlow: string[];
+  instructions: SearchHit[];
+  prompts: SearchHit[];
+  agents: SearchHit[];
+}
+
 export interface CatalogSummary {
   generatedAtUtc: string;
   freshness: {
@@ -38,13 +73,21 @@ export interface CatalogSummary {
     lastCommitDateUtc: string | null;
   };
   counts: Record<Kind, number>;
-  instructionsByPrefix: Array<{
-    prefix: string;
+  kindHelp: Record<Kind, string>;
+  quickstart: {
+    name: string;
     description: string;
-    count: number;
-    examples: string[];
-  }>;
+    path: string;
+  } | null;
+  instructionsByPrefix: InstructionGroupSummary[];
 }
+
+const KIND_HELP: Record<Kind, string> = {
+  instructions: "Rules, standards, patterns, and platform/shared contracts.",
+  prompts: "Reusable guided flows for creating or updating repo content.",
+  agents: "Specialist delegated workers for execution, alignment, or review.",
+  skills: "Reusable domain playbooks when the catalog publishes them.",
+};
 
 let cachedRoot: string | null = null;
 let cachedFreshness: { value: { gitSha: string | null; lastCommitDateUtc: string | null }; fetchedAtMs: number } | null = null;
@@ -171,6 +214,41 @@ export function listItems(kind: Kind): ItemSummary[] {
   return out;
 }
 
+export function browseInstructions(options?: {
+  prefix?: string;
+  applyToContains?: string;
+  limit?: number;
+  offset?: number;
+}): BrowseResult<ItemSummary> {
+  const prefix = options?.prefix?.trim().toLowerCase();
+  const applyToContains = options?.applyToContains?.trim().toLowerCase();
+  const offset = Math.max(0, options?.offset ?? 0);
+  const limit = Math.min(200, Math.max(1, options?.limit ?? 25));
+
+  let items = listItems("instructions");
+
+  if (prefix) {
+    items = items.filter((item) => {
+      const name = item.name.toLowerCase();
+      return name === prefix || name.startsWith(`${prefix}.`);
+    });
+  }
+
+  if (applyToContains) {
+    items = items.filter((item) => item.applyTo?.toLowerCase().includes(applyToContains) ?? false);
+  }
+
+  const total = items.length;
+  const paged = items.slice(offset, offset + limit);
+  return {
+    total,
+    offset,
+    limit,
+    hasMore: offset + paged.length < total,
+    items: paged,
+  };
+}
+
 export function getItem(kind: Kind, name: string): ItemFull | null {
   const bare = normaliseName(name, kind);
   const direct = readItem(kind, bare);
@@ -226,6 +304,84 @@ export function getCatalogSummary(): CatalogSummary {
   };
 
   const instructions = listItems("instructions");
+  const instructionsByPrefix = buildInstructionPrefixSummary(instructions);
+  const quickstart = getItem("instructions", "catalog.quickstart");
+
+  return {
+    generatedAtUtc,
+    freshness: getGitFreshness(),
+    counts,
+    kindHelp: KIND_HELP,
+    quickstart: quickstart
+      ? {
+        name: quickstart.name,
+        description: quickstart.description,
+        path: quickstart.path,
+      }
+      : null,
+    instructionsByPrefix,
+  };
+}
+
+export function listInstructionGroups(): InstructionGroupSummary[] {
+  return buildInstructionPrefixSummary(listItems("instructions"));
+}
+
+export function getQuickstartSummary(): QuickstartSummary {
+  const quickstart = getItem("instructions", "catalog.quickstart");
+  return {
+    generatedAtUtc: new Date().toISOString(),
+    startHere: [
+      "Call get_catalog first for top-level counts, kind summaries, and freshness.",
+      "Call get_quickstart when you want a compact chooser between instructions, prompts, and agents.",
+      "Use list_instruction_groups or list_instructions({ prefix }) to narrow by domain before reading individual files.",
+      "Use recommend_entries({ task }) when you know the task but not the right catalog entrypoints.",
+    ],
+    kindHelp: KIND_HELP,
+    taskRouting: [
+      {
+        task: "Update a workflow",
+        use: ["workflow instructions", "workflow prompts", "align-project-workflows agent"],
+      },
+      {
+        task: "Review in-progress changes",
+        use: ["standards/patterns instructions", "code-review agent"],
+      },
+      {
+        task: "Update README / CONTRIBUTING / SECURITY / repo instructions",
+        use: ["metadata instructions", "update-project-metadata agent"],
+      },
+      {
+        task: "Figure out a platform/shared contract for a repo",
+        use: ["platform.* instructions", "shared.* instructions", "get_catalog"],
+      },
+    ],
+    referenceInstruction: quickstart
+      ? {
+        name: quickstart.name,
+        description: quickstart.description,
+        path: quickstart.path,
+      }
+      : null,
+  };
+}
+
+export function recommendEntries(task: string): RecommendationResult {
+  const lowered = task.trim().toLowerCase();
+  const focus = inferFocus(lowered);
+  const terms = expandRecommendationTerms(lowered, focus);
+
+  return {
+    task,
+    inferredFocus: focus,
+    recommendedFlow: buildRecommendedFlow(focus),
+    instructions: combinedSearch("instructions", terms, 5),
+    prompts: combinedSearch("prompts", terms, 5),
+    agents: combinedSearch("agents", terms, 5),
+  };
+}
+
+function buildInstructionPrefixSummary(instructions: ItemSummary[]): InstructionGroupSummary[] {
   const prefixMap = new Map<string, { count: number; examples: string[] }>();
   for (const item of instructions) {
     const firstDot = item.name.indexOf(".");
@@ -250,10 +406,17 @@ export function getCatalogSummary(): CatalogSummary {
       descriptions.set(prefix, fallback.description);
       continue;
     }
+
+    const prefixMatch = instructions.find((item) => item.name === prefix || item.name.startsWith(`${prefix}.`));
+    if (prefixMatch && prefixMatch.description) {
+      descriptions.set(prefix, prefixMatch.description);
+      continue;
+    }
+
     descriptions.set(prefix, "No prefix summary available.");
   }
 
-  const instructionsByPrefix = Array.from(prefixMap.entries())
+  return Array.from(prefixMap.entries())
     .map(([prefix, data]) => ({
       prefix,
       description: descriptions.get(prefix) ?? "No prefix summary available.",
@@ -261,13 +424,98 @@ export function getCatalogSummary(): CatalogSummary {
       examples: data.examples,
     }))
     .sort((a, b) => b.count - a.count || a.prefix.localeCompare(b.prefix));
+}
 
-  return {
-    generatedAtUtc,
-    freshness: getGitFreshness(),
-    counts,
-    instructionsByPrefix,
-  };
+function inferFocus(loweredTask: string): string[] {
+  const focus = new Set<string>();
+  if (/(workflow|github actions|dependabot|deploy|pr verify|build-and-test|codequality)/.test(loweredTask)) focus.add("workflow");
+  if (/(readme|contributing|security|copilot instructions|agents.md|codeowners|issue template|pull request template|metadata)/.test(loweredTask)) focus.add("metadata");
+  if (/(terraform|iac|infrastructure|app service|dns|monitoring|platform|remote state)/.test(loweredTask)) focus.add("platform");
+  if (/(review|audit|findings|risk)/.test(loweredTask)) focus.add("review");
+  if (/(prompt|agent|instruction|catalog|discoverability|mcp)/.test(loweredTask)) focus.add("catalog");
+  if (focus.size === 0) focus.add("general");
+  return Array.from(focus);
+}
+
+function expandRecommendationTerms(loweredTask: string, focus: string[]): string[] {
+  const terms = new Set<string>();
+  if (loweredTask) terms.add(loweredTask);
+  for (const word of loweredTask.split(/[^a-z0-9.-]+/)) {
+    if (word.length >= 4) terms.add(word);
+  }
+  for (const bucket of focus) {
+    switch (bucket) {
+      case "workflow":
+        terms.add("workflow");
+        terms.add("workflows");
+        break;
+      case "metadata":
+        terms.add("metadata");
+        terms.add("readme");
+        break;
+      case "platform":
+        terms.add("platform");
+        terms.add("terraform");
+        break;
+      case "review":
+        terms.add("review");
+        terms.add("code-review");
+        break;
+      case "catalog":
+        terms.add("catalog");
+        terms.add("mcp");
+        break;
+      default:
+        break;
+    }
+  }
+  return Array.from(terms);
+}
+
+function buildRecommendedFlow(focus: string[]): string[] {
+  if (focus.includes("review")) {
+    return [
+      "Start with recommend_entries to shortlist relevant instructions and the code-review agent.",
+      "Read the top matching standards/patterns instructions before review.",
+      "Use the code-review agent when you want a findings-first assessment.",
+    ];
+  }
+  if (focus.includes("workflow")) {
+    return [
+      "Start with list_instruction_groups or list_instructions({ prefix: 'workflows' }).",
+      "Read the workflow-specific instruction plus its category layers.",
+      "Use the matching workflow prompt or align-project-workflows agent if you want delegated changes.",
+    ];
+  }
+  if (focus.includes("metadata")) {
+    return [
+      "Start with list_instructions({ prefix: 'metadata' }).",
+      "Read the universal metadata instruction first, then the file-specific one.",
+      "Use the update-project-metadata agent if you want delegated multi-file updates.",
+    ];
+  }
+  return [
+    "Start with get_catalog for the top-level map.",
+    "Use list_instruction_groups to pick the right domain.",
+    "Read the best matching instruction first, then use prompts/agents if the task needs guided authoring or delegation.",
+  ];
+}
+
+function combinedSearch(kind: Kind, terms: string[], limit: number): SearchHit[] {
+  const byName = new Map<string, SearchHit>();
+  for (const term of terms) {
+    for (const hit of searchItems(kind, term, 20)) {
+      const existing = byName.get(hit.name);
+      if (!existing) {
+        byName.set(hit.name, { ...hit });
+      } else {
+        existing.score += hit.score;
+      }
+    }
+  }
+  return Array.from(byName.values())
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
+    .slice(0, limit);
 }
 
 function getGitFreshness(): { gitSha: string | null; lastCommitDateUtc: string | null } {

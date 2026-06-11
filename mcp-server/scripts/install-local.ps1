@@ -8,6 +8,9 @@ $ErrorActionPreference = 'Stop'
 
 $tools = @(
     'get_catalog',
+    'get_quickstart',
+    'list_instruction_groups',
+    'recommend_entries',
     'list_instructions',
     'get_instruction',
     'search_instructions',
