@@ -41,26 +41,44 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Shared Copilot setup
+        uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
+        with:
+          checkout-repo: 'true'
+          checkout-shared-copilot: 'true'
+```
+
+> **Critical:** if you override `shared-copilot-path`, preserve a non-root path (for example `.github-copilot`). A root-path checkout will overwrite the main repo checkout.
+
+### `actions/` repo bootstrap exception
+
+When authoring the `copilot-setup` composite in the `actions/` repo itself (before the first `copilot-setup/v1` tag exists), a local-path invocation is allowed **only** with an explicit checkout first:
+
+```yaml
+    steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Checkout .github-copilot for shared instructions
-        uses: actions/checkout@v6
+      - name: Shared Copilot setup
+        uses: ./copilot-setup
         with:
-          repository: frasermolyneux/.github-copilot
-          path: .github-copilot
+          checkout-repo: 'false'
+          checkout-shared-copilot: 'true'
 ```
 
-> **Critical:** the second checkout must include `path: .github-copilot`. Without it, the second checkout overwrites the main repo checkout. Always preserve this.
+After `copilot-setup/v1` is available, consumer repos should use the remote pinned form.
 
 ## Optional steps (by project content)
 
 ### .NET projects
 
 ```yaml
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+      - name: Shared Copilot setup
+        uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
         with:
+          checkout-repo: 'true'
+          checkout-shared-copilot: 'true'
+          setup-dotnet: 'true'
           dotnet-version: |
             9.0.x
             10.0.x
@@ -69,18 +87,24 @@ jobs:
 ### Node / SCSS projects
 
 ```yaml
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Shared Copilot setup
+        uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
         with:
+          checkout-repo: 'true'
+          checkout-shared-copilot: 'true'
+          setup-node: 'true'
           node-version: 20.x
 ```
 
 ### Python (rare)
 
 ```yaml
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Shared Copilot setup
+        uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
         with:
+          checkout-repo: 'true'
+          checkout-shared-copilot: 'true'
+          setup-python: 'true'
           python-version: '3.x'
 ```
 
@@ -88,7 +112,15 @@ jobs:
 
 1. Job is named `copilot-setup-steps`.
 2. Triggers limited to file-self-changes plus `workflow_dispatch`.
-3. Main repo checkout first; `.github-copilot` checkout includes `path: .github-copilot`.
+3. Uses `frasermolyneux/actions/copilot-setup@copilot-setup/v1` with `checkout-repo: 'true'` and `checkout-shared-copilot: 'true'`.
 4. Setup steps match the project's runtimes (.NET, Node, Python).
 5. Action pins match `workflows.instructions.md`.
 6. No secrets referenced; `permissions: contents: read` only.
+
+## Rollout ordering
+
+When introducing a brand-new composite and a new canonical pin:
+
+1. Merge the `actions/` repo change first.
+2. Confirm the rolling tag exists (for example `copilot-setup/v1`).
+3. Then apply the canonical pinned reference in consumer repos.

@@ -49,9 +49,10 @@ Runs Playwright integration tests against a deployed app.
       terraform-folder: terraform
       terraform-var-file: tfvars/dev.tfvars
       terraform-backend-file: backends/dev.backend.hcl
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
   ```
 
 #### `terraform-apply`
@@ -120,6 +121,21 @@ Deploys Logic App definitions.
         terraform:terraform/**
   - if: steps.changes.outputs.src == 'true'
     run: dotnet build
+  ```
+
+#### `copilot-setup`
+- **Purpose**: Standard pre-session setup for Copilot coding-agent workflows (`copilot-setup-steps.yml`) including repository checkout, `.github-copilot` checkout, and optional runtime installation.
+- **Key inputs**: `checkout-repo`, `checkout-shared-copilot`, `shared-copilot-repository`, `shared-copilot-path`, `setup-dotnet`, `dotnet-version`, `setup-node`, `node-version`, `setup-python`, `python-version`.
+- **Sample**:
+  ```yaml
+  - uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
+    with:
+      checkout-repo: 'true'
+      checkout-shared-copilot: 'true'
+      setup-dotnet: 'true'
+      dotnet-version: |
+        9.0.x
+        10.0.x
   ```
 
 ### Logic Apps & Bicep

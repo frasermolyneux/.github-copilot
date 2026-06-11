@@ -12,6 +12,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 - **Always pin to the specific tag**, e.g. `@dotnet-ci/v1.4`. Never use `@main` or floating refs.
 - Reusable workflows (`uses: frasermolyneux/actions/.github/workflows/<name>.yml@<ref>`) currently pin to `@main` because they are versioned by the catalog repo's main branch — this is the documented exception.
 - When bumping a tag, update this file once and propagate to every Layer-3 instruction that references it.
+- For a brand-new composite action pin, merge `actions/` first and verify the rolling tag exists before rolling the pin into consumer repos.
 
 ## Composite actions
 
@@ -35,6 +36,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/wait-for-version` | `@wait-for-version/v1.0` | Poll an `info-url` until `expected-version` is live |
 | `frasermolyneux/actions/apim-api-import` | `@apim-api-import/v1.0` | Import an OpenAPI definition into Azure API Management |
 | `frasermolyneux/actions/dotnet-playwright-tests` | `@dotnet-playwright-tests/v1.1` | Run Playwright end-to-end tests against a deployed .NET app |
+| `frasermolyneux/actions/copilot-setup` | `@copilot-setup/v1` | Standard pre-session setup for Copilot coding-agent workflows (checkouts + optional runtimes) |
 
 ## Reusable workflows
 
