@@ -185,6 +185,15 @@
           "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
         },
         "problemMatcher": []
+      },
+      {
+        "label": "MCP: Force reinstall + smoke verify",
+        "type": "shell",
+        "command": "npm run install-local && npm run smoke",
+        "options": {
+          "cwd": "${workspaceFolder:.github-copilot}/mcp-server"
+        },
+        "problemMatcher": []
       }
     ]
   }
