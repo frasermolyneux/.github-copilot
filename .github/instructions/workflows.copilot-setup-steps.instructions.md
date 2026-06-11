@@ -50,24 +50,6 @@ jobs:
 
 > **Critical:** if you override `shared-copilot-path`, preserve a non-root path (for example `.github-copilot`). A root-path checkout will overwrite the main repo checkout.
 
-### `actions/` repo bootstrap exception
-
-When authoring the `copilot-setup` composite in the `actions/` repo itself (before the first `copilot-setup/v1` tag exists), a local-path invocation is allowed **only** with an explicit checkout first:
-
-```yaml
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Shared Copilot setup
-        uses: ./copilot-setup
-        with:
-          checkout-repo: 'false'
-          checkout-shared-copilot: 'true'
-```
-
-After `copilot-setup/v1` is available, consumer repos should use the remote pinned form.
-
 ## Optional steps (by project content)
 
 ### .NET projects
