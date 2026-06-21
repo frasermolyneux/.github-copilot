@@ -1,6 +1,10 @@
 {
   "folders": [
     {
+      "name": ".github",
+      "path": "../.github"
+    },
+    {
       "name": ".github-copilot",
       "path": "."
     },
@@ -139,10 +143,6 @@
     {
       "name": "twenty-one",
       "path": "../twenty-one"
-    },
-    {
-      "name": "github-copilot",
-      "path": "../github-copilot"
     }
   ],
   "settings": {
