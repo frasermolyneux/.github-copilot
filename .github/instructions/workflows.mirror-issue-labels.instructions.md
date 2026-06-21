@@ -45,7 +45,7 @@ jobs:
       issues: read
     steps:
       - name: Copy labels from linked issue(s)
-        uses: actions/github-script@v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const body = context.payload.pull_request.body || '';
@@ -120,6 +120,6 @@ jobs:
 7. The script strips HTML comments and fenced code blocks before matching `Closes #N`, so template guidance and pasted command output don't trigger spurious lookups.
 8. Existing PR labels are **never removed** — only additive. Labels the PR already has are skipped (no API churn).
 9. Cross-repo references (`owner/repo#N`) are intentionally **not** supported — labels are repo-local and copying foreign labels would create new noise labels in this repo.
-10. Uses `actions/github-script@v7` pinned per `workflows.instructions.md`.
+10. Uses `actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3` pinned per `workflows.instructions.md`.
 
 > **Non-goals.** This workflow does not: tick checkboxes, set draft/ready state, post comments, request reviewers, or remove labels. Those decisions stay with the human.

@@ -67,7 +67,7 @@ When a workflow installs .NET directly (e.g. `copilot-setup-steps.yml`), use:
 
 ```yaml
 - name: Setup .NET
-  uses: actions/setup-dotnet@v5
+  uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2
   with:
     dotnet-version: |
       9.0.x

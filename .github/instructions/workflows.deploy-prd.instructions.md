@@ -329,13 +329,13 @@ static-web-app-deploy-prd:
     needs.detect-changes.outputs.src == 'true'
   steps:
     - name: Download site artifact
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
         name: static-site
         path: static-site
 
     - name: Az CLI Login
-      uses: azure/login@v3
+      uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43
       with:
         client-id: ${{ vars.AZURE_CLIENT_ID }}
         subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}

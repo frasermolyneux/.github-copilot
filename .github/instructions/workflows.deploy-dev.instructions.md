@@ -213,8 +213,8 @@ build-and-test:
     contents: read
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v6
-    - uses: actions/setup-node@v6
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+    - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
       with:
         node-version: 20.x
     - name: Install dependencies
@@ -227,7 +227,7 @@ build-and-test:
       run: rm -rf node_modules
       working-directory: src
     - name: Upload site artifact
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: static-site
         path: src
@@ -277,13 +277,13 @@ static-web-app-deploy-dev:
     group: ${{ github.repository }}-dev
   steps:
     - name: Download site artifact
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
       with:
         name: static-site
         path: static-site
 
     - name: Az CLI Login
-      uses: azure/login@v3
+      uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43
       with:
         client-id: ${{ vars.AZURE_CLIENT_ID }}
         subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}

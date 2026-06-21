@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v3
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -50,6 +50,6 @@ jobs:
 2. Triggered on `pull_request` to `main` only.
 3. Actor guard `if: ${{ github.actor == 'dependabot[bot]' }}` is present.
 4. Permissions are `contents: write`, `pull-requests: write` on the job (top-level `{}` retained).
-5. Uses `dependabot/fetch-metadata@v3`.
+5. Uses `dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98`.
 6. Merge command is `gh pr merge --auto --squash`.
 7. No project-specific customisation — the file should be byte-identical across repos.

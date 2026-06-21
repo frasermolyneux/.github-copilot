@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 steps:
-  - uses: azure/login@v3
+  - uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43
     with:
       client-id: ${{ secrets.AZURE_CLIENT_ID }}
       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -54,7 +54,7 @@ A workflow / pipeline is compliant when:
 
 - It declares `permissions: id-token: write` (GitHub) or uses a federated service connection (ADO).
 - It does not reference any `*_CLIENT_SECRET`, `*_PASSWORD`, or `AZURE_CREDENTIALS` JSON-blob secret.
-- It uses `azure/login@v3` (GitHub) without `creds:` input.
+- It uses `azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43` (GitHub) without `creds:` input.
 
 A Terraform stack is compliant when:
 

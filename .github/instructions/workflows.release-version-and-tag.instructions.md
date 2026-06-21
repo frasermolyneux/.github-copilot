@@ -51,7 +51,7 @@ calculate-version:
     tag_name: ${{ steps.release_tag.outputs.tag_name }}
     should_tag: ${{ steps.release_tag.outputs.should_tag }}
   steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       with:
         fetch-depth: 0
 
@@ -140,7 +140,7 @@ tag-release:
   runs-on: ubuntu-latest
   steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       with:
         fetch-depth: 0
 
