@@ -15,12 +15,12 @@ Pin provider versions in `terraform/providers.tf` (or `versions.tf`) using pessi
 
 ```hcl
 terraform {
-  required_version = ">= 1.6.0"
+  required_version = ">= 1.15.6"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 4.78.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
