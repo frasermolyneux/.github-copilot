@@ -129,7 +129,7 @@ Workflow standards are encoded in `.github-copilot/.github/instructions/` as thr
    - `workflows.dotnet.instructions.md` — .NET conventions
    - `workflows.security.instructions.md` — Sonar / scanning / dependency-review
 3. **Per-workflow** (one per canonical workflow filename)
-   - `workflows.build-and-test.instructions.md`, `workflows.pr-verify.instructions.md`, `workflows.codequality.instructions.md`, `workflows.copilot-setup-steps.instructions.md`, `workflows.dependabot-automerge.instructions.md`, `workflows.dependabot-config.instructions.md`, `workflows.deploy-dev.instructions.md`, `workflows.deploy-prd.instructions.md`, `workflows.destroy-environment.instructions.md`, `workflows.destroy-development.instructions.md`, `workflows.mirror-issue-labels.instructions.md`, `workflows.release-version-and-tag.instructions.md`, `workflows.release-publish-nuget.instructions.md`
+   - `workflows.build-and-test.instructions.md`, `workflows.pr-verify.instructions.md`, `workflows.codequality.instructions.md`, `workflows.copilot-setup-steps.instructions.md`, `workflows.dependabot-automerge.instructions.md`, `workflows.dependabot-config.instructions.md`, `workflows.deploy-dev.instructions.md`, `workflows.deploy-prd.instructions.md`, `workflows.destroy-environment.instructions.md`, `workflows.destroy-development.instructions.md`, `workflows.release-version-and-tag.instructions.md`, `workflows.release-publish-nuget.instructions.md`
 
 Each per-workflow file contains the canonical YAML template plus a compliance checklist. The matching `update-*-workflow.prompt.md` is a thin shim that delegates to it.
 
@@ -183,3 +183,4 @@ Five further instruction prefixes encode org-wide context that applies beyond a 
 - `shared.instructions.md` (catalog), `shared.actions.instructions.md`, `shared.ado-pipeline-templates.instructions.md`, `shared.api-client-abstractions.instructions.md`, `shared.observability-appinsights.instructions.md`, `shared.invision-api-client.instructions.md`, `shared.portal-core.instructions.md`
 
 **Companion agent**: `audit-project-alignment.agent.md` produces a read-only drift report for a target repo against these layers.
+
