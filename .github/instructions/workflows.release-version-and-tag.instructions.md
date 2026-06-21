@@ -57,7 +57,7 @@ calculate-version:
 
     - name: Install Nerdbank.GitVersioning tool
       run: |
-        dotnet tool install --global nbgv
+        dotnet tool install --global nbgv --version <repo-pinned-nbgv-version>
         echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
     - name: Determine version
@@ -104,7 +104,7 @@ calculate-version:
         "tag_name=$tagName" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
 ```
 
-This job is identical across NuGet repos — do not customise.
+Pin the `nbgv` CLI to the same version the repo references in `Directory.Build.props` (or the equivalent repo-standard source of truth). Do not install the latest version implicitly.
 
 ### `dotnet-ci`
 
@@ -160,7 +160,7 @@ tag-release:
 ## Compliance checklist
 
 1. Trigger includes `paths: ['src/**']` on push to main, plus `workflow_dispatch`.
-2. `calculate-version` job is byte-identical to the canonical version above (other than indentation).
+2. `calculate-version` job matches the canonical version above, with the `nbgv` tool version pinned to the repo's declared Nerdbank.GitVersioning version.
 3. `dotnet-ci` uses `BUILD_VERSION_OVERRIDE` from `calculate-version`.
 4. `dotnet-version:` matrix matches the project's TFMs.
 5. `tag-release` gated on `should_tag == 'true'`, depends on both upstream jobs.

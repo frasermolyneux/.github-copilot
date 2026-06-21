@@ -52,7 +52,7 @@ Use a single version (`9.0.x` or `10.0.x`) only when the project's csproj explic
 NuGet-publishing repos use NBGV for SemVer:
 
 - `version.json` lives at the repo root or per-project folder.
-- The `release-version-and-tag.yml` workflow installs `nbgv` as a global tool, calls `nbgv get-version -f json`, and outputs `semver`, `nuget_version`, `should_tag`.
+- The `release-version-and-tag.yml` workflow installs `nbgv` as a global tool pinned to the same Nerdbank.GitVersioning version declared by the repo, calls `nbgv get-version -f json`, and outputs `semver`, `nuget_version`, `should_tag`.
 - Downstream `dotnet-ci` step receives `BUILD_VERSION_OVERRIDE: ${{ needs.calculate-version.outputs.nuget_version }}` to stamp the package version.
 
 See `workflows.release-version-and-tag.instructions.md` for the canonical job set.
