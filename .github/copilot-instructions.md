@@ -91,6 +91,7 @@ Each standard below has a dedicated `standards.*.instructions.md` file with full
 - **Terraform style** — `standards.terraform-style.instructions.md`
 - **.NET project files** — `standards.dotnet-project.instructions.md`
 - **Branching and PRs** — `standards.branching-and-prs.instructions.md`
+- **Health endpoints and probes** — `standards.health-endpoints.instructions.md`
 - **Workflow scheduling** — `workflows.scheduling.instructions.md` (centralised ops-clock; deploy-prd weekly drift prevention; Dependabot Sunday, codequality Monday, deploy-prd Wed/Thu/Fri)
 - **Test filtering**: CI excludes integration tests via `--filter "FullyQualifiedName!~IntegrationTests"`.
 
@@ -170,8 +171,8 @@ Five further instruction prefixes encode org-wide context that applies beyond a 
 **`tenant.*` files** (5):
 - `tenant.subscriptions.instructions.md`, `tenant.regions.instructions.md`, `tenant.network-topology.instructions.md`, `tenant.identity.instructions.md`, `tenant.dns.instructions.md`
 
-**`standards.*` files** (6):
-- `standards.azure-naming.instructions.md`, `standards.azure-tagging.instructions.md`, `standards.oidc-and-secrets.instructions.md`, `standards.terraform-style.instructions.md`, `standards.dotnet-project.instructions.md`, `standards.branching-and-prs.instructions.md`
+**`standards.*` files** (7):
+- `standards.azure-naming.instructions.md`, `standards.azure-tagging.instructions.md`, `standards.oidc-and-secrets.instructions.md`, `standards.terraform-style.instructions.md`, `standards.dotnet-project.instructions.md`, `standards.branching-and-prs.instructions.md`, `standards.health-endpoints.instructions.md`
 
 **`patterns.*` files** (7):
 - `patterns.api-client.instructions.md`, `patterns.repository.instructions.md`, `patterns.versioned-apis.instructions.md`, `patterns.terraform-remote-state.instructions.md`, `patterns.workload-identity-provisioning.instructions.md`, `patterns.nbgv-versioning.instructions.md`, `patterns.scss-build.instructions.md`

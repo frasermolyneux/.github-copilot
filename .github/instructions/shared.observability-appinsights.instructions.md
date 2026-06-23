@@ -52,7 +52,7 @@ Bound from `ApplicationInsights:TelemetryFilter:*` (optional; sensible defaults 
 | `Dependencies.DurationThresholdMs` | `1000` | Drop dependencies faster than this |
 | `Requests.Enabled` | `true` | Filter request telemetry |
 | `Requests.DurationThresholdMs` | `1000` | Drop requests faster than this |
-| `Requests.ExcludedPaths` | `/healthz,/health,/api/health` | Drop these paths regardless of duration |
+| `Requests.ExcludedPaths` | `/health/live,/health/ready` | Drop these paths regardless of duration |
 | `Requests.RetainedStatusCodeRanges` | `400-599` | Always keep these status codes |
 | `Traces.Enabled` | `true` | Filter trace telemetry |
 | `Traces.MinSeverity` | `Warning` | Drop traces below this severity |
