@@ -38,7 +38,7 @@ jobs:
     steps:
       - name: Evaluate Dependabot policy
         id: evaluate
-        uses: frasermolyneux/actions/dependabot-policy@dependabot-policy/v1.0
+        uses: frasermolyneux/actions/dependabot-policy@dependabot-policy/v1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,9 +65,10 @@ jobs:
 3. `dependabot-policy` job exists and completes successfully on non-draft PRs.
 4. `dependabot-policy` emits outputs `is_dependabot` and `auto_merge_allowed`.
 5. Dependabot detection in policy is based on PR author (`pull_request.user.login`), not event actor.
-6. `dependabot-policy` uses `frasermolyneux/actions/dependabot-policy@dependabot-policy/v1.0`.
+6. `dependabot-policy` uses `frasermolyneux/actions/dependabot-policy@dependabot-policy/v1.1`.
 7. Auto-merge policy is fail-closed and only allows approved update classes (patch/minor by default).
 8. Major updates are marked non-auto-merge and `run-prd-plan` is applied.
 9. Auto-merge job is gated by `needs.dependabot-policy.outputs.*`.
 10. Auto-merge command remains `gh pr merge --auto --squash`.
 11. Top-level permissions remain `{}` and per-job permissions are least-privilege.
+
