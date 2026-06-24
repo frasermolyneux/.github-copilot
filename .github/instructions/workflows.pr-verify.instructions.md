@@ -27,7 +27,9 @@ concurrency:
   cancel-in-progress: true
 ```
 
-`labeled, unlabeled` are required so the `run-prd-plan` and `deploy-dev` labels can re-trigger Terraform behaviour.
+`labeled, unlabeled` are part of the canonical trigger set for label-aware Terraform behaviour in PR verification.
+
+To avoid duplicate required checks (and blocked PRs caused by cancelled duplicates), required jobs must only run for `opened`, `synchronize`, `reopened`, and `ready_for_review`. Label-driven jobs must gate on both the label being present and the relevant label-change event.
 
 The workflow-level `concurrency:` block cancels superseded PR runs when an agent or human pushes a new revision — see the PR-check concurrency rule in `workflows.instructions.md`. This is independent of the per-job environment-scoped concurrency groups (`${{ github.repository }}-dev` / `-prd`) on Terraform jobs.
 
@@ -94,7 +96,7 @@ terraform-plan-dev:
     contents: read
     id-token: write
     pull-requests: write
-  if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'deploy-dev')
+  if: github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'deploy-dev') && contains(fromJson('["opened","synchronize","reopened","ready_for_review"]'), github.event.action)
   needs: build-and-test
   environment: Development
   runs-on: ubuntu-latest
@@ -113,6 +115,37 @@ terraform-plan-dev:
 
 The `!contains(... 'deploy-dev')` guard skips the plan when the PR is intentionally being deployed to dev (the deploy workflow takes over).
 
+The action guard ensures this required job is not re-triggered by unrelated label churn.
+
+### Terraform plan and apply (dev) — opt-in via label
+
+When the PR carries the `deploy-dev` label, optionally run plan-and-apply in dev:
+
+```yaml
+terraform-plan-and-apply-dev:
+  permissions:
+    contents: read
+    id-token: write
+    pull-requests: write
+  if: github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-dev') && (contains(fromJson('["opened","synchronize","reopened","ready_for_review"]'), github.event.action) || (github.event.action == 'labeled' && github.event.label.name == 'deploy-dev'))
+  needs: build-and-test
+  environment: Development
+  runs-on: ubuntu-latest
+  concurrency:
+    group: ${{ github.repository }}-dev
+  steps:
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+      with:
+        terraform-folder: "terraform"
+        terraform-var-file: "tfvars/dev.tfvars"
+        terraform-backend-file: "backends/dev.backend.hcl"
+        AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+```
+
+The action+label guard prevents retriggers when unrelated labels are added or removed.
+
 ### Terraform plan (prd) — opt-in via label
 
 When the PR carries the `run-prd-plan` label, additionally run a prd plan:
@@ -123,7 +156,7 @@ terraform-plan-prd:
     contents: read
     id-token: write
     pull-requests: write
-  if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'run-prd-plan')
+  if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'run-prd-plan') && (contains(fromJson('["opened","synchronize","reopened","ready_for_review"]'), github.event.action) || (github.event.action == 'labeled' && github.event.label.name == 'run-prd-plan'))
   needs: build-and-test
   environment: Production
   runs-on: ubuntu-latest
@@ -147,7 +180,8 @@ terraform-plan-prd:
 3. Every job guards with `if: github.event.pull_request.draft == false`.
 4. Build job present matching project type.
 5. Terraform `dev` plan job present if `terraform/` exists; uses `pull-requests: write`.
-6. `terraform-plan-dev` includes the `!contains(..., 'deploy-dev')` label guard.
-7. `terraform-plan-prd` (opt-in by `run-prd-plan` label) present for Terraform repos.
-8. Composite versions match `workflows.frasermolyneux-actions.instructions.md`.
-9. Per-job concurrency group `${{ github.repository }}-<env>` on Terraform jobs (independent of the workflow-level group).
+6. `terraform-plan-dev` includes the `!contains(..., 'deploy-dev')` guard and runs only for actions `opened|synchronize|reopened|ready_for_review`.
+7. `terraform-plan-and-apply-dev` (opt-in by `deploy-dev` label) present where this behaviour is supported, and gates on `(action == 'labeled' && label.name == 'deploy-dev')` for label-triggered runs.
+8. `terraform-plan-prd` (opt-in by `run-prd-plan` label) present for Terraform repos, and gates on `(action == 'labeled' && label.name == 'run-prd-plan')` for label-triggered runs.
+9. Composite versions match `workflows.frasermolyneux-actions.instructions.md`.
+10. Per-job concurrency group `${{ github.repository }}-<env>` on Terraform jobs (independent of the workflow-level group).

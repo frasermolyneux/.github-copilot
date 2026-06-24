@@ -15,5 +15,5 @@ Identify the target repository folder within the workspace before doing anything
 2. If `.github/workflows/pr-verify.yml` exists, align it with the instructions file.
 3. If it doesn't exist, create it using the canonical templates for the detected project types.
 4. Ensure every job guards on `if: github.event.pull_request.draft == false`.
-5. For Terraform repos, include the `terraform-plan-dev` job (with the `!contains(... 'deploy-dev')` label guard) and the opt-in `terraform-plan-prd` job (gated on the `run-prd-plan` label).
+5. For Terraform repos, include `terraform-plan-dev` as a required check job that runs only on `opened|synchronize|reopened|ready_for_review` (plus the `!contains(... 'deploy-dev')` guard), and include supported opt-in label jobs (`terraform-plan-and-apply-dev`, `terraform-plan-prd`) with label-triggered runs gated on exact label events (`deploy-dev` / `run-prd-plan`).
 6. Verify the file against the compliance checklist in the instructions file before considering the task complete.

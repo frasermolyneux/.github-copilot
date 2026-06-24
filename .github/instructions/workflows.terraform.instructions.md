@@ -52,6 +52,16 @@ concurrency:
 
 This prevents two workflows from racing on the same backend state file.
 
+## PR label-trigger safety
+
+When a Terraform workflow uses `pull_request` types including `labeled` and `unlabeled` (for example `pr-verify.yml`), apply these guardrails:
+
+- Required merge-gate jobs (for example `terraform-plan-dev`) must run only for `opened`, `synchronize`, `reopened`, and `ready_for_review`.
+- Label-driven opt-in jobs (for example `terraform-plan-and-apply-dev`, `terraform-plan-prd`) must gate label-triggered runs on exact label events (`github.event.action == 'labeled'` and `github.event.label.name == '<label>'`).
+- Do not let unrelated label churn create extra runs for required check contexts.
+
+This prevents cancelled duplicate required checks from blocking PR merges.
+
 ## Permissions
 
 Standard for any job calling Terraform composites:

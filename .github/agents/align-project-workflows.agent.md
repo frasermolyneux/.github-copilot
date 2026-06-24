@@ -31,7 +31,8 @@ After all applicable prompts have run:
 1. Check each updated/new workflow against the **Compliance checklist** in its source-of-truth instructions file.
 2. Confirm cron expressions match the repo's slot in `docs/ops-clock.md`.
 3. Confirm action pins match `workflows.frasermolyneux-actions.instructions.md`.
-4. Report any compliance gaps to the user — do not silently leave drift.
+4. For `pr-verify.yml` in Terraform repos, confirm required check jobs run only on `opened|synchronize|reopened|ready_for_review`, and label-triggered opt-in jobs gate on exact label events.
+5. Report any compliance gaps to the user — do not silently leave drift.
 
 ## Bespoke workflows
 
