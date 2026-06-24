@@ -11,6 +11,7 @@ If this prompt is not applicable to the target repository, report the reason and
 2. Load and follow `.github-copilot/.github/instructions/workflows.dependabot-config.instructions.md` as the source of truth.
 3. Apply scheduling rules from `.github-copilot/.github/instructions/workflows.scheduling.instructions.md`.
 4. Update or create `.github/dependabot.yml` using canonical structure and only the ecosystems that apply to the target repo.
-5. Validate against the compliance checklist in the per-workflow instructions before finishing.
-6. Return a concise summary of changes and any repo-specific decisions.
+5. Enforce strict grouping contract on every ecosystem: `groups.all-updates.patterns: ["*"]` (exact key name), and include `timezone: "Etc/UTC"` in every schedule block.
+6. Validate against the compliance checklist in the per-workflow instructions before finishing.
+7. Return a concise summary of changes and any repo-specific decisions.
 

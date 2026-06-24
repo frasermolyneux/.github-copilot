@@ -19,6 +19,12 @@ For every file matching `.github/workflows/*.yml` and `.github/dependabot.yml` i
 3. **Layer 2 — categories**: `workflows.frasermolyneux-actions.instructions.md`, `workflows.terraform.instructions.md`, `workflows.dotnet.instructions.md`, `workflows.security.instructions.md` — apply by `applyTo` glob and project content.
 4. **Layer 3 — per-workflow**: `workflows.<name>.instructions.md` — use the **Compliance checklist** in the matching file.
 
+Additional required checks:
+
+- For `.github/dependabot.yml`, group keys must be `all-updates` exactly and each ecosystem schedule must include `timezone: "Etc/UTC"`.
+- If schedule overlaps exist in the Monday/Sunday window, treat them as compliant only when explicitly documented in `docs/ops-clock.md`.
+- For `destroy-development.yml`, do not mark repo-specific pre-destroy extension steps as drift when canonical triggers, permissions, concurrency, and destroy composite inputs remain compliant.
+
 For bespoke workflows (`actions-versioning`, `code-quality`, `devops-secure-scanning`, `estate-sync`, `feature-development`, `decommission-state-rm`, `update-dashboard-from-staging`) only Layers 1 and 2 apply.
 
 ## Output

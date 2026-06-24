@@ -43,6 +43,7 @@ jobs:
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          perform-checkout: "false"
 ```
 
 ## Notes
@@ -50,6 +51,7 @@ jobs:
 - The cron minute is staggered across repos (every 5 min from 23:00 UTC). Get the slot from `docs/ops-clock.md` — see `workflows.scheduling.instructions.md`.
 - This works in tandem with the `terraform-state-check-dev` pattern in `deploy-prd.yml` so the next deploy rebuilds the environment.
 - Concurrency group `${{ github.repository }}-dev` prevents racing with `deploy-dev` / `pr-verify`.
+- Repo-specific pre-destroy extension steps are allowed before the `terraform-destroy` composite when they are required for safe teardown (for example APIM resource cleanup). Keep them idempotent and keep the canonical destroy step as the final destroy action.
 
 ## Compliance checklist
 
@@ -60,3 +62,5 @@ jobs:
 5. Concurrency group `${{ github.repository }}-dev`.
 6. Composite version matches `workflows.frasermolyneux-actions.instructions.md`.
 7. Permissions: `id-token: write`, `contents: read`.
+8. If explicit checkout is present, `perform-checkout: "false"` is set on the destroy composite.
+9. Any extra pre-destroy steps are repo-specific extensions, not replacements: they must run before the destroy composite and preserve canonical trigger/permissions/concurrency/inputs.

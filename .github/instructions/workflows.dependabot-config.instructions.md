@@ -31,6 +31,8 @@ All ecosystems use the same weekly Sunday schedule. The `time:` must match the r
 
 All ecosystems must include `groups.all-updates.patterns: ["*"]` to batch updates into a single PR per ecosystem.
 
+The group key name is a strict contract: use `all-updates` exactly. Ecosystem-specific keys like `nuget`, `terraform`, or `github-actions` are non-compliant even when patterns are identical.
+
 ## Canonical config
 
 ```yaml
@@ -43,6 +45,7 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "HH:MM"   # repo's ops-clock time
+      timezone: "Etc/UTC"
     groups:
       all-updates:
         patterns:
@@ -55,6 +58,7 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "HH:MM"
+      timezone: "Etc/UTC"
     groups:
       all-updates:
         patterns:
@@ -67,6 +71,7 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "HH:MM"
+      timezone: "Etc/UTC"
     groups:
       all-updates:
         patterns:
@@ -79,6 +84,7 @@ updates:
       interval: "weekly"
       day: "sunday"
       time: "HH:MM"
+      timezone: "Etc/UTC"
     groups:
       all-updates:
         patterns:
@@ -92,5 +98,7 @@ updates:
 3. `assignees: ["frasermolyneux"]` on every ecosystem.
 4. `schedule.day: "sunday"` and `schedule.interval: "weekly"` everywhere.
 5. All `time:` values match the repo's codequality Monday slot.
-6. `groups.all-updates.patterns: ["*"]` present on every ecosystem.
-7. `directory:` is correct per ecosystem (see table).
+6. `schedule.timezone: "Etc/UTC"` is present on every ecosystem.
+7. `groups.all-updates.patterns: ["*"]` present on every ecosystem.
+8. Group key name is exactly `all-updates` on every ecosystem.
+9. `directory:` is correct per ecosystem (see table).

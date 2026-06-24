@@ -16,13 +16,23 @@ All scheduled workflows and Dependabot configs in the frasermolyneux organisatio
 | Day | Window | Workflow Type | Stagger |
 |-----|--------|---------------|---------|
 | Daily | 23:00–23:50 | `destroy-development.yml` | 5 min |
-| Sunday | 01:00–08:00 | Dependabot (`.github/dependabot.yml`) | 15 min |
-| Monday | 01:00–08:00 | `codequality.yml` | 15 min |
+| Sunday | 01:00–08:00 | Dependabot (`.github/dependabot.yml`) | 15 min (primary), controlled overlap allowed |
+| Monday | 01:00–08:00 | `codequality.yml` | 15 min (primary), controlled overlap allowed |
 | Tuesday | — | Clear (buffer) | — |
 | Wednesday | 01:00–09:00 | `deploy-prd.yml` — portal stack | 1 hour |
 | Thursday | 01:00–04:00 | `deploy-prd.yml` — shared plan stack | 1 hour |
 | Friday | 01:00–07:00 | `deploy-prd.yml` — independent repos | 1 hour |
 | Saturday | — | Clear (buffer) | — |
+
+## Capacity and overlap rule
+
+The 01:00-08:00 window contains 29 unique 15-minute slots. When the estate size exceeds this capacity, controlled overlap is allowed.
+
+Overlap is compliant only when all of the following are true:
+
+1. The overlap is explicitly documented in `docs/ops-clock.md`.
+2. The same repo time is used for Sunday Dependabot and Monday codequality.
+3. The overlap does not violate known infrastructure dependency sequencing for deploy workflows.
 
 ## Cron expression rules
 
@@ -81,9 +91,10 @@ See `workflows.dependabot-config.instructions.md` for the full file template.
 ## Adding a new repository
 
 1. Find the next available slot in the ops clock for each workflow type.
-2. Set the cron/schedule accordingly.
-3. Update `docs/ops-clock.md` in `.github-copilot` with the new entry.
-4. If the repo shares infrastructure (e.g. an App Service Plan provided by another repo), place its `deploy-prd` on the same day as other consumers, after the infrastructure provider.
+2. If no unique Monday/Sunday 15-minute slot remains, allocate a controlled overlap and document it in the ops clock.
+3. Set the cron/schedule accordingly.
+4. Update `docs/ops-clock.md` in `.github-copilot` with the new entry.
+5. If the repo shares infrastructure (e.g. an App Service Plan provided by another repo), place its `deploy-prd` on the same day as other consumers, after the infrastructure provider.
 
 ## Modifying an existing schedule
 
