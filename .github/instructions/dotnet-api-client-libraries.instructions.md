@@ -1,5 +1,5 @@
 ---
-description: Conventions for typed .NET API client libraries built on the MX.Api.Client / MX.Api.Abstractions framework.
+description: "Use when Conventions for typed .NET API client libraries built on the MX.Api.Client / MX.Api.Abstractions framework."
 applyTo: '**/src/**/*Api.Client*/**/*.cs,**/src/**/*Api.Abstractions*/**/*.cs,**/src/**/*Api.Client.Testing*/**/*.cs'
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Mandatory health endpoint and probe contract for all frasermolyneux applications and infrastructure.
+description: "Use when Mandatory health endpoint and probe contract for all frasermolyneux applications and infrastructure."
 applyTo: '**/Program.cs,**/Controllers/**/HealthController.cs,**/Functions/HealthCheck.cs,**/HealthCheck.cs,**/*WebAppFactory.cs,**/*InfoAndHealthTests.cs,**/*RootApiTests*.cs,**/web_app*.tf,**/function_app*.tf,**/container_app*.tf'
 ---
 # Standards - Health Endpoints and Probes

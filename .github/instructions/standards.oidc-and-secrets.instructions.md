@@ -1,5 +1,5 @@
 ---
-description: Mandatory authentication rules — OIDC federation only, managed identities preferred, no client secrets.
+description: "Use when Mandatory authentication rules — OIDC federation only, managed identities preferred, no client secrets."
 applyTo: '**/*.tf,.github/workflows/**/*.yml,**/azure-pipelines*.yml'
 ---
 # Standard — OIDC and Secrets

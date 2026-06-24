@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Build and Test workflow that runs on feature/bugfix/hotfix branch pushes. Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, and workflows.terraform.instructions.md.
+description: "Use when Canonical pattern for the Build and Test workflow that runs on feature/bugfix/hotfix branch pushes. Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, and workflows.terraform.instructions.md."
 applyTo: '**/build-and-test.yml'
 ---
 

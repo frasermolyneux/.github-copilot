@@ -1,5 +1,5 @@
 ---
-description: Canonical content rules for the org-wide ISSUE_TEMPLATE/ folder (provided by the `.github` repo) and any per-repo override. Includes the "Delegate to coding agent" form that's the headline reason these exist.
+description: "Use when Canonical content rules for the org-wide ISSUE_TEMPLATE/ folder (provided by the `.github` repo) and any per-repo override. Includes the \"Delegate to coding agent\" form that's the headline reason these exist."
 applyTo: '.github/ISSUE_TEMPLATE/**,.github/issue_template/**'
 ---
 # ISSUE_TEMPLATE/ — Generation Guidelines

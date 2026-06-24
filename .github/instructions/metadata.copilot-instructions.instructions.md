@@ -1,5 +1,5 @@
 ---
-description: Guidelines for generating or updating a repository's .github/copilot-instructions.md file for AI coding agents.
+description: "Use when Guidelines for generating or updating a repository's .github/copilot-instructions.md file for AI coding agents."
 applyTo: '.github/copilot-instructions.md'
 ---
 # .github/copilot-instructions.md — Generation Guidelines

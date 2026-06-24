@@ -1,8 +1,9 @@
 ---
 name: update-nuget-packages
-description: Updates NuGet packages to their latest stable versions for one, several, or all .NET repositories in the active workspace. Reads each repo's .github/dependabot.yml to honour ignore rules before updating. Use when asked to "update NuGet packages", "upgrade NuGet", "bump NuGet dependencies", "update dotnet packages", "dotnet-outdated", "upgrade packages", or "update all packages". Requires dotnet-outdated-tool to be installed globally (installs it automatically if missing).
+description: Use when you need to update NuGet packages to latest stable versions for one, several, or all .NET repositories in the active workspace while honoring Dependabot ignore rules.
 tools: [execute, read, search, edit, todo]
 argument-hint: "Target scope: a repo name (e.g. 'portal-web'), a comma-separated list (e.g. 'portal-web, geo-location'), or 'all' for every .NET repo in the workspace."
+agents: []
 ---
 
 You are a NuGet package update specialist. Your job is to update NuGet packages to their latest stable versions across one or more .NET repositories in this workspace, while honouring each repository's Dependabot ignore rules.
@@ -17,13 +18,14 @@ The user will specify one of:
 ## Constraints
 
 - ❌ Do NOT `git commit`, `git push`, create branches, or stage files — all git write operations are reserved for the user.
+- ❌ Do NOT run git revert-style write operations (`git checkout --`, `git restore`, `git reset`) unless explicitly requested by the user.
 - ❌ Do NOT upgrade packages that are excluded by the repo's Dependabot `ignore` rules for the `nuget` ecosystem.
 - ❌ Do NOT update Terraform providers, GitHub Actions pins, npm packages, or Docker base images — NuGet only.
 - ❌ Do NOT change `version.json`, `Directory.Build.props` (target frameworks or SDK versions), or any CI workflow files.
 - ❌ Do NOT install pre-release / preview package versions unless the current installed version is already a pre-release for that package.
 - ✅ Honour the `ignore` entries in `.github/dependabot.yml` for the `nuget` ecosystem exactly.
 - ✅ Only update packages found under the NuGet `directory` declared in `dependabot.yml` (typically `/src`). If no `dependabot.yml` exists, default to `src/`.
-- ✅ Run a build after updating each repo to confirm packages resolve correctly. Revert if the build fails.
+- ✅ Run a build after updating each repo to confirm packages resolve correctly.
 
 ---
 
@@ -140,11 +142,7 @@ dotnet build "<repo-path>/src" --nologo -v q
 ```
 
 - **If the build succeeds**: mark the repo as done. Proceed to the next.
-- **If the build fails**: revert all changes in the src directory using git:
-  ```pwsh
-  git -C "<repo-path>" checkout -- src/
-  ```
-  Record the failure in the final summary. Do not attempt partial rollback or selective revert.
+- **If the build fails**: stop processing that repo, record the failure in the final summary, and leave the working tree unchanged for user review. Do not attempt automatic git-based rollback.
 
 ---
 
@@ -160,7 +158,7 @@ After processing all repos, output a consolidated summary:
 | portal-web | 5 packages | 1 package | ✅ Pass |
 | geo-location | 3 packages | 0 packages | ✅ Pass |
 | portal-sync | 0 packages | 0 packages | ⏭ No changes |
-| portal-server-agent | 2 packages | 0 packages | ❌ Build failed — reverted |
+| portal-server-agent | 2 packages | 0 packages | ❌ Build failed — left for user review (no auto rollback) |
 
 ## Detail
 

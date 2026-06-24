@@ -1,5 +1,5 @@
 ---
-description: Branch strategy, PR rules, and label-driven workflow gates for the frasermolyneux organization.
+description: "Use when Branch strategy, PR rules, and label-driven workflow gates for the frasermolyneux organization."
 applyTo: '.github/workflows/**/*.yml,.github/dependabot.yml'
 ---
 # Standard — Branching and Pull Requests

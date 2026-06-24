@@ -1,5 +1,5 @@
 ---
-description: Repository pattern for data access — interfaces, DI registration, cache-first reads.
+description: "Use when Repository pattern for data access — interfaces, DI registration, cache-first reads."
 applyTo: '**/*.cs'
 ---
 # Pattern — Repository

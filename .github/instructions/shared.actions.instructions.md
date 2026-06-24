@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for the actions repo — composite GitHub Actions catalog (conceptual). Pinned versions are in workflows.frasermolyneux-actions.instructions.md.
+description: "Use when Consumption contract for the actions repo — composite GitHub Actions catalog (conceptual). Pinned versions are in workflows.frasermolyneux-actions.instructions.md."
 applyTo: '.github/workflows/**/*.yml'
 ---
 # actions/ — Consumer Contract

@@ -1,5 +1,5 @@
 ---
-description: These instructions define the standard pattern for web app version visibility including the /info endpoint, footer version display, and deployment verification polling. AI should follow these patterns when generating, reviewing, or modifying web app projects and their deployment workflows.
+description: "Use when These instructions define the standard pattern for web app version visibility including the /info endpoint, footer version display, and deployment verification polling. AI should follow these patterns when generating, reviewing, or modifying web app projects and their deployment workflows."
 applyTo: '**/InfoEndpointExtensions.cs,**/deploy-dev.yml,**/deploy-prd.yml,**/_Layout.cshtml'
 ---
 

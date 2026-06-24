@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for invision-api-client — typed API client for Invision Community.
+description: "Use when Consumption contract for invision-api-client — typed API client for Invision Community."
 applyTo: '**/*.cs,**/*.csproj'
 ---
 # invision-api-client — Consumer Contract

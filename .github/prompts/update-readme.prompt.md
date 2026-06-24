@@ -1,7 +1,16 @@
 ---
 name: update-readme
-description: Generate or update `README.md` to provide a high-level project overview and essential information for developers
+description: Use when you need to generate or align `README.md` with the canonical organization-wide structure.
+argument-hint: "Target repo folder (for example: platform-workloads)"
+agent: agent
 ---
-Before updating the README, identify the target repository folder within the workspace. Ask the user which folder to target or infer it from context (open file paths, workspace roots) and operate against that folder. Don't include context from other workspace folders.
 
-Analyze the target codebase and generate or update its `README.md` following the structure and rules in `.github-copilot/.github/instructions/metadata.readme.instructions.md` (and the universal rules in `.github-copilot/.github/instructions/metadata.instructions.md`).
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
+
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/metadata.readme.instructions.md` as the source of truth.
+3. Apply universal metadata rules from `.github-copilot/.github/instructions/metadata.instructions.md`.
+4. Update or create `README.md` in the target repo to match canonical structure and content rules.
+5. Validate against the instruction requirements before finishing.
+6. Return a concise summary of changes.
+

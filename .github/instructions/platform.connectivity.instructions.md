@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for platform-connectivity — DNS zones (public and private) and DNS resource group.
+description: "Use when Consumption contract for platform-connectivity — DNS zones (public and private) and DNS resource group."
 applyTo: '**/*.tf,**/*.tfvars'
 ---
 # platform-connectivity — Consumer Contract

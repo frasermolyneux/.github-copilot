@@ -1,18 +1,17 @@
 ---
 name: update-deploy-dev-workflow
-description: Align the repository's `.github/workflows/deploy-dev.yml` with the canonical pattern defined in `workflows.deploy-dev.instructions.md`.
+description: Use when you need to align `.github/workflows/deploy-dev.yml` with the canonical organization pattern.
+argument-hint: "Target repo folder (for example: travel-itinerary)"
+agent: agent
 ---
 
-Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
 
-## Source of truth
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/workflows.deploy-dev.instructions.md` as the source of truth.
+3. Apply layered workflow rules from `.github-copilot/.github/instructions/workflows.instructions.md` plus relevant category instructions (`workflows.dotnet`, `workflows.terraform`, `workflows.frasermolyneux-actions`).
+4. Update or create `.github/workflows/deploy-dev.yml` using the canonical pattern for the target repo components.
+5. Keep trigger behavior canonical (`workflow_dispatch` only unless the instructions explicitly say otherwise).
+6. Validate against the compliance checklist in the per-workflow instructions before finishing.
+7. Return a concise summary of changes and any repo-specific decisions.
 
-`.github-copilot/.github/instructions/workflows.deploy-dev.instructions.md` is the canonical pattern for this workflow. Terraform / .NET conventions come from the corresponding category instructions; action versions from `workflows.frasermolyneux-actions.instructions.md`.
-
-## Action
-
-1. Inspect the target repo to determine deployable components (terraform-only / web app / functions / static web app / database).
-2. If `.github/workflows/deploy-dev.yml` exists, align it with the instructions file (build → terraform → deploy chain, concurrency, permissions, terraform output extraction).
-3. If it doesn't exist and the repo has deployable components, create it using the canonical templates for the detected project types.
-4. Trigger must be `workflow_dispatch` only — do not add `push:` or `schedule:`.
-5. Verify the file against the compliance checklist in the instructions file before considering the task complete.

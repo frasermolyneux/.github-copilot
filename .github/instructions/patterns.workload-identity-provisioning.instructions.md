@@ -1,5 +1,5 @@
 ---
-description: End-to-end workload identity provisioning flow via platform-workloads.
+description: "Use when End-to-end workload identity provisioning flow via platform-workloads."
 applyTo: '**/*.tf,**/workloads/*.json'
 ---
 # Pattern — Workload Identity Provisioning

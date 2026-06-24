@@ -1,5 +1,5 @@
 ---
-description: SCSS build pattern (npm-driven Sass compile alongside .NET projects).
+description: "Use when SCSS build pattern (npm-driven Sass compile alongside .NET projects)."
 applyTo: '**/package.json,**/*.scss,**/*.sass'
 ---
 # Pattern — SCSS Build

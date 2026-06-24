@@ -1,5 +1,5 @@
 ---
-description: Conventions for any GitHub Actions workflow that builds, tests, deploys, or releases .NET projects. Layered on top of workflows.instructions.md and workflows.frasermolyneux-actions.instructions.md.
+description: "Use when Conventions for any GitHub Actions workflow that builds, tests, deploys, or releases .NET projects. Layered on top of workflows.instructions.md and workflows.frasermolyneux-actions.instructions.md."
 applyTo: '.github/workflows/{build-and-test,pr-verify,codequality,deploy-dev,deploy-prd,release-version-and-tag,release-publish-nuget,copilot-setup-steps}.yml'
 ---
 

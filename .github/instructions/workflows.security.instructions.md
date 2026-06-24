@@ -1,5 +1,5 @@
 ---
-description: Conventions for code quality, dependency review, and secure scanning jobs across CI workflows. Layered on top of workflows.instructions.md.
+description: "Use when Conventions for code quality, dependency review, and secure scanning jobs across CI workflows. Layered on top of workflows.instructions.md."
 applyTo: '.github/workflows/{codequality,pr-verify,build-and-test}.yml'
 ---
 

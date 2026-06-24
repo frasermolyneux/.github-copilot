@@ -1,5 +1,5 @@
 ---
-description: Shared Terraform conventions for all gh-frasermolyneux repositories that contain Terraform code.
+description: "Use when Shared Terraform conventions for all gh-frasermolyneux repositories that contain Terraform code."
 applyTo: '**/*.tf,**/*.tfvars,**/backends/*.hcl'
 ---
 

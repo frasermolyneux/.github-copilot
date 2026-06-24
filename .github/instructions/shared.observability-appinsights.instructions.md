@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for observability-appinsights — telemetry filtering, audit logger, job telemetry NuGet packages.
+description: "Use when Consumption contract for observability-appinsights — telemetry filtering, audit logger, job telemetry NuGet packages."
 applyTo: '**/*.cs,**/*.csproj,**/appsettings*.json'
 ---
 # observability-appinsights — Consumer Contract

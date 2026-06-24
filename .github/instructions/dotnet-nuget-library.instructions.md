@@ -1,5 +1,5 @@
 ---
-description: Shared conventions for any .NET library in this org that publishes one or more NuGet packages.
+description: "Use when Shared conventions for any .NET library in this org that publishes one or more NuGet packages."
 applyTo: '**/src/**/*.cs,**/version.json,**/*.csproj'
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for platform-workloads — workload identities, GitHub/ADO wiring, resource groups, state storage.
+description: "Use when Consumption contract for platform-workloads — workload identities, GitHub/ADO wiring, resource groups, state storage."
 applyTo: '**/*.tf,**/*.tfvars,**/workloads/*.json'
 ---
 # platform-workloads — Consumer Contract

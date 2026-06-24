@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Release - Publish NuGet workflow that runs after Release - Version and Tag completes successfully. Layered on top of workflows.dotnet.instructions.md.
+description: "Use when Canonical pattern for the Release - Publish NuGet workflow that runs after Release - Version and Tag completes successfully. Layered on top of workflows.dotnet.instructions.md."
 applyTo: '**/release-publish-nuget.yml'
 ---
 

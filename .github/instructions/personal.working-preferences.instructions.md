@@ -1,5 +1,5 @@
 ---
-description: Fraser's personal preferences for working with GitHub Copilot. Always-on rules that govern how Copilot interacts with git and signals task completion.
+description: "Use when Fraser's personal preferences for working with GitHub Copilot. Always-on rules that govern how Copilot interacts with git and signals task completion."
 applyTo: '**'
 ---
 # Personal Working Preferences (Fraser)

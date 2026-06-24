@@ -1,25 +1,17 @@
 ---
 name: update-deploy-prd-workflow
-description: Align the repository's `.github/workflows/deploy-prd.yml` with the canonical pattern defined in `workflows.deploy-prd.instructions.md`.
+description: Use when you need to align `.github/workflows/deploy-prd.yml` with the canonical organization pattern.
+argument-hint: "Target repo folder (for example: portal-repository)"
+agent: agent
 ---
 
-Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
 
-## Source of truth
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/workflows.deploy-prd.instructions.md` as the source of truth.
+3. Apply layered rules from `.github-copilot/.github/instructions/workflows.instructions.md`, `.github-copilot/.github/instructions/workflows.scheduling.instructions.md`, and relevant category files (`workflows.dotnet`, `workflows.terraform`, `workflows.frasermolyneux-actions`).
+4. Update or create `.github/workflows/deploy-prd.yml` using canonical jobs, gating, and schedule behavior.
+5. Keep skip-dev-on-schedule and production-gating logic aligned with canonical rules.
+6. Validate against the compliance checklist in the per-workflow instructions before finishing.
+7. Return a concise summary of changes and any repo-specific decisions.
 
-`.github-copilot/.github/instructions/workflows.deploy-prd.instructions.md` is the canonical pattern for this workflow. The skip-dev-on-schedule pattern lives in `workflows.scheduling.instructions.md`. Terraform / .NET conventions come from the corresponding category instructions; action versions from `workflows.frasermolyneux-actions.instructions.md`.
-
-## Action
-
-1. Inspect the target repo to determine deployable components and whether it's terraform-only or mixed.
-2. If `.github/workflows/deploy-prd.yml` exists, align it with the instructions file. Pay particular attention to:
-   - `detect-changes` job (must be first, with `src` / `terraform` / `database` filters as applicable).
-   - `terraform-state-check-dev` job in parallel with `detect-changes`.
-   - Conditional Terraform action (plan-and-apply vs output) using the change flag and state-check.
-   - Dev jobs gated on `src == 'true' || has_resources != 'true'` with `!failure() && !cancelled()`.
-   - Prd jobs explicitly check `terraform-plan-and-apply-prd.result == 'success'`.
-   - Skip-dev-on-schedule wired correctly (dev `if: github.event_name != 'schedule'`, prd gateway `|| github.event_name == 'schedule'`).
-3. If it doesn't exist and the repo has deployable components, create it using the canonical templates.
-4. Look up the repo's deploy-prd slot from `docs/ops-clock.md` — do not invent a cron expression.
-5. Terraform-only repos use the `paths:` filter shortcut instead of `detect-changes`.
-6. Verify the file against the full compliance checklist in the instructions file before considering the task complete.

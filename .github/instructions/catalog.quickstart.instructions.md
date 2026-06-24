@@ -1,5 +1,5 @@
 ---
-description: Quickstart index for the org catalog — how to choose between instructions, prompts, and agents, with task-routing examples.
+description: "Use when Quickstart index for the org catalog — how to choose between instructions, prompts, and agents, with task-routing examples."
 ---
 # Catalog Quickstart
 

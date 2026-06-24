@@ -1,5 +1,5 @@
 ---
-description: Canonical content rules for the org-wide PULL_REQUEST_TEMPLATE.md (provided by the `.github` repo) and any per-repo override.
+description: "Use when Canonical content rules for the org-wide PULL_REQUEST_TEMPLATE.md (provided by the `.github` repo) and any per-repo override."
 applyTo: '.github/PULL_REQUEST_TEMPLATE.md,.github/pull_request_template.md'
 ---
 # PULL_REQUEST_TEMPLATE.md — Generation Guidelines

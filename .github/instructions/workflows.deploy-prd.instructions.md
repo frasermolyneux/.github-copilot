@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Deploy Prd workflow — change-detected, environment-promoted production deploy with weekly drift run. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, workflows.scheduling.instructions.md, and workflows.frasermolyneux-actions.instructions.md.
+description: "Use when Canonical pattern for the Deploy Prd workflow — change-detected, environment-promoted production deploy with weekly drift run. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, workflows.scheduling.instructions.md, and workflows.frasermolyneux-actions.instructions.md."
 applyTo: '**/deploy-prd.yml'
 ---
 

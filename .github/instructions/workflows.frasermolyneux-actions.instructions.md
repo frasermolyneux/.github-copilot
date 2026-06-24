@@ -1,5 +1,5 @@
 ---
-description: Catalog of frasermolyneux/actions composite actions and reusable workflows, with the canonical pinned versions. Use this as the single source of truth for action references — per-workflow instructions reference this file rather than duplicating versions.
+description: "Use when Catalog of frasermolyneux/actions composite actions and reusable workflows, with the canonical pinned versions. Use this as the single source of truth for action references — per-workflow instructions reference this file rather than duplicating versions."
 applyTo: '.github/workflows/**/*.yml'
 ---
 

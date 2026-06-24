@@ -1,5 +1,5 @@
 ---
-description: Layer-1 catalog of shared library and automation repos and how to find the right consumption contract.
+description: "Use when Layer-1 catalog of shared library and automation repos and how to find the right consumption contract."
 applyTo: '**'
 ---
 # Shared Library / Automation Repos — Catalog

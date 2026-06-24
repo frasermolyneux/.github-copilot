@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Copilot Setup Steps workflow that prepares the Copilot coding-agent environment.
+description: "Use when Canonical pattern for the Copilot Setup Steps workflow that prepares the Copilot coding-agent environment."
 applyTo: '**/copilot-setup-steps.yml'
 ---
 

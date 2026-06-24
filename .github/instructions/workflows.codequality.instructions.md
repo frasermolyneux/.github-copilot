@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Code Quality workflow (Sonar + DevOps secure scanning + dependency review). Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, workflows.security.instructions.md, and workflows.scheduling.instructions.md.
+description: "Use when Canonical pattern for the Code Quality workflow (Sonar + DevOps secure scanning + dependency review). Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, workflows.security.instructions.md, and workflows.scheduling.instructions.md."
 applyTo: '**/codequality.yml'
 ---
 

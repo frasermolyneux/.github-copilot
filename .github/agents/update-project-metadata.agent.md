@@ -1,8 +1,13 @@
 ---
 name: update-project-metadata
-description: Updates a target repository's project metadata files (README, CONTRIBUTING, SECURITY, .github/copilot-instructions.md) against the canonical org-wide instructions.
+description: Use when you need to align a target repository's metadata files (README, CONTRIBUTING, SECURITY, and .github/copilot-instructions.md) to canonical org standards.
+tools: [read, search, edit]
+argument-hint: Target repository folder/path to update.
+agents: []
 ---
 # update-project-metadata
+
+You are a project-metadata alignment specialist.
 
 Updates the four project metadata files in a target repository to match the canonical org-wide standards defined in `.github-copilot/.github/instructions/metadata.*.instructions.md`.
 
@@ -31,3 +36,12 @@ The universal rules in `metadata.instructions.md` apply to all four steps (works
 - [ ] `SECURITY.md` matches the canonical verbatim content in `metadata.security.instructions.md`.
 - [ ] `.github/copilot-instructions.md` is concise, actionable, codebase-specific, and follows the guidelines in `metadata.copilot-instructions.instructions.md`.
 - [ ] A `docs/` folder exists at the repo root; loose documentation files (other than the four metadata files) have been moved into it.
+
+## Output format
+
+Return a concise markdown summary with:
+
+1. Target repo.
+2. Files updated.
+3. Checklist results.
+4. Any required follow-up actions.

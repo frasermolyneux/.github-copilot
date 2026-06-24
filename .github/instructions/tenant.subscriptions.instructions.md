@@ -1,5 +1,5 @@
 ---
-description: Subscription and management group layout for the frasermolyneux Azure tenant.
+description: "Use when Subscription and management group layout for the frasermolyneux Azure tenant."
 applyTo: '**'
 ---
 # Tenant — Subscriptions and Management Groups

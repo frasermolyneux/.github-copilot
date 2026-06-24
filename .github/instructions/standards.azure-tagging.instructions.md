@@ -1,5 +1,5 @@
 ---
-description: Mandatory Azure resource tagging convention for the frasermolyneux organization.
+description: "Use when Mandatory Azure resource tagging convention for the frasermolyneux organization."
 applyTo: '**/*.tf,**/*.bicep'
 ---
 # Standard — Azure Resource Tagging

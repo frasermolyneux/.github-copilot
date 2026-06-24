@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Deploy Dev workflow — manual deployment to the Development environment. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, and workflows.frasermolyneux-actions.instructions.md.
+description: "Use when Canonical pattern for the Deploy Dev workflow — manual deployment to the Development environment. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, and workflows.frasermolyneux-actions.instructions.md."
 applyTo: '**/deploy-dev.yml'
 ---
 

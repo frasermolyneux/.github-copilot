@@ -1,5 +1,5 @@
 ---
-description: Mandatory Azure resource naming convention for the frasermolyneux organization.
+description: "Use when Mandatory Azure resource naming convention for the frasermolyneux organization."
 applyTo: '**/*.tf,**/*.tfvars,**/*.bicep'
 ---
 # Standard — Azure Resource Naming

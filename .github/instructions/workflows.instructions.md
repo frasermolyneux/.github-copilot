@@ -1,5 +1,5 @@
 ---
-description: Universal rules for every GitHub Actions workflow in the frasermolyneux organisation. Applies ambiently to all workflow files. Lower-specificity layer — category and per-workflow instructions take precedence on conflict.
+description: "Use when Universal rules for every GitHub Actions workflow in the frasermolyneux organisation. Applies ambiently to all workflow files. Lower-specificity layer — category and per-workflow instructions take precedence on conflict."
 applyTo: '.github/workflows/**/*.yml'
 ---
 

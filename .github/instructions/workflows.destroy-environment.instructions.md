@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Destroy Environment workflow (manual workflow_dispatch with environment input). Layered on top of workflows.terraform.instructions.md.
+description: "Use when Canonical pattern for the Destroy Environment workflow (manual workflow_dispatch with environment input). Layered on top of workflows.terraform.instructions.md."
 applyTo: '**/destroy-environment.yml'
 ---
 

@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for platform-landing-zones — management group hierarchy and subscription placement.
+description: "Use when Consumption contract for platform-landing-zones — management group hierarchy and subscription placement."
 applyTo: '**/*.tf,**/*.tfvars'
 ---
 # platform-landing-zones — Consumer Contract

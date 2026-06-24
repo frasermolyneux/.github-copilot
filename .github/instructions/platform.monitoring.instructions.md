@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for platform-monitoring — central Log Analytics workspace and severity-based action groups.
+description: "Use when Consumption contract for platform-monitoring — central Log Analytics workspace and severity-based action groups."
 applyTo: '**/*.tf,**/*.tfvars'
 ---
 # platform-monitoring — Consumer Contract

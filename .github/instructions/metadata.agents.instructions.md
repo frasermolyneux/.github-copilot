@@ -1,5 +1,5 @@
 ---
-description: Canonical guidance for per-repo AGENTS.md files — the cloud-agent entry point that survives outside the local VS Code workspace.
+description: "Use when Canonical guidance for per-repo AGENTS.md files — the cloud-agent entry point that survives outside the local VS Code workspace."
 applyTo: 'AGENTS.md'
 ---
 # AGENTS.md — Generation Guidelines

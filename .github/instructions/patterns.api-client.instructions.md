@@ -1,5 +1,5 @@
 ---
-description: Typed API client pattern (interfaces, generated clients, testing helpers, fluent DI options).
+description: "Use when Typed API client pattern (interfaces, generated clients, testing helpers, fluent DI options)."
 applyTo: '**/*.cs,**/*.csproj'
 ---
 # Pattern — Typed API Client

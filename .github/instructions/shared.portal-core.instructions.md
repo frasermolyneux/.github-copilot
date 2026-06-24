@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for portal-core — shared Terraform infrastructure (App Insights, App Service Plans, SQL Server, Service Bus) for portal-* repos.
+description: "Use when Consumption contract for portal-core — shared Terraform infrastructure (App Insights, App Service Plans, SQL Server, Service Bus) for portal-* repos."
 applyTo: '**/*.tf,**/*.tfvars,**/*.cs,**/*.csproj'
 ---
 # portal-core — Consumer Contract

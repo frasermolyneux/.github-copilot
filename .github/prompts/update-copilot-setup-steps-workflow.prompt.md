@@ -1,19 +1,16 @@
 ---
 name: update-copilot-setup-steps-workflow
-description: Align the repository's `.github/workflows/copilot-setup-steps.yml` with the canonical pattern defined in `workflows.copilot-setup-steps.instructions.md`.
+description: Use when you need to align `.github/workflows/copilot-setup-steps.yml` with the canonical organization pattern.
+argument-hint: "Target repo folder (for example: platform-registry)"
+agent: agent
 ---
 
-Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
 
-## Source of truth
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/workflows.copilot-setup-steps.instructions.md` as the source of truth.
+3. Keep critical guardrails intact: checkout `.github-copilot` to `path: .github-copilot`, and keep the job name `copilot-setup-steps`.
+4. Update or create `.github/workflows/copilot-setup-steps.yml` in the target repo to match the canonical pattern.
+5. Validate against the compliance checklist in the per-workflow instructions before finishing.
+6. Return a concise summary of changes and any repo-specific decisions.
 
-`.github-copilot/.github/instructions/workflows.copilot-setup-steps.instructions.md` is the canonical pattern for this workflow.
-
-## Action
-
-1. Inspect the target repo to determine which runtimes the agent needs (.NET, Node, Python, etc.).
-2. If `.github/workflows/copilot-setup-steps.yml` exists, align it with the instructions file.
-3. If it doesn't exist, create it using the canonical template plus the appropriate runtime setup steps.
-4. **Critical:** the `.github-copilot` checkout step MUST include `path: .github-copilot` — without it, the second checkout overwrites the main repo checkout.
-5. The job MUST be named `copilot-setup-steps` or Copilot will not pick it up.
-6. Verify the file against the compliance checklist in the instructions file before considering the task complete.

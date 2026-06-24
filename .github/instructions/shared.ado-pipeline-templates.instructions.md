@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for ado-pipeline-templates — reusable Azure DevOps stages, jobs, and tasks.
+description: "Use when Consumption contract for ado-pipeline-templates — reusable Azure DevOps stages, jobs, and tasks."
 applyTo: '**/azure-pipelines*.yml,**/.azuredevops/**/*.yml'
 ---
 # ado-pipeline-templates — Consumer Contract

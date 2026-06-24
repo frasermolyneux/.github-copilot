@@ -1,7 +1,16 @@
 ---
 name: update-contributing
-description: Generate or update `CONTRIBUTING.md` with the canonical organization-wide contributing content
+description: Use when you need to generate or align `CONTRIBUTING.md` with the canonical organization-wide content.
+argument-hint: "Target repo folder (for example: talkwithtiles)"
+agent: agent
 ---
-Before updating, identify the target repository folder within the workspace. Ask the user which folder to target or infer it from context (open file paths, workspace roots) and operate against that folder.
 
-Replace or create `CONTRIBUTING.md` in the target folder with the verbatim canonical content defined in `.github-copilot/.github/instructions/metadata.contributing.instructions.md`. Apply the universal rules in `.github-copilot/.github/instructions/metadata.instructions.md`.
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
+
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/metadata.contributing.instructions.md` as the source of truth.
+3. Apply universal metadata rules from `.github-copilot/.github/instructions/metadata.instructions.md`.
+4. Create or replace `CONTRIBUTING.md` in the target repo with canonical content.
+5. Validate against the instruction requirements before finishing.
+6. Return a concise summary of changes.
+

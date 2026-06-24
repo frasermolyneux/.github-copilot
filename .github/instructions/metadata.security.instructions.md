@@ -1,5 +1,5 @@
 ---
-description: Canonical verbatim content for a repository's SECURITY.md.
+description: "Use when Canonical verbatim content for a repository's SECURITY.md."
 applyTo: 'SECURITY.md'
 ---
 # SECURITY.md — Canonical Content

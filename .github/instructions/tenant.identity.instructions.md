@@ -1,5 +1,5 @@
 ---
-description: AAD tenant identity model, group conventions, and federated-credential subject formats specific to the frasermolyneux tenant.
+description: "Use when AAD tenant identity model, group conventions, and federated-credential subject formats specific to the frasermolyneux tenant."
 applyTo: '**'
 ---
 # Tenant — Identity

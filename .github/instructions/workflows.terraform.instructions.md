@@ -1,5 +1,5 @@
 ---
-description: Conventions for any GitHub Actions workflow that interacts with Terraform infrastructure (plan, apply, output, state-check, destroy, decommission). Layered on top of workflows.instructions.md and workflows.frasermolyneux-actions.instructions.md.
+description: "Use when Conventions for any GitHub Actions workflow that interacts with Terraform infrastructure (plan, apply, output, state-check, destroy, decommission). Layered on top of workflows.instructions.md and workflows.frasermolyneux-actions.instructions.md."
 applyTo: '.github/workflows/{deploy-dev,deploy-prd,destroy-development,destroy-environment,pr-verify,build-and-test,feature-development,decommission-state-rm,update-dashboard-from-staging}.yml'
 ---
 

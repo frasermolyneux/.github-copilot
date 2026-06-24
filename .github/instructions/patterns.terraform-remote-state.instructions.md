@@ -1,5 +1,5 @@
 ---
-description: Pattern for consuming upstream Terraform stacks via terraform_remote_state.
+description: "Use when Pattern for consuming upstream Terraform stacks via terraform_remote_state."
 applyTo: '**/*.tf'
 ---
 # Pattern — Terraform Remote State

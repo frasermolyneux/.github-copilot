@@ -1,5 +1,5 @@
 ---
-description: Approved Azure regions for the frasermolyneux tenant.
+description: "Use when Approved Azure regions for the frasermolyneux tenant."
 applyTo: '**'
 ---
 # Tenant — Approved Azure Regions

@@ -1,17 +1,16 @@
 ---
 name: update-dependabot-automerge
-description: Align the repository's `.github/workflows/dependabot-automerge.yml` with the canonical pattern defined in `workflows.dependabot-automerge.instructions.md`.
+description: Use when you need to align `.github/workflows/dependabot-automerge.yml` with the canonical organization pattern.
+argument-hint: "Target repo folder (for example: cod-demo-reader)"
+agent: agent
 ---
 
-Identify the target repository folder within the workspace before doing anything else. Ask the user which folder to target if it isn't obvious from context.
+If this prompt is not applicable to the target repository, report the reason and stop without making changes.
 
-## Source of truth
+1. Resolve the target repository folder first. If it is not clear, ask the user to pick one.
+2. Load and follow `.github-copilot/.github/instructions/workflows.dependabot-automerge.instructions.md` as the source of truth.
+3. Update or create `.github/workflows/dependabot-automerge.yml` in the target repo using canonical content.
+4. Keep this workflow byte-for-byte aligned with the canonical pattern unless the instructions explicitly permit a deviation.
+5. Validate against the compliance checklist in the per-workflow instructions before finishing.
+6. Return a concise summary of changes.
 
-`.github-copilot/.github/instructions/workflows.dependabot-automerge.instructions.md` is the canonical pattern for this workflow. The file is identical across all repos.
-
-## Action
-
-1. If `.github/workflows/dependabot-automerge.yml` exists, replace it with the canonical content from the instructions file.
-2. If it doesn't exist (and the repo has a `.github/dependabot.yml`), create it using the canonical content.
-3. No project-specific customisation is expected — the file should be byte-identical across repos.
-4. Verify the file against the compliance checklist in the instructions file before considering the task complete.

@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the PR Verify workflow that runs on pull requests targeting main. Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, and workflows.terraform.instructions.md.
+description: "Use when Canonical pattern for the PR Verify workflow that runs on pull requests targeting main. Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, and workflows.terraform.instructions.md."
 applyTo: '**/pr-verify.yml'
 ---
 

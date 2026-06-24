@@ -1,5 +1,5 @@
 ---
-description: These instructions define the scheduling standards for all GitHub Actions workflows and Dependabot configurations. AI must follow these rules when creating, modifying, or reviewing any workflow schedule or cron expression.
+description: "Use when These instructions define the scheduling standards for all GitHub Actions workflows and Dependabot configurations. AI must follow these rules when creating, modifying, or reviewing any workflow schedule or cron expression."
 applyTo: '.github/workflows/**/*.yml,**/.github/dependabot.yml'
 ---
 

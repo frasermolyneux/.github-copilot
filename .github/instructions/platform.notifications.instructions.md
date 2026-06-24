@@ -1,5 +1,5 @@
 ---
-description: Consumption contract for platform-notifications — centralised email/SMS notification API.
+description: "Use when Consumption contract for platform-notifications — centralised email/SMS notification API."
 applyTo: '**/*.tf,**/*.tfvars,**/appsettings*.json,**/*.cs'
 ---
 # platform-notifications — Consumer Contract

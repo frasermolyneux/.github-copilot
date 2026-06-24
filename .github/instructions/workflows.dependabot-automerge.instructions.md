@@ -1,5 +1,5 @@
 ---
-description: Canonical pattern for the Dependabot Auto-Merge workflow that auto-squashes Dependabot PRs.
+description: "Use when Canonical pattern for the Dependabot Auto-Merge workflow that auto-squashes Dependabot PRs."
 applyTo: '**/dependabot-automerge.yml'
 ---
 
