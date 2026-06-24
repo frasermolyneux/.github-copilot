@@ -7,7 +7,7 @@ applyTo: '**/src/**/*.cs,**/version.json,**/*.csproj'
 
 These conventions apply to every repository in the org that publishes one or more NuGet packages. Repository-specific guidance (and patterns for typed API clients built on `MX.Api.Client`) lives elsewhere — see [`.github-copilot/.github/instructions/dotnet-api-client-libraries.instructions.md`](./dotnet-api-client-libraries.instructions.md) for the API-client-specific layer.
 
-> Some solutions in the org mix library projects with applications (Function Apps, web apps, Windows Forms hosts). The rules below apply only to projects that produce a NuGet package — in this org, identified by `<GeneratePackageOnBuild>true</GeneratePackageOnBuild>` in the `.csproj`. Application/host projects (which set `<IsPackable>false</IsPackable>` or omit `GeneratePackageOnBuild`) are not subject to multi-targeting, packaging, or release-flow rules.
+> Some solutions in the org mix library projects with applications (Function Apps, web apps, Windows Forms hosts). The rules below apply only to projects that produce a NuGet package — in this org, identified by one or more of: `<GeneratePackageOnBuild>true</GeneratePackageOnBuild>`, `<IsPackable>true</IsPackable>`, or the presence of `.github/workflows/release-publish-nuget.yml`. Application/host projects (which set `<IsPackable>false</IsPackable>` and have no NuGet publish workflow) are not subject to multi-targeting, packaging, or release-flow rules.
 
 ## Multi-Targeting
 
@@ -28,6 +28,15 @@ These conventions apply to every repository in the org that publishes one or mor
 - Versioning is driven by Nerdbank.GitVersioning (`version.json` at the repo root).
 - Release flow: `release-version-and-tag.yml` creates a tag, then `release-publish-nuget.yml` publishes to NuGet.org and creates a GitHub Release.
 - Other standard workflows: `build-and-test.yml`, `pr-verify.yml`, `codequality.yml` (SonarCloud + CodeQL), `dependabot-automerge.yml`, `copilot-setup-steps.yml`.
+
+## GitHub NuGet Integration
+
+- Workflow names are canonical and must be exact:
+	- `Release - Version and Tag`
+	- `Release - Publish NuGet`
+- Canonical workflow implementation details (environment name, secret name, permissions, and publish action pin) are defined in `workflows.release-publish-nuget.instructions.md`.
+- Canonical README presentation details (release badges and `## NuGet Packages` section) are defined in `metadata.readme.instructions.md`.
+- Keep those two layers aligned when evolving NuGet release behavior.
 
 ## Visibility & Internals
 

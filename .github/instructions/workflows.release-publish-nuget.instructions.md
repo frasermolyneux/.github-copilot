@@ -85,14 +85,29 @@ jobs:
 ## Notes
 
 - Identical across all NuGet-publishing repos.
-- The `NuGet` GitHub environment must be configured with the `NUGET_API_KEY` secret. The environment is the gate that prevents accidental publishes.
+- The `NuGet` GitHub environment must be configured with the `NUGET_API_KEY` secret. The environment is the credential boundary that prevents accidental publishes.
 - `actions: read` permission is required to download the artifact from the upstream `Release - Version and Tag` run.
+
+## GitHub environment contract
+
+- Environment name is exactly `NuGet`.
+- Required secret name is exactly `NUGET_API_KEY`.
+- Default org standard is a streamlined environment configuration (no wait timer, no required reviewers) unless a specific repo explicitly requires extra governance.
+
+## README integration contract
+
+Repos with this workflow should expose release status consistently in `README.md`:
+
+- Include the `Release - Version and Tag` badge.
+- Include the `Release - Publish NuGet` badge.
+- Badge display names must match workflow `name:` values exactly.
+- Package version visibility belongs in the README NuGet packages section per metadata guidance.
 
 ## Compliance checklist
 
 1. Trigger is `workflow_run` watching the `Release - Version and Tag` workflow with `types: [completed]`.
 2. Job guard `if: ${{ github.event.workflow_run.conclusion == 'success' }}` is present.
-3. Job environment is `NuGet`.
+3. Job environment is `NuGet`, and publish step consumes `NUGET_API_KEY`.
 4. `HAS_RELEASE_TAG` / `RELEASE_TAG` env block initialises both to safe defaults.
 5. Checkout uses `ref: ${{ github.event.workflow_run.head_sha }}`.
 6. Tag-detection step is byte-identical to canonical (no project customisation).

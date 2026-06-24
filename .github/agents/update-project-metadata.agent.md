@@ -26,6 +26,7 @@ The universal rules in `metadata.instructions.md` apply to all four steps (works
 ## Post-update checklist
 
 - [ ] `README.md` matches the structure in `metadata.readme.instructions.md` (badges for **every** workflow in `.github/workflows/`, Documentation, Overview, verbatim Contributing/Security sections).
+- [ ] For NuGet-publishing repos (any of: `<GeneratePackageOnBuild>true</GeneratePackageOnBuild>`, `<IsPackable>true</IsPackable>`, or `.github/workflows/release-publish-nuget.yml`), README includes: exact `Release - Version and Tag` and `Release - Publish NuGet` badges (when workflows exist), plus a `## NuGet Packages` section with package-version visibility.
 - [ ] `CONTRIBUTING.md` matches the canonical verbatim content in `metadata.contributing.instructions.md`.
 - [ ] `SECURITY.md` matches the canonical verbatim content in `metadata.security.instructions.md`.
 - [ ] `.github/copilot-instructions.md` is concise, actionable, codebase-specific, and follows the guidelines in `metadata.copilot-instructions.instructions.md`.

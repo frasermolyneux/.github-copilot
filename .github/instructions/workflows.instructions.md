@@ -9,7 +9,8 @@ These rules apply to **every** workflow YAML file across the organisation. They 
 
 ## Filename and `name`
 
-- The workflow `name:` should be the human-readable form of the filename (`build-and-test.yml` → `name: Build and Test`).
+- The workflow `name:` should be the human-readable form of the filename (`build-and-test.yml` → `name: Build and Test`) when there is no per-workflow canonical instruction.
+- If a matching `workflows.<name>.instructions.md` file defines a canonical name, that canonical name takes precedence.
 - One workflow per file; do not combine unrelated triggers.
 
 ## Permissions (always least privilege)
@@ -37,7 +38,9 @@ jobs:
 
 ## Pinned action versions
 
-Use these exact pinned versions across all workflows:
+For workflows with a per-workflow canonical instruction, use the exact action refs defined there (including SHA pins where specified).
+
+For workflows without a per-workflow canonical instruction, use these default pins:
 
 | Action | Pin |
 |---|---|
@@ -134,7 +137,7 @@ For `frasermolyneux/actions/*` composites see `workflows.frasermolyneux-actions.
 ## Secrets
 
 - Never log secrets. Wrap any inline-extracted secret (e.g. Static Web App API keys) with `echo "::add-mask::$value"` before exporting it.
-- Repository-level secrets in use today are limited to: `GITHUB_TOKEN` (default), `SONAR_TOKEN`, `NUGET_API_KEY`. New secrets require an explicit reason.
+- Secrets in use today are limited to: `GITHUB_TOKEN` (default), `SONAR_TOKEN`, and `NUGET_API_KEY` (typically sourced via the `NuGet` environment for publish workflows). New secrets require an explicit reason.
 
 ## Bespoke per-repo workflows
 
