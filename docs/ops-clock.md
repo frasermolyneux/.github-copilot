@@ -14,18 +14,18 @@ This document defines the weekly operations schedule for all automated workflows
 
 ### Daily
 
-| Time        | Workflow            | Repos                            |
-| ----------- | ------------------- | -------------------------------- |
-| 03:30       | estate-sync         | `.github` (org-level)            |
-| 23:00–23:50 | destroy-development | 11 repos (staggered every 5 min) |
+| Time        | Workflow            | Repos                                           |
+| ----------- | ------------------- | ----------------------------------------------- |
+| 03:30       | estate-sync         | `.github` (org-level)                           |
+| 23:00–23:50 | destroy-development | 14 repos (5-minute slots with limited overlaps) |
 
 ### Sunday — Dependabot (all repos)
 
-All 30 repositories run Dependabot on Sunday, staggered every 15 minutes from 01:00 to 08:00. Each repo's Dependabot time matches its Monday codequality time. All ecosystems use `groups` with `patterns: ["*"]` to batch updates into a single PR per ecosystem.
+All 32 repositories run Dependabot on Sunday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Each repo's Dependabot time matches its Monday codequality time. All ecosystems use `groups` with `patterns: ["*"]` to batch updates into a single PR per ecosystem.
 
 ### Monday — Code Quality (all repos)
 
-All 30 repositories run codequality scans on Monday, staggered every 15 minutes from 01:00 to 08:00. Times match the Sunday Dependabot schedule per repo.
+All 32 repositories run codequality scans on Monday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Times match the Sunday Dependabot schedule per repo.
 
 ### Tuesday — Clear
 
@@ -97,6 +97,8 @@ When adding or modifying scheduled workflows:
 | 23:15 | portal-servers-integration |
 | 23:20 | portal-sync                |
 | 23:25 | geo-location               |
+| 23:25 | platform-notifications     |
+| 23:30 | craftpledge                |
 | 23:30 | talkwithtiles              |
 | 23:35 | travel-itinerary           |
 | 23:40 | molyneux-me                |
@@ -119,7 +121,9 @@ When adding or modifying scheduled workflows:
 | 03:00 | portal-web                  |
 | 03:15 | platform-hosting            |
 | 03:30 | geo-location                |
+| 03:30 | platform-notifications      |
 | 03:45 | travel-itinerary            |
+| 04:00 | craftpledge                 |
 | 04:00 | talkwithtiles               |
 | 04:15 | platform-connectivity       |
 | 04:30 | platform-landing-zones      |
@@ -129,9 +133,9 @@ When adding or modifying scheduled workflows:
 | 05:30 | platform-workloads          |
 | 05:45 | platform-letsencrypt-iis    |
 | 06:00 | api-client-abstractions     |
+| 06:00 | observability-appinsights   |
 | 06:15 | invision-api-client         |
 | 06:30 | cod-demo-reader             |
-| 06:45 | bicep-modules               |
 | 07:00 | ado-pipeline-templates      |
 | 07:15 | demo-manager                |
 | 07:30 | molyneux-me                 |
