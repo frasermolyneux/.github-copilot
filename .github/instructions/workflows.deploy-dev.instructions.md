@@ -118,7 +118,7 @@ app-service-deploy-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+    - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
       with:
         web-artifact-name: "<MyOrg.MyApp.Web>"
         web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}

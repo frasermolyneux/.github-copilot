@@ -177,7 +177,7 @@ Name the deploy step with the version so it is visible in the GitHub Actions sid
 
 ```yaml
 - name: Deploy v${{ needs.build-and-test.outputs.build_version }}
-  uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+  uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
   with:
     ...
 ```

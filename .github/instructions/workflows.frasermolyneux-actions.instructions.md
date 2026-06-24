@@ -28,7 +28,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/terraform-state-rm` | `@terraform-state-rm/v1.2` | `terraform state rm` for decommissioning |
 | `frasermolyneux/actions/terraform-destroy` | `@terraform-destroy/v1.2` | `terraform destroy` for an environment |
 | `frasermolyneux/actions/detect-changes` | `@detect-changes/v1.0` | Path-filter detection; forces all outputs to `true` on schedule/dispatch |
-| `frasermolyneux/actions/deploy-app-service` | `@deploy-app-service/v1.2` | Deploy a built artifact to an App Service |
+| `frasermolyneux/actions/deploy-app-service` | `@deploy-app-service/v1.3` | Deploy a built artifact to an App Service |
 | `frasermolyneux/actions/deploy-function-app` | `@deploy-function-app/v1.2` | Deploy a built artifact to a Function App |
 | `frasermolyneux/actions/deploy-sql-database` | `@deploy-sql-database/v1.3` | Deploy a DACPAC to Azure SQL |
 | `frasermolyneux/actions/publish-nuget-packages` | `@publish-nuget-packages/v2.0` | Download artifact + push to NuGet.org |
