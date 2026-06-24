@@ -57,6 +57,7 @@ calculate-version:
 
     - name: Install Nerdbank.GitVersioning tool
       run: |
+        dotnet tool uninstall --global nbgv || true
         dotnet tool install --global nbgv --version <repo-pinned-nbgv-version>
         echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
