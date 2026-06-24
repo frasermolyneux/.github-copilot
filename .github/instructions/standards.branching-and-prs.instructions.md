@@ -27,17 +27,16 @@ The `pr-verify.yml` workflow runs on every PR to `main` and is the gate before m
 
 ## Dependabot and Copilot PRs
 
-PRs authored by `dependabot[bot]` or `Copilot` (the cloud agent) skip Terraform plans **unless** the PR carries the `run-prd-plan` label or `run-dev-plan` label. This avoids burning OIDC plan runs on routine dependency bumps.
+PRs authored by `dependabot[bot]` or `Copilot` (the cloud agent) follow the same **dev Terraform plan gate** as other PRs. Dev plan remains the default safety guardrail.
 
-The skip is implemented via a `if: github.actor != 'dependabot[bot]' && github.actor != 'Copilot' || contains(github.event.pull_request.labels.*.name, 'run-dev-plan')` condition (or equivalent). See `workflows.pr-verify.instructions.md` for the canonical pattern.
+Dependabot auto-merge is controlled by a dedicated policy check (`dependabot-policy`) and only enables auto-merge for approved update classes (for example patch/minor by default). High-risk updates (for example major) stay in governed manual review and can be labeled for prd planning (`run-prd-plan`).
 
 ## Labels
 
 | Label | Effect |
 |---|---|
-| `run-dev-plan` | Force dev Terraform plan on Dependabot/Copilot PRs |
 | `run-prd-plan` | Run prd Terraform plan on any PR |
-| `auto-merge` | Eligible for Dependabot auto-merge after checks pass |
+| `auto-merge` | Optional triage label; Dependabot merge eligibility is enforced by `dependabot-policy` |
 | `coding-agent` | Auto-applied by the `delegate-to-agent` issue template. Signals that the PR was created through the coding-agent flow and should include the completed agent attestation section in the PR template. |
 | `breaking-contract` | Apply when a PR changes a published API/NuGet contract (Abstractions / Api.Client paths) in a non-backwards-compatible way and the package major version must bump. This label is a reviewer/agent signal for triage and changelog automation. |
 | `needs-decision` | Applied by the cloud coding agent (and by humans) when a PR is blocked on a human decision. PRs with this label stay in **draft**. Humans triage these before other PRs. See per-repo `AGENTS.md` Escalation section. |
@@ -54,5 +53,6 @@ The skip is implemented via a `if: github.actor != 'dependabot[bot]' && github.a
 
 - Workflows use the branch globs above as `on.push.branches`
 - `pr-verify.yml` follows the canonical pattern in `workflows.pr-verify.instructions.md`
-- Dependabot/Copilot PR-skip conditions are present where Terraform plans run
+- Dependabot/Copilot PRs run the default dev plan gate
+- Dependabot auto-merge is gated by a required `dependabot-policy` check
 - `deploy-prd.yml` includes the weekly schedule and skip-dev-on-schedule guards (see `workflows.scheduling.instructions.md`)
