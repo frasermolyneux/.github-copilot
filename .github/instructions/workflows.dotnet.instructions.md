@@ -61,6 +61,18 @@ See `workflows.release-version-and-tag.instructions.md` for the canonical job se
 
 CI excludes integration tests by default — composites already apply `--filter "FullyQualifiedName!~IntegrationTests"`. Do not override unless you intentionally want integration tests in CI.
 
+## Formatting verification
+
+Workflows that build/test .NET code must enforce formatting via:
+
+```bash
+dotnet format <solution-or-src-path> --verify-no-changes
+```
+
+- Prefer running this check before `dotnet build`/`dotnet test` so style drift fails fast.
+- Current pinned `frasermolyneux/actions/dotnet-ci`, `dotnet-web-ci`, and `dotnet-func-ci` versions may not include this gate; add an explicit workflow-level `dotnet format --verify-no-changes` step until the pinned composite version includes equivalent enforcement.
+- If a workflow runs manual .NET commands (outside the composites), add an explicit `dotnet format --verify-no-changes` step in that workflow.
+
 ## Setup-dotnet (manual setup workflows)
 
 When a workflow installs .NET directly (e.g. `copilot-setup-steps.yml`), use:

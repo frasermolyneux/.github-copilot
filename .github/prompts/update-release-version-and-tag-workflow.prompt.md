@@ -12,6 +12,10 @@ If this prompt is not applicable to the target repository, report the reason and
 3. Load and follow `.github-copilot/.github/instructions/workflows.release-version-and-tag.instructions.md` as the source of truth.
 4. Apply relevant `.NET` workflow rules from `.github-copilot/.github/instructions/workflows.dotnet.instructions.md`.
 5. Update or create `.github/workflows/release-version-and-tag.yml` using canonical content.
-6. Validate against the compliance checklist in the per-workflow instructions before finishing.
-7. Return a concise summary of changes and any repo-specific decisions.
+6. Ensure workflow formatting gates are enforced where .NET build/test/publish work is present:
+	- `dotnet format <solution-or-src-path> --verify-no-changes`
+	- an explicit workflow-level format check when pinned composites do not yet provide equivalent enforcement
+	- if missing, add or update workflow steps to meet the gate
+7. Validate against the compliance checklist in the per-workflow instructions before finishing.
+8. Return a concise summary of changes, format-gate status, and any repo-specific decisions.
 
