@@ -57,7 +57,7 @@ For workflows without a per-workflow canonical instruction, use these default pi
 | `dependabot/fetch-metadata` | `@v3` |
 | `ncipollo/release-action` | `@v1` |
 
-For `frasermolyneux/actions/*` composites see `workflows.frasermolyneux-actions.instructions.md` — always pin to the specific tag (e.g. `@dotnet-ci/v1.4`), never `@main`.
+For `frasermolyneux/actions/*` composites see `workflows.frasermolyneux-actions.instructions.md` — always pin to the specific tag (e.g. `@dotnet-ci/v2`), never `@main`.
 
 ## Authentication: OIDC only
 

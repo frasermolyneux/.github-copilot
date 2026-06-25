@@ -14,8 +14,8 @@ If this prompt is not applicable to the target repository, report the reason and
 5. Keep trigger behavior canonical (`workflow_dispatch` only unless the instructions explicitly say otherwise).
 6. Ensure workflow formatting gates are enforced where .NET build/test/publish work is present:
 	- `dotnet format <solution-or-src-path> --verify-no-changes`
-	- an explicit workflow-level format check when pinned composites do not yet provide equivalent enforcement
-	- if missing, add or update workflow steps to meet the gate
+	- when workflows pin `frasermolyneux/actions/dotnet-ci`, `dotnet-web-ci`, or `dotnet-func-ci` at v2 or later, treat the composite-integrated format gate as compliant
+	- add or update an explicit workflow-level format step only when .NET commands run outside those composites, when pinned below v2, or when `skip-format-check: "true"` is intentionally set
 7. Validate against the compliance checklist in the per-workflow instructions before finishing.
 8. Return a concise summary of changes, format-gate status, and any repo-specific decisions.
 

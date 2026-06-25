@@ -71,5 +71,5 @@ After updates:
 
 1. Check compliance against both standards files.
 2. Confirm warning/style baseline consistency between project properties and `.editorconfig`.
-3. Confirm each relevant .NET workflow enforces `dotnet format <solution-or-src-path> --verify-no-changes`, including explicit workflow-level checks where required by current composite capabilities.
+3. Confirm each relevant .NET workflow enforces `dotnet format <solution-or-src-path> --verify-no-changes`, relying on the v2 .NET composite-integrated gate where pinned, and adding explicit workflow-level checks only for manual .NET command workflows, pre-v2 pins, or intentional `skip-format-check: "true"` usage.
 4. Report any unresolved gaps explicitly.

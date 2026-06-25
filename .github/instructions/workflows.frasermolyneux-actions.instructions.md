@@ -9,7 +9,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 
 ## Pinning policy
 
-- **Always pin to the specific tag**, e.g. `@dotnet-ci/v1.4`. Never use `@main` or floating refs.
+- **Always pin to the specific tag**, e.g. `@dotnet-ci/v2`. Never use `@main` or floating refs.
 - Reusable workflows (`uses: frasermolyneux/actions/.github/workflows/<name>.yml@<ref>`) currently pin to `@main` because they are versioned by the catalog repo's main branch — this is the documented exception.
 - When bumping a tag, update this file once and propagate to every Layer-3 instruction that references it.
 - For a brand-new composite action pin, merge `actions/` first and verify the rolling tag exists before rolling the pin into consumer repos.
@@ -18,9 +18,9 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 
 | Action | Pinned tag | Purpose |
 |---|---|---|
-| `frasermolyneux/actions/dotnet-ci` | `@dotnet-ci/v1.4` | Restore, build, test, package a .NET solution |
-| `frasermolyneux/actions/dotnet-web-ci` | `@dotnet-web-ci/v1.4` | Build & publish a .NET web app project |
-| `frasermolyneux/actions/dotnet-func-ci` | `@dotnet-func-ci/v1.4` | Build & publish a .NET Azure Functions project |
+| `frasermolyneux/actions/dotnet-ci` | `@dotnet-ci/v2` | Restore, build, test, package a .NET solution |
+| `frasermolyneux/actions/dotnet-web-ci` | `@dotnet-web-ci/v2` | Build & publish a .NET web app project |
+| `frasermolyneux/actions/dotnet-func-ci` | `@dotnet-func-ci/v2` | Build & publish a .NET Azure Functions project |
 | `frasermolyneux/actions/terraform-plan` | `@terraform-plan/v1.4` | `init` + `validate` + `plan`, with PR commenting |
 | `frasermolyneux/actions/terraform-plan-and-apply` | `@terraform-plan-and-apply/v1.4` | Full `init` + `plan` + `apply` |
 | `frasermolyneux/actions/terraform-output` | `@terraform-output/v1.0` | `init` against backend so outputs can be read (no plan/apply) |

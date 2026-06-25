@@ -18,7 +18,7 @@ The `actions/` repo hosts ~30 reusable **composite GitHub Actions** consumed acr
 - **Outputs**: `build_version` (NBGV NuGet version), `semver`.
 - **Sample**:
   ```yaml
-  - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v1.4
+  - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v2
     with:
       dotnet-version: "9.0.x"
       src-folder: src
@@ -153,7 +153,7 @@ Runs `.NET` integration test suites against a deployed environment.
 
 ## Tag pinning rules
 
-- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v1.4`, `@terraform-plan/v1.4`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
+- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v2`, `@terraform-plan/v1.4`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
 - Do **not** use `@main` outside of the `actions/` repo's own internal CI.
 - See `workflows.frasermolyneux-actions.instructions.md` for the canonical pinned-tag list.
 

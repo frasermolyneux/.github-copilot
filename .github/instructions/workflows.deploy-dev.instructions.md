@@ -65,7 +65,7 @@ build-and-test:
     id-token: write
   runs-on: ubuntu-latest
   steps:
-    - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v1.4
+    - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Web>"
         dotnet-version: 9.0.x
@@ -139,7 +139,7 @@ build-and-test:
     id-token: write
   runs-on: ubuntu-latest
   steps:
-    - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v1.4
+    - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Functions>"
         dotnet-version: 9.0.x

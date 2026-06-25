@@ -70,8 +70,8 @@ dotnet format <solution-or-src-path> --verify-no-changes
 ```
 
 - Prefer running this check before `dotnet build`/`dotnet test` so style drift fails fast.
-- Current pinned `frasermolyneux/actions/dotnet-ci`, `dotnet-web-ci`, and `dotnet-func-ci` versions may not include this gate; add an explicit workflow-level `dotnet format --verify-no-changes` step until the pinned composite version includes equivalent enforcement.
-- If a workflow runs manual .NET commands (outside the composites), add an explicit `dotnet format --verify-no-changes` step in that workflow.
+- Pinned `frasermolyneux/actions/dotnet-ci@dotnet-ci/v2`, `dotnet-web-ci@dotnet-web-ci/v2`, and `dotnet-func-ci@dotnet-func-ci/v2` include this gate natively; workflows using these pins are compliant without an extra workflow-level format step.
+- Add an explicit workflow-level `dotnet format --verify-no-changes` step only when .NET commands run outside those composites, when the workflow is pinned below v2, or when `skip-format-check: "true"` is intentionally set.
 
 ## Setup-dotnet (manual setup workflows)
 

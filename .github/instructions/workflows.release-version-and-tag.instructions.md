@@ -118,7 +118,7 @@ dotnet-ci:
   env:
     BUILD_VERSION_OVERRIDE: ${{ needs.calculate-version.outputs.nuget_version }}
   steps:
-    - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v1.4
+    - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v2
       with:
         dotnet-version: |
           9.0.x
