@@ -93,6 +93,22 @@ dotnet test src/<Solution>.sln --filter "FullyQualifiedName~MyTestClass.MyTestMe
 dotnet format src/<Solution>.sln --verify-no-changes
 ```
 
+### .NET completion gate (required for sign-off)
+
+Before declaring any .NET-related change complete (for example changes to `.cs`, `.csproj`, `.sln`, `.slnx`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, or `.vscode/tasks.json`), validate both build and format checks:
+
+1. Prefer VS Code tasks when available in the target repo:
+  - run the build task (prefer `dotnet: build`)
+  - run the format task (prefer `dotnet: format`, which must include `--verify-no-changes`)
+2. Fallback when tasks are not available:
+
+```pwsh
+dotnet build <solution-or-src-path>
+dotnet format <solution-or-src-path> --verify-no-changes
+```
+
+If either validation fails, do not sign off completion.
+
 <!-- Terraform repos: -->
 
 ```pwsh
@@ -140,6 +156,7 @@ Complete the `## Agent attestation` section before requesting review; reviewers 
 - [ ] Build succeeds locally / in CI
 - [ ] Tests pass (excluding integration tests where applicable)
 - [ ] Format check passes (`terraform fmt -check` / `dotnet format --verify-no-changes`)
+- [ ] For .NET changes, build + format were run using VS Code tasks when available, with fallback commands used only when tasks are missing
 - [ ] No new secrets / GUIDs / connection strings introduced
 - [ ] Changes align with files in **Stack guardrails**
 - [ ] `code-review` sub-agent run; High/Medium findings resolved or justified in the PR body

@@ -80,6 +80,23 @@ Before declaring completion on work that crosses package boundaries, Copilot mus
 
 If neither is true, do not mark the task complete.
 
+## Task completion — .NET validation gate
+
+Before telling me a .NET-related change is complete (for example changes to `.cs`, `.csproj`, `.sln`, `.slnx`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, or `.vscode/tasks.json` in a .NET repo), Copilot must validate both build and format checks.
+
+Validation order:
+
+1. **Prefer VS Code tasks when available** in the target repo:
+	- Run the repo's build task (prefer `dotnet: build` when present).
+	- Run the repo's format task (prefer `dotnet: format` when present, which must include `--verify-no-changes`).
+2. **Fallback to commands when tasks are not available**:
+	- `dotnet build <solution-or-src-path>`
+	- `dotnet format <solution-or-src-path> --verify-no-changes`
+
+If either build or format validation fails, do not sign off completion. Report the failure and blocker clearly.
+
+When reporting completion, include brief evidence of what was run (tasks or fallback commands) and the pass/fail outcome.
+
 ## Task completion — review first
 
 Before telling me a piece of work is "done", "complete", "ready", or otherwise signalling completion:

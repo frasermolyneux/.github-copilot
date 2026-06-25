@@ -38,9 +38,12 @@ When working in this multi-root workspace, always identify the target repository
 
 ## Build and Test Commands
 
+Prefer running VS Code tasks when available in the target repository (`.vscode/tasks.json`), especially for build and format checks. If tasks are not available, use the fallback commands below.
+
 **.NET projects** (check each repo for the specific `.sln` path):
 ```bash
 dotnet build src/<SolutionName>.sln
+dotnet format src/<SolutionName>.sln --verify-no-changes
 dotnet test src/<SolutionName>.sln
 dotnet test src/<SolutionName>.sln --filter "FullyQualifiedName!~IntegrationTests"  # skip slow integration tests
 dotnet test src/<SolutionName>.sln --filter "FullyQualifiedName~MyTestClass.MyTestMethod"  # single test
@@ -111,6 +114,7 @@ Quick reference of headline composites — full contract for each is in `shared.
 
 Use the prompts and agents defined in this repo (`.github-copilot/.github/prompts/` and `.github-copilot/.github/agents/`) for standardized updates:
 - **`@workspace /update-project-metadata`** — Updates README, CONTRIBUTING, SECURITY, and copilot-instructions for a target repo
+- **`@workspace /update-agents`** — Updates a target repo `AGENTS.md` using the canonical template and enforces the .NET build+format sign-off gate where applicable
 - **`@workspace /align-project-workflows`** — Aligns GitHub Actions workflows, Dependabot config, and related files to org standards
 - **`@workspace /audit-project-workflows`** — Read-only drift report for all workflows in a target repo
 - **`@workspace /create-workflow`** — Bootstraps a single new canonical workflow in a target repo
