@@ -113,7 +113,7 @@ Quick reference of headline composites — full contract for each is in `shared.
 ## Prompts and Agents
 
 Use the prompts and agents defined in this repo (`.github-copilot/.github/prompts/` and `.github-copilot/.github/agents/`) for standardized updates:
-- **`@workspace /update-project-metadata`** — Updates README, CONTRIBUTING, SECURITY, and copilot-instructions for a target repo
+- **`@workspace /update-project-metadata`** — Updates README, CONTRIBUTING, SECURITY, copilot-instructions, and AGENTS for a target repo
 - **`@workspace /update-agents`** — Updates a target repo `AGENTS.md` using the canonical template and enforces the .NET build+format sign-off gate where applicable
 - **`@workspace /align-project-workflows`** — Aligns GitHub Actions workflows, Dependabot config, and related files to org standards
 - **`@workspace /audit-project-workflows`** — Read-only drift report for all workflows in a target repo
@@ -156,7 +156,7 @@ Project metadata standards (README, CONTRIBUTING, SECURITY, repo-level Copilot i
    - `metadata.pull-request-template.instructions.md` — canonical content rules for `.github/PULL_REQUEST_TEMPLATE.md` (org-default in `.github` repo + per-repo override)
    - `metadata.issue-templates.instructions.md` — canonical content rules for `.github/ISSUE_TEMPLATE/` (org-default in `.github` repo + per-repo override; includes the `delegate-to-agent` form)
 
-Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates all four legacy files in order; `AGENTS.md` / `CODEOWNERS` / PR + issue templates are currently rolled out manually or via per-repo prompts.
+Each per-file file is the source of truth. The matching `update-*.prompt.md` is a thin shim that delegates to it. The `update-project-metadata.agent.md` agent orchestrates `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `.github/copilot-instructions.md`, and `AGENTS.md`; `CODEOWNERS` and PR/issue templates are currently rolled out manually or via per-repo prompts.
 
 Canonical reusable content for the four new metadata files lives in `.github-copilot/templates/`: `AGENTS.md`, `CODEOWNERS`, `PULL_REQUEST_TEMPLATE.md`, `ISSUE_TEMPLATE/{config,delegate-to-agent,bug_report,feature_request}.yml`. The org-wide `frasermolyneux/.github` repo holds the deployed PR template + issue templates — every repo inherits those automatically. `AGENTS.md` and `CODEOWNERS` must be present **per repo** (no org-level inheritance).
 
