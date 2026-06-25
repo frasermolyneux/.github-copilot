@@ -21,6 +21,7 @@ You are a .NET standards alignment specialist. Align a target repository with or
 
 - `.github-copilot/.github/instructions/standards.dotnet-project.instructions.md`
 - `.github-copilot/.github/instructions/standards.editorconfig.instructions.md`
+- `.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md`
 - `.github-copilot/.github/instructions/workflows.dotnet.instructions.md`
 
 ## Scope and target selection
@@ -62,8 +63,10 @@ Return one concise markdown report with:
 1. Target repo and preflight classification.
 2. Files updated by baseline area (project baseline, editorconfig baseline, workflow format gates).
 3. Exceptions retained with rationale.
-4. Workflow format-gate status (enforced, unchanged, or not applicable).
-5. Remaining follow-ups.
+4. NuGet profile alignment status (applied or not applicable).
+5. Scoped CA1707 test override status (applied or not applicable).
+6. Workflow format-gate status (enforced, unchanged, or not applicable).
+7. Remaining follow-ups.
 
 ## Verification
 

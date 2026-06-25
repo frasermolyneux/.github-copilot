@@ -73,6 +73,22 @@ Example:
 dotnet_diagnostic.IDE0060.severity = none # Intentional for framework callback signatures; tracked in #1234
 ```
 
+## Common test naming exception (optional)
+
+Many repositories in this org use underscore-separated xUnit method names for readability (for example `Method_Condition_ExpectedResult`). That pattern can conflict with `CA1707`.
+
+When a repository predominantly uses underscore-style test names, a targeted exception is allowed:
+
+```ini
+[**/*Tests.cs]
+# Keep descriptive xUnit method names with underscores for readability in test code.
+dotnet_diagnostic.CA1707.severity = none
+```
+
+- Keep this exception scoped to test files only.
+- Keep the inline rationale comment.
+- Do not disable `CA1707` globally.
+
 ## Generated code
 
 Disable style/analyzer noise for generated files only, not for hand-written code.
@@ -98,4 +114,5 @@ dotnet_analyzer_diagnostic.severity = none
 - A repository-root `.editorconfig` exists in SDK-style .NET repositories and sets `root = true`.
 - Category severity baseline matches this standard unless a documented exception exists.
 - Rule-level severity downgrades below baseline include an inline justification comment.
+- If `CA1707` is downgraded for test naming, it is scoped to test files only and includes an inline rationale comment.
 - `.editorconfig` severity choices remain aligned with the warning-as-error baseline in `Directory.Build.props`.

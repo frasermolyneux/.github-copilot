@@ -1,6 +1,6 @@
 ---
 description: "Use when Shared conventions for any .NET library in this org that publishes one or more NuGet packages."
-applyTo: '**/src/**/*.cs,**/version.json,**/*.csproj'
+applyTo: '**/src/**/*.cs,**/version.json,**/*.csproj,**/Directory.Build.props,**/Directory.Packages.props'
 ---
 
 # .NET NuGet Library Conventions
@@ -22,6 +22,30 @@ These conventions apply to every repository in the org that publishes one or mor
 - Include a `<PackageReadmeFile>README.md</PackageReadmeFile>` and pack the README via the project file.
 - Set `<IsPackable>false</IsPackable>` on test projects, sample apps, and any non-distributable project.
 - Keep version numbers aligned across packages that ship from the same repository.
+
+## Directory.Build.props profile for NuGet libraries
+
+For NuGet-publishing repositories, keep the org warning/style baseline in root `Directory.Build.props` (from `standards.dotnet-project.instructions.md`) and typically include packaging-friendly defaults like:
+
+```xml
+<PropertyGroup>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+	<!-- SourceLink / symbols -->
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
+</PropertyGroup>
+
+<ItemGroup>
+	<PackageReference Include="Nerdbank.GitVersioning" Version="3.9" PrivateAssets="all" />
+</ItemGroup>
+```
+
+- Keep package metadata fields (`Authors`, `Company`, `PackageLicenseExpression`, etc.) repo-specific.
+- If a repo centralizes NBGV elsewhere, do not duplicate it.
+- Prefer this profile in NuGet library repos to reduce rollout drift across package publishing, symbols, and source indexing.
 
 ## Versioning & Release
 
