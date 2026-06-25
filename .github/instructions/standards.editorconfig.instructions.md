@@ -50,6 +50,7 @@ dotnet_style_qualification_for_field = false:warning
 dotnet_style_qualification_for_property = false:warning
 dotnet_style_qualification_for_method = false:warning
 dotnet_style_qualification_for_event = false:warning
+dotnet_diagnostic.IDE0011.severity = warning
 dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
 dotnet_style_object_initializer = true:warning
 dotnet_style_collection_initializer = true:warning
