@@ -53,9 +53,16 @@ Run this prompt against the target repo:
 ## Constraints
 
 - Do not edit files outside the selected target repository.
+- Remove superseded/duplicate .NET tasks that are replaced by canonical baseline/extension labels, using the pruning rules from the source-of-truth instruction.
+- Do not delete intentionally distinct tasks solely to enforce canonical-label uniqueness; relabel distinct extras to non-canonical labels when safe, otherwise retain and report.
 - Do not remove clearly valid repo-specific non-.NET tasks unless they conflict with the standard.
+- Before removing superseded tasks, rewrite `dependsOn` references to canonical replacement labels.
+- After rewiring/removal, validate task-graph safety: all `dependsOn` targets exist, `dependsOrder` behavior is preserved, duplicate edges are removed, and no cycles were introduced.
+- Validate external task-label consumers (for example `.vscode/launch.json` `preLaunchTask`) before removing labels; rewire references or retain the original task when ambiguous.
+- Search the target repo for references to removed labels; update clear non-.vscode consumers, and retain/report when semantics are unclear.
 - Keep task labels and command shape consistent with the source-of-truth instructions.
 - Ensure `dotnet format --verify-no-changes` is present through `dotnet: format`.
+- Use conservative integration pruning: when integration-test detection is uncertain, retain existing integration-task variants and report ambiguity.
 - If per-file applicability is ambiguous, prefer no edit and report the file as follow-up.
 
 ## Output format
@@ -67,7 +74,11 @@ Return one concise markdown report with:
 3. Baseline tasks enforced (`clean`, `build`, `test`, `format`).
 4. Integration/web/function extensions applied or skipped with reason.
 5. Non-standard tasks retained intentionally.
-6. Remaining follow-ups.
+6. Superseded/duplicate .NET tasks removed.
+7. External label consumers rewired (or task retained when ambiguous).
+8. Uncertain integration-detection cases retained safely (with reason).
+9. Ambiguous tasks intentionally retained (with reason).
+10. Remaining follow-ups.
 
 ## Verification
 
@@ -77,4 +88,9 @@ After updates:
 2. Confirm each `dotnet: format` task uses `dotnet format <path> --verify-no-changes`.
 3. Confirm default test task excludes integration tests.
 4. Confirm optional extension tasks appear only where applicable.
-5. Report unresolved ambiguity explicitly instead of guessing.
+5. Confirm superseded/duplicate .NET tasks were removed or explicitly reported when ambiguous.
+6. Confirm rewired task graphs have no missing `dependsOn` targets, preserve `dependsOrder` behavior, and contain no introduced cycles.
+7. Confirm external task-label consumers (for example `preLaunchTask`) were rewired or intentionally preserved.
+8. Confirm uncertain integration-detection cases retained existing integration tasks.
+9. Confirm clear non-.vscode task-label consumers were rewired and unclear consumers were preserved/reported.
+10. Report unresolved ambiguity explicitly instead of guessing.

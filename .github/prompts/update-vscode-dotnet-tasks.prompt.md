@@ -24,8 +24,16 @@ If this prompt is not applicable to the target repository, report the reason and
    - include `dotnet: clean`, `dotnet: build`, `dotnet: test`, `dotnet: format`
    - ensure `dotnet: format` runs `dotnet format <solution-or-src-path> --verify-no-changes`
    - ensure default `dotnet: test` excludes integration tests
-   - include `dotnet: test-integration` only when integration tests exist
+   - when integration tests exist, keep at least one valid integration-test task; prefer canonical `dotnet: test-integration` only when a single general integration scope exists, and preserve intentional multi-scope integration variants
+   - when integration detection is uncertain, keep existing integration-test tasks and report ambiguity instead of pruning
    - add web/function extensions only when applicable
+   - remove superseded or duplicate .NET tasks replaced by canonical labels, per pruning rules in the source-of-truth instruction
+   - do not delete intentionally distinct tasks solely to enforce canonical-label uniqueness; relabel distinct extras to non-canonical labels when safe, otherwise retain and report
+   - before removing a superseded task, update any `dependsOn` references to point at the canonical replacement label
+   - after rewiring/removal, validate task-graph safety: all `dependsOn` targets exist, `dependsOrder` behavior is preserved, duplicate edges are removed, and no cycles were introduced
+   - validate external label consumers before removal: update `.vscode/launch.json` `preLaunchTask` (and other `.vscode/*.json` task-label references) to the replacement label
+   - search the target repo for removed task labels; if non-.vscode consumers are found with clear semantics, update them; if semantics are unclear, retain the original task and report follow-up instead of guessing
+   - if removal safety is ambiguous, keep the task and report it as follow-up instead of guessing
 7. Preserve valid repo-specific non-.NET tasks (for example npm/playwright/azurite tasks) unless they conflict with baseline conventions.
 8. Keep pathing stable and `${workspaceFolder}`-relative.
 9. Validate each updated file against the compliance checklist in `.github-copilot/.github/instructions/standards.vscode-dotnet-tasks.instructions.md` before finishing.
@@ -33,5 +41,9 @@ If this prompt is not applicable to the target repository, report the reason and
    - files changed
    - project type classification
    - baseline compliance status
+   - superseded/duplicate .NET tasks removed
+   - external task-label consumers rewired (or task retained when ambiguous)
+   - uncertain integration-detection cases retained safely (with reason)
+   - ambiguous tasks intentionally retained (with reason)
    - repo-specific tasks kept intentionally
    - files skipped as not applicable (with reason)
