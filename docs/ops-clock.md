@@ -71,6 +71,7 @@ Repos with no shared infrastructure dependencies, staggered 1 hour apart:
 | 05:00 | platform-sitewatch-func |
 | 06:00 | platform-workloads      |
 | 07:00 | twenty-one              |
+| 08:00 | portal-cod4x-plugin     |
 
 ### Saturday — Clear
 

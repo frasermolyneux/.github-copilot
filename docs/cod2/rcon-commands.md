@@ -1,0 +1,137 @@
+# CoD2 — RCON Command Reference
+
+The full command set exposed by a stock **Call of Duty 2** dedicated server (idTech3 engine), captured directly from a live server with `cmdlist`. This document normalises that raw dump into a consistent reference: each command's **inputs**, **output / behaviour**, and the **output parsing regex** where the output is structured.
+
+> Source capture: `cmdlist`. Cross-referenced with the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands). For confirmed CoD4x output regexes (same engine family), see [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
+
+## How to read this
+
+- **Transport** — over RCON, prefix the command with `rcon <password>` (Quake3 UDP out-of-band packet). The response is one or more connectionless `print` packets; concatenate before parsing.
+- **Inputs** — `<required>`, `[optional]`. Player targets accept a **slot/client id** (from `status`) or a **name**.
+- **Output regex** — a `—` means the output is free-form / unstructured text or there is no parseable response. Status/dvar regexes below are **engine-standard but unverified against a confirmed capture** — validate before relying on them.
+- Strip colour codes (`\^\d`) from names before matching. Bad input prints a `Usage:` line; with no map loaded, server-state commands print `Server is not running.`
+
+---
+
+## Server lifecycle & info
+
+| Command              | Inputs | Output / behaviour                                                                    | Output regex                              |
+| -------------------- | ------ | ------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `status`             | —      | Connected-player table: slot, score, ping, guid, name, lastmsg, address, qport, rate. | see [§ Parsing regexes](#parsing-regexes) |
+| `serverinfo`         | —      | Serverinfo cvars (`\key\value\…`).                                                    | `\\(?P<key>[^\\]+)\\(?P<value>[^\\]*)`    |
+| `systeminfo`         | —      | Systeminfo (engine/system dvars).                                                     | `\\(?P<key>[^\\]+)\\(?P<value>[^\\]*)`    |
+| `meminfo`            | —      | Memory allocation summary.                                                            | —                                         |
+| `gameCompleteStatus` | —      | Report end-of-game completion status.                                                 | —                                         |
+| `heartbeat`          | —      | Force a heartbeat to the master server list.                                          | —                                         |
+| `net_restart`        | —      | Reinitialise the network subsystem.                                                   | —                                         |
+| `net_dumpprofile`    | —      | Dump network profiling data.                                                          | —                                         |
+| `in_restart`         | —      | Reinitialise the input subsystem.                                                     | —                                         |
+| `killserver`         | —      | Disconnect all clients and stop the server (stays in process).                        | —                                         |
+| `quit`               | —      | Shut the server process down.                                                         | —                                         |
+
+## Map control
+
+| Command        | Inputs  | Output / behaviour                                   | Output regex |
+| -------------- | ------- | ---------------------------------------------------- | ------------ |
+| `map`          | `<map>` | Load the given map (full reload).                    | —            |
+| `devmap`       | `<map>` | Load a map in developer mode (cheats enabled).       | —            |
+| `map_restart`  | —       | Restart the current map (full reload).               | —            |
+| `fast_restart` | —       | Restart the current round without reloading the map. | —            |
+| `map_rotate`   | —       | Advance to the next map per `sv_maprotation`.        | —            |
+
+## Player moderation & bans
+
+| Command         | Inputs            | Output / behaviour                                     | Output regex                     |
+| --------------- | ----------------- | ------------------------------------------------------ | -------------------------------- |
+| `kick`          | `<name>` \| `all` | Kick by player name; `all` kicks everyone.             | —                                |
+| `onlykick`      | `<name>`          | Kick by name without recording a ban.                  | —                                |
+| `clientkick`    | `<slot>`          | Kick by client slot/id.                                | —                                |
+| `banClient`     | `<slot>`          | Permanent ban by client slot; GUID added to `ban.txt`. | —                                |
+| `banUser`       | `<name>`          | Permanent ban by name.                                 | —                                |
+| `tempBanClient` | `<slot>`          | Temporary ban by client slot.                          | —                                |
+| `tempBanUser`   | `<name>`          | Temporary ban by name.                                 | —                                |
+| `unbanUser`     | `<name>`          | Remove a ban by name (edit `ban.txt` for duplicates).  | —                                |
+| `dumpuser`      | `<name>`          | Dump a player's userinfo cvars.                        | `^(?P<key>\S+)\s+(?P<value>.*)$` |
+
+## Messaging
+
+| Command | Inputs             | Output / behaviour                       | Output regex |
+| ------- | ------------------ | ---------------------------------------- | ------------ |
+| `say`   | `<message>`        | Broadcast a chat message to all players. | —            |
+| `tell`  | `<slot> <message>` | Private chat message to one player.      | —            |
+
+## Filesystem
+
+| Command     | Inputs        | Output / behaviour                                   | Output regex |
+| ----------- | ------------- | ---------------------------------------------------- | ------------ |
+| `path`      | —             | Print the filesystem search paths.                   | —            |
+| `fullpath`  | `[file]`      | Print the full OS path of a game file/directory.     | —            |
+| `dir`       | `<dir> [ext]` | List files in a directory (optionally by extension). | —            |
+| `fdir`      | `<filter>`    | Find files matching a wildcard filter.               | —            |
+| `touchFile` | `<file>`      | Touch/load a file to force it into the cache.        | —            |
+
+## Key bindings
+
+| Command     | Inputs            | Output / behaviour             | Output regex                             |
+| ----------- | ----------------- | ------------------------------ | ---------------------------------------- |
+| `bind`      | `<key> <command>` | Bind a key to a command.       | —                                        |
+| `unbind`    | `<key>`           | Remove a key binding.          | —                                        |
+| `unbindall` | —                 | Remove all key bindings.       | —                                        |
+| `bindlist`  | —                 | List all current key bindings. | `^"(?P<key>[^"]+)"\s+"(?P<command>.*)"$` |
+
+## Audio
+
+| Command                      | Inputs | Output / behaviour                        | Output regex |
+| ---------------------------- | ------ | ----------------------------------------- | ------------ |
+| `snd_refreshVolumeModGroups` | —      | Refresh the sound volume modifier groups. | —            |
+
+## Dvars, config & engine
+
+| Command         | Inputs                      | Output / behaviour                                  | Output regex                                            |
+| --------------- | --------------------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| `set`           | `<var> <value>`             | Set a dvar.                                         | —                                                       |
+| `seta`          | `<var> <value>`             | Set a dvar and archive it (persisted to config).    | —                                                       |
+| `sets`          | `<var> <value>`             | Set a dvar flagged as serverinfo.                   | —                                                       |
+| `setu`          | `<var> <value>`             | Set a dvar flagged as userinfo.                     | —                                                       |
+| `reset`         | `<var>`                     | Reset a dvar to its default value.                  | —                                                       |
+| `toggle`        | `<var> [values…]`           | Toggle a dvar between 0/1 or a list of values.      | —                                                       |
+| `togglep`       | `<var> [values…]`           | Toggle a dvar and print the new value.              | —                                                       |
+| `vstr`          | `<var>`                     | Execute the contents of a string dvar as a command. | —                                                       |
+| `wait`          | `[frames]`                  | Delay subsequent buffered commands by N frames.     | —                                                       |
+| `exec`          | `<file>`                    | Execute a config file.                              | —                                                       |
+| `writeconfig`   | `<file>`                    | Write archived dvars/binds to a config file.        | —                                                       |
+| `writedefaults` | `<file>`                    | Write all default dvar values to a file.            | —                                                       |
+| `dvarlist`      | `[filter]`                  | List all dvars (optionally filtered).               | `^(?P<flags>[\w-]+)\s+(?P<name>\S+)\s+"(?P<value>.*)"$` |
+| `dvardump`      | `<var>`                     | Dump a dvar's value, default, and flags.            | —                                                       |
+| `dvar_float`    | `<var> <value> <min> <max>` | Register/define a float dvar with range.            | —                                                       |
+| `dvar_int`      | `<var> <value> <min> <max>` | Register/define an integer dvar with range.         | —                                                       |
+| `dvar_bool`     | `<var> <value>`             | Register/define a boolean dvar.                     | —                                                       |
+| `setfromdvar`   | `<dest> <src>`              | Set one dvar's value from another dvar.             | —                                                       |
+| `stringUsage`   | —                           | String table / configstring memory usage.           | —                                                       |
+| `scriptUsage`   | —                           | GSC script memory usage.                            | —                                                       |
+
+---
+
+## Parsing regexes
+
+> ⚠️ Unlike the CoD4x regexes (confirmed against captures in [../cod4x/rcon-system.md](../cod4x/rcon-system.md)), the patterns below are engine-standard templates and should be validated against a real capture before use.
+
+### `status` — player rows (approximate)
+
+```regex
+^\s*(?P<num>\d+)\s+(?P<score>-?\d+)\s+(?P<ping>CNCT|ZMBI|\d+)\s+(?P<guid>[0-9a-fA-F]+)\s+(?P<name>.+?)\s+(?P<lastmsg>\d+)\s+(?P<address>(?:[0-9.]+|loopback|bot):?\d*)\s+(?P<qport>\d+)\s+(?P<rate>\d+)\s*$
+```
+
+### `serverinfo` / `systeminfo` — cvar pairs
+
+```regex
+\\(?P<key>[^\\]+)\\(?P<value>[^\\]*)
+```
+
+---
+
+## Behavioural notes
+
+- Stock CoD2 keys bans in `ban.txt` by GUID; prefer `clientkick`/`banClient` (slot id) over the name-based variants because colour-coded names are hard to type.
+- Outputs may be split across multiple packets; reassemble before applying regex.
+- For confirmed ban/unban output formats, use the CoD4x reference: [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
