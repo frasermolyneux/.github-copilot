@@ -26,4 +26,4 @@ Build the dedicated server, and how plugin ABI versioning gates compatibility. S
 
 ## 5. Portal deployment notes
 - Pin server build + plugin handler version per environment for reproducibility.
-- A `portal-cod4x-plugin` must rebuild against handler 4.000 and ship x86; CI cross-compiles, and deployment drops into each server home (see [multi-server-fleet.md](multi-server-fleet.md)).
+- A `portal-cod4x-plugin` must rebuild against handler 4.000 and ship x86; written in C++ (SonarCloud build-wrapper + CodeQL in CI), and deployment drops into each server home (see [multi-server-fleet.md](multi-server-fleet.md)).

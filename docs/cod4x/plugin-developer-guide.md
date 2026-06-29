@@ -5,8 +5,9 @@ End-to-end guide for building a CoD4X18 plugin — the basis for **portal-cod4x-
 ---
 
 ## 1. Choose a language
-- **C/C++** — canonical; include `pinc.h` once.
-- **D** — supported; declare C functions `extern(C)`, init with `Runtime.initialize()`. Build x86.
+- **C++** — the chosen language for `portal-cod4x-plugin`: native C-ABI match, SonarCloud + CodeQL coverage, clean static-linked x86 build. Include `pinc.h` once.
+- **C** — also canonical; same SDK/build.
+- **D** — supported but avoid (no SonarCloud/CodeQL coverage, ships a runtime): declare C functions `extern(C)`, init with `Runtime.initialize()`.
 
 ## 2. Minimum viable plugin
 ```c
@@ -48,9 +49,9 @@ Pump in `OnFrame`: `Plugin_HTTP_MakeHttpRequest(url, "POST", body, len, "Content
 - Config via `Plugin_Cvar_Register*`; persist via `Plugin_FS_*`.
 
 ## 8. Build, distribute, load
-- C/C++ (Windows): `g++ -m32 -O1 -c *.cpp` then `g++ -m32 -shared -static-libgcc -static-libstdc++ -o name.dll *.o -L.. -lcom_plugin`.
-- C/C++ (Linux): `g++ -m32 -fvisibility=hidden -c *.cpp` then `g++ -m32 -shared -o name.so *.o`.
-- D: `dub --arch=x86 --build=release`.
+- C++ (Windows): `g++ -m32 -O1 -c *.cpp` then `g++ -m32 -shared -static-libgcc -static-libstdc++ -o name.dll *.o -L.. -lcom_plugin`.
+- C++ (Linux): `g++ -m32 -fvisibility=hidden -c *.cpp` then `g++ -m32 -shared -o name.so *.o`.
+- CI: wrap the compile in the SonarCloud build-wrapper (C/C++ has no automatic analysis); CodeQL covers C++ too.
 - Drop in `fs_homepath/plugins/`; `loadplugin <name>` (config) or `+loadplugin <name>`; ABI v4.000 gates load. Return 0 from `OnInit`.
 
 ## 9. portal-cod4x-plugin checklist
@@ -58,3 +59,4 @@ Pump in `OnFrame`: `Plugin_HTTP_MakeHttpRequest(url, "POST", body, len, "Content
 - Provide portal-controlled chat commands; gate by power.
 - Enrich HUD via stats; report bans bidirectionally; emit structured logs (`Plugin_PrintAdministrativeLog`).
 - Keep secrets in cvars/env, not source; x86 release builds; honour 16-plugin/limit caps.
+- Language is **C++** (SonarCloud + CodeQL covered; native ABI; static-linked x86).
