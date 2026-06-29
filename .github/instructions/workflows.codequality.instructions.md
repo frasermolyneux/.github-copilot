@@ -115,6 +115,32 @@ quality:
     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 ```
 
+#### C++ / CMake project
+
+```yaml
+quality:
+  permissions:
+    contents: read
+    actions: read
+    security-events: write
+  if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+  uses: frasermolyneux/actions/.github/workflows/codequality.yml@main
+  with:
+    sonar-project-key: <org>_<project>
+    sonar-organization: <org>
+    sonar-host-url: https://sonarcloud.io
+    build-target: cmake-ci
+    codeql-languages: cpp
+    codeql-category: /language:cpp
+    cmake-source-dir: .
+    cmake-build-dir: build
+    cmake-configure-args: -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    cmake-build-args: --config Release
+    ctest-args: --output-on-failure --build-config Release
+  secrets:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+```
+
 ### DevOps secure scanning (always)
 
 ```yaml
@@ -150,8 +176,9 @@ dependency-review:
 2. Cron matches the repo's allocated Monday slot in `docs/ops-clock.md`.
 3. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
 4. Every job skips drafts: `quality` and `devops-secure-scanning` guard with `github.event_name != 'pull_request' || github.event.pull_request.draft == false`; `dependency-review` guard combines `github.event_name == 'pull_request'` with the draft check.
-5. `quality` job uses the reusable codequality workflow with the right `build-target` for project type.
-6. `devops-secure-scanning` job always present.
-7. `dependency-review` job always present, gated on `pull_request` and not draft.
-8. `SONAR_TOKEN` secret threaded into the `quality` job.
-9. Top-level `permissions: {}`; per-job permissions declared.
+5. `quality` job uses the reusable codequality workflow with the right `build-target` for project type (`dotnet-ci`, `dotnet-web-ci`, `dotnet-func-ci`, or `cmake-ci`).
+6. For C++ repos, `codeql-languages` and `codeql-category` are set to C++ values.
+7. `devops-secure-scanning` job always present.
+8. `dependency-review` job always present, gated on `pull_request` and not draft.
+9. `SONAR_TOKEN` secret threaded into the `quality` job.
+10. Top-level `permissions: {}`; per-job permissions declared.

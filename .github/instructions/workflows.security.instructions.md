@@ -18,7 +18,7 @@ with:
   sonar-project-key: <org>_<project>          # e.g. frasermolyneux_portal-web
   sonar-organization: <org>                   # e.g. frasermolyneux
   sonar-host-url: https://sonarcloud.io
-  build-target: dotnet-ci                     # or dotnet-web-ci / dotnet-func-ci
+  build-target: dotnet-ci                     # or dotnet-web-ci / dotnet-func-ci / cmake-ci
   dotnet-version: |
     9.0.x
     10.0.x
@@ -36,7 +36,21 @@ permissions:
   security-events: write
 ```
 
-`build-target` must match the project type (see `workflows.dotnet.instructions.md` for the composite selection matrix). Web/func calls additionally need `dotnet-project:`.
+`build-target` must match the project type (see `workflows.dotnet.instructions.md` for the .NET composite selection matrix). Web/func calls additionally need `dotnet-project:`.
+
+For C++/CMake repositories:
+
+```yaml
+with:
+  build-target: cmake-ci
+  codeql-languages: cpp
+  codeql-category: /language:cpp
+  cmake-source-dir: .
+  cmake-build-dir: build
+  cmake-configure-args: -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  cmake-build-args: --config Release
+  ctest-args: --output-on-failure --build-config Release
+```
 
 ## DevOps secure scanning
 

@@ -21,6 +21,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/dotnet-ci` | `@dotnet-ci/v2` | Restore, build, test, package a .NET solution |
 | `frasermolyneux/actions/dotnet-web-ci` | `@dotnet-web-ci/v2` | Build & publish a .NET web app project |
 | `frasermolyneux/actions/dotnet-func-ci` | `@dotnet-func-ci/v2` | Build & publish a .NET Azure Functions project |
+| `frasermolyneux/actions/cmake-ci` | `@cmake-ci/v1` | Configure, build, and test a CMake project |
 | `frasermolyneux/actions/terraform-plan` | `@terraform-plan/v1.4` | `init` + `validate` + `plan`, with PR commenting |
 | `frasermolyneux/actions/terraform-plan-and-apply` | `@terraform-plan-and-apply/v1.4` | Full `init` + `plan` + `apply` |
 | `frasermolyneux/actions/terraform-output` | `@terraform-output/v1.0` | `init` against backend so outputs can be read (no plan/apply) |

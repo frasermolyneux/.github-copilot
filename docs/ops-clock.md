@@ -21,11 +21,11 @@ This document defines the weekly operations schedule for all automated workflows
 
 ### Sunday — Dependabot (all repos)
 
-All 32 repositories run Dependabot on Sunday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Each repo's Dependabot time matches its Monday codequality time. All ecosystems use `groups` with `patterns: ["*"]` to batch updates into a single PR per ecosystem.
+All 33 repositories run Dependabot on Sunday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Each repo's Dependabot time matches its Monday codequality time. All ecosystems use `groups` with `patterns: ["*"]` to batch updates into a single PR per ecosystem.
 
 ### Monday — Code Quality (all repos)
 
-All 32 repositories run codequality scans on Monday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Times match the Sunday Dependabot schedule per repo.
+All 33 repositories run codequality scans on Monday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Times match the Sunday Dependabot schedule per repo.
 
 ### Tuesday — Clear
 
@@ -136,6 +136,7 @@ When adding or modifying scheduled workflows:
 | 06:00 | observability-appinsights   |
 | 06:15 | invision-api-client         |
 | 06:30 | cod-demo-reader             |
+| 06:45 | portal-cod4x-plugin         |
 | 07:00 | ado-pipeline-templates      |
 | 07:15 | demo-manager                |
 | 07:30 | molyneux-me                 |
