@@ -91,13 +91,13 @@ Read stable identity at **`OnClientAuthorized`** (`Plugin_GetPlayerID` / `Plugin
 
 ## What changes / what doesn't
 
-| Layer | Change |
-|---|---|
-| Plugin | New: batched egress, buffer, `OnFrame` pump. |
-| APIM | **New**: auth + rate-limit + light validation, then **direct** send to the per-type Service Bus queues via managed identity. No function/ingest app. |
-| Service Bus | Existing queues; **duplicate detection must be enabled** (creation-time, immutable property — see [risks](risks-and-open-questions.md)). |
-| portal-server-events | **Unchanged** for existing event types / migration scope; new event types (Phase 7) add new processors. |
-| Ingest dedupe | Service Bus duplicate detection on a per-event `MessageId` GUID (`SequenceId` informational only). |
+| Layer                | Change                                                                                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plugin               | New: batched egress, buffer, `OnFrame` pump.                                                                                                         |
+| APIM                 | **New**: auth + rate-limit + light validation, then **direct** send to the per-type Service Bus queues via managed identity. No function/ingest app. |
+| Service Bus          | Existing queues; **duplicate detection must be enabled** (creation-time, immutable property — see [risks](risks-and-open-questions.md)).             |
+| portal-server-events | **Unchanged** for existing event types / migration scope; new event types (Phase 7) add new processors.                                              |
+| Ingest dedupe        | Service Bus duplicate detection on a per-event `MessageId` GUID (`SequenceId` informational only).                                                   |
 
 ## Related
 

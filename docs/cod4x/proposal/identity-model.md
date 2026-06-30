@@ -4,11 +4,11 @@ Cross-cutting reference for how players and admins are identified across the plu
 
 ## The three CoD4x identifiers
 
-| ID | Stable across reconnect | Steam required | Use |
-|---|---|---|---|
-| **playerid** (~19 digits, non-Steam universe) | Yes (per machine) | No | **Primary key** for bans and admin power |
-| **steamid** (~17 digits or `0`) | Yes (per person) | Yes | Person-level correlation when present |
-| **legacy GUID** (32-char hex) | Legacy | No | Input only — auto-converted to `playerid` |
+| ID                                            | Stable across reconnect | Steam required | Use                                       |
+| --------------------------------------------- | ----------------------- | -------------- | ----------------------------------------- |
+| **playerid** (~19 digits, non-Steam universe) | Yes (per machine)       | No             | **Primary key** for bans and admin power  |
+| **steamid** (~17 digits or `0`)               | Yes (per person)        | Yes            | Person-level correlation when present     |
+| **legacy GUID** (32-char hex)                 | Legacy                  | No             | Input only — auto-converted to `playerid` |
 
 A player without Steam has `steamid == 0` but always a non-zero `playerid`. The plugin reads identity via `Plugin_GetPlayerID(slot)` / `Plugin_GetPlayerSteamID(slot)` at `OnClientAuthorized` (not at raw connect).
 

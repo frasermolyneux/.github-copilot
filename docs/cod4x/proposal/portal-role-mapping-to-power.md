@@ -6,10 +6,10 @@ How a portal admin's role (HeadAdmin, GameAdmin, Moderator, …) becomes an in-g
 
 CoD4x has two ways to grant power (see [`../admin-system.md`](../admin-system.md), [`../player-authentication.md`](../player-authentication.md)):
 
-| Mechanism | SteamID required? | Keyed on | Chosen? |
-|---|---|---|---|
-| Native **persistent admin store** (`Auth_AddAdminToList`) | **Yes** — rejects `steamid == 0` | steamid | ❌ excludes non-Steam players; needs schema change |
-| **Transient** `cl->power` (`Auth_GetClPower` returns `cl->power` before any steamid lookup) | **No** | slot / `cl->power` | ✅ |
+| Mechanism                                                                                   | SteamID required?                | Keyed on           | Chosen?                                           |
+| ------------------------------------------------------------------------------------------- | -------------------------------- | ------------------ | ------------------------------------------------- |
+| Native **persistent admin store** (`Auth_AddAdminToList`)                                   | **Yes** — rejects `steamid == 0` | steamid            | ❌ excludes non-Steam players; needs schema change |
+| **Transient** `cl->power` (`Auth_GetClPower` returns `cl->power` before any steamid lookup) | **No**                           | slot / `cl->power` | ✅                                                 |
 
 We use **transient power keyed on `playerid`** — no SteamID requirement, covers non-Steam players, and the **plugin owns enforcement** (consistent with it owning [bans](bans-portal-authority.md)). The per-client **command whitelist** (also slot-keyed) is available for fine-grained grants without the admin store.
 

@@ -6,10 +6,10 @@ Commands the **portal implements** (`!fu`, `!whoami`, `!register`, `!commands`, 
 
 The defining idea: portal-owned commands are **defined once** and can be **executed in two places**:
 
-| Executor | Servers | How |
-|---|---|---|
-| **portal-server-events** (today) | legacy CoD2/4/5 + any non-plugin server | matches chat from the log tail, replies / acts via RCON |
-| **portal-cod4x-plugin** (new) | CoD4x with the plugin | matches chat **in-process**, replies via `Plugin_ChatPrintf` or a portal HTTP call |
+| Executor                         | Servers                                 | How                                                                                |
+| -------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
+| **portal-server-events** (today) | legacy CoD2/4/5 + any non-plugin server | matches chat from the log tail, replies / acts via RCON                            |
+| **portal-cod4x-plugin** (new)    | CoD4x with the plugin                   | matches chat **in-process**, replies via `Plugin_ChatPrintf` or a portal HTTP call |
 
 Same definitions, same `chatCommands` config, **different runtime**. The plugin is simply a *second executor* of the existing catalog — there is **no separate "plugin commands" namespace** (that would cause drift between "the portal's `!fu`" and "the plugin's `!fu`").
 

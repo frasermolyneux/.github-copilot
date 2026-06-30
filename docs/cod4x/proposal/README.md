@@ -68,15 +68,15 @@ _Not shown: the artifact flow — plugin `demo-captured` / `screenshot-captured`
 
 ## Headline design decisions
 
-| # | Decision |
-|---|---|
-| 1 | **Events go over HTTPS via APIM** (the plugin can't use the Service Bus SDK / managed identity from outside Azure). APIM posts **directly** into the **existing, unchanged** Service Bus queues via managed identity — **no function/ingest app** in between. |
-| 2 | **Portal is the source of truth for bans.** The CoD4x native ban list is already delegated to plugins (`OnPlayerGetBanStatus`), so the plugin *is* the ban authority. |
-| 3 | **Admin power via a cached roster** (`playerid → { power, tags }`), portal-link gated, keyed on **playerid** (no SteamID requirement). |
-| 4 | **One command catalog, two executors.** Portal-owned commands live in `chatCommands`; the plugin is a second executor alongside `portal-server-events`. Native server commands are tuned via `cod4xCommands`. |
-| 5 | **Single shared Entra app** for all servers (one Terraform block, like the existing static apps); the plugin authenticates to APIM with it and `ServerId` is **self-declared** in the body. **Accepted risk:** a leaked secret from any box can spoof any server's events fleet-wide; per-server containment deferred. |
-| 6 | **Agent becomes the lifecycle controller** (deploy/update/health/rollback) and keeps the log-tail path for legacy + migration fallback. |
-| 7 | **Artifacts:** the plugin emits capture events; `portal-server-events` triggers `portal-sync`, which pulls the files via `portal-servers-integration` and persists them to `portal-repository` (plus a 4-hourly reconcile sweep). Demos reuse the existing demo pipeline; screenshot storage is greenfield. |
+| #   | Decision                                                                                                                                                                                                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Events go over HTTPS via APIM** (the plugin can't use the Service Bus SDK / managed identity from outside Azure). APIM posts **directly** into the **existing, unchanged** Service Bus queues via managed identity — **no function/ingest app** in between.                                                          |
+| 2   | **Portal is the source of truth for bans.** The CoD4x native ban list is already delegated to plugins (`OnPlayerGetBanStatus`), so the plugin *is* the ban authority.                                                                                                                                                  |
+| 3   | **Admin power via a cached roster** (`playerid → { power, tags }`), portal-link gated, keyed on **playerid** (no SteamID requirement).                                                                                                                                                                                 |
+| 4   | **One command catalog, two executors.** Portal-owned commands live in `chatCommands`; the plugin is a second executor alongside `portal-server-events`. Native server commands are tuned via `cod4xCommands`.                                                                                                          |
+| 5   | **Single shared Entra app** for all servers (one Terraform block, like the existing static apps); the plugin authenticates to APIM with it and `ServerId` is **self-declared** in the body. **Accepted risk:** a leaked secret from any box can spoof any server's events fleet-wide; per-server containment deferred. |
+| 6   | **Agent becomes the lifecycle controller** (deploy/update/health/rollback) and keeps the log-tail path for legacy + migration fallback.                                                                                                                                                                                |
+| 7   | **Artifacts:** the plugin emits capture events; `portal-server-events` triggers `portal-sync`, which pulls the files via `portal-servers-integration` and persists them to `portal-repository` (plus a 4-hourly reconcile sweep). Demos reuse the existing demo pipeline; screenshot storage is greenfield.            |
 
 \* `portal-server-events` is unchanged for the existing event types / migration scope; new event types (e.g. `player-killed`, `screenshot-captured`) in [phase 7](roadmap-and-phasing.md) add new processors.
 

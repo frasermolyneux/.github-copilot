@@ -12,12 +12,12 @@ Default cadence (tunable): config + roster + active-bans sync **~60 s**.
 
 ## Namespaces the plugin reads
 
-| Namespace | Owner / status | What the plugin does with it |
-|---|---|---|
-| **chatCommands** | existing | Commands it should **execute in-process** (see [portal commands](chat-commands-portal.md)). |
-| **cod4xCommands** | new | Native server command tuning to **reconcile onto the server** (see [native commands](chat-commands-native.md)). |
-| **cod4xPower** | new | Role-tag → power bands for the **connected-player roster** (see [role mapping](portal-role-mapping-to-power.md)). |
-| **agent / broadcasts / banfiles / ftp / rcon** | existing | Existing per-server config the agent uses today; relevant subsets move in-plugin over time. |
+| Namespace                                      | Owner / status | What the plugin does with it                                                                                      |
+| ---------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **chatCommands**                               | existing       | Commands it should **execute in-process** (see [portal commands](chat-commands-portal.md)).                       |
+| **cod4xCommands**                              | new            | Native server command tuning to **reconcile onto the server** (see [native commands](chat-commands-native.md)).   |
+| **cod4xPower**                                 | new            | Role-tag → power bands for the **connected-player roster** (see [role mapping](portal-role-mapping-to-power.md)). |
+| **agent / broadcasts / banfiles / ftp / rcon** | existing       | Existing per-server config the agent uses today; relevant subsets move in-plugin over time.                       |
 
 The connected-player **roster** (`playerid → { power, tags }`) is synced as part of this same periodic pull — compact, admins-only, scoped to the server's game type.
 
