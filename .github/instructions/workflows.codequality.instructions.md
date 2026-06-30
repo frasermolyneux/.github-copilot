@@ -48,6 +48,8 @@ All three jobs must be present in every repo (Sonar, DevOps secure scanning, dep
 
 The `quality` job uses the reusable workflow with the appropriate `build-target`. See `workflows.security.instructions.md` for the parameter contract.
 
+For .NET build targets (`dotnet-ci`, `dotnet-web-ci`, and `dotnet-func-ci`), set `skip-format-check: true` in the `with:` block. Format validation runs in build/test workflows, so codequality should avoid duplicating the same gate.
+
 #### .NET library / solution
 
 ```yaml
@@ -63,6 +65,7 @@ quality:
     sonar-organization: <org>
     sonar-host-url: https://sonarcloud.io
     build-target: dotnet-ci
+    skip-format-check: true
     dotnet-version: |
       9.0.x
       10.0.x
@@ -86,6 +89,7 @@ quality:
     sonar-organization: <org>
     sonar-host-url: https://sonarcloud.io
     build-target: dotnet-func-ci
+    skip-format-check: true
     dotnet-project: <MyOrg.MyApp.Functions>
     dotnet-version: 10.0.x
     src-folder: src
@@ -108,6 +112,7 @@ quality:
     sonar-organization: <org>
     sonar-host-url: https://sonarcloud.io
     build-target: dotnet-web-ci
+    skip-format-check: true
     dotnet-project: <MyOrg.MyApp.Web>
     dotnet-version: 9.0.x
     src-folder: src
@@ -177,8 +182,9 @@ dependency-review:
 3. Workflow-level `concurrency:` block uses `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}` with `cancel-in-progress: true` (per `workflows.instructions.md`).
 4. Every job skips drafts: `quality` and `devops-secure-scanning` guard with `github.event_name != 'pull_request' || github.event.pull_request.draft == false`; `dependency-review` guard combines `github.event_name == 'pull_request'` with the draft check.
 5. `quality` job uses the reusable codequality workflow with the right `build-target` for project type (`dotnet-ci`, `dotnet-web-ci`, `dotnet-func-ci`, or `cmake-ci`).
-6. For C++ repos, `codeql-languages` and `codeql-category` are set to C++ values.
-7. `devops-secure-scanning` job always present.
-8. `dependency-review` job always present, gated on `pull_request` and not draft.
-9. `SONAR_TOKEN` secret threaded into the `quality` job.
-10. Top-level `permissions: {}`; per-job permissions declared.
+6. For .NET `build-target` values (`dotnet-ci`, `dotnet-web-ci`, `dotnet-func-ci`), `skip-format-check: true` is set in the `quality` job `with:` block.
+7. For C++ repos, `codeql-languages` and `codeql-category` are set to C++ values.
+8. `devops-secure-scanning` job always present.
+9. `dependency-review` job always present, gated on `pull_request` and not draft.
+10. `SONAR_TOKEN` secret threaded into the `quality` job.
+11. Top-level `permissions: {}`; per-job permissions declared.

@@ -19,6 +19,7 @@ with:
   sonar-organization: <org>                   # e.g. frasermolyneux
   sonar-host-url: https://sonarcloud.io
   build-target: dotnet-ci                     # or dotnet-web-ci / dotnet-func-ci / cmake-ci
+  skip-format-check: true                     # set for .NET build-targets
   dotnet-version: |
     9.0.x
     10.0.x
@@ -36,7 +37,7 @@ permissions:
   security-events: write
 ```
 
-`build-target` must match the project type (see `workflows.dotnet.instructions.md` for the .NET composite selection matrix). Web/func calls additionally need `dotnet-project:`.
+`build-target` must match the project type (see `workflows.dotnet.instructions.md` for the .NET composite selection matrix). Web/func calls additionally need `dotnet-project:`. For .NET build-targets (`dotnet-ci`, `dotnet-web-ci`, `dotnet-func-ci`), set `skip-format-check: true`.
 
 For C++/CMake repositories:
 
