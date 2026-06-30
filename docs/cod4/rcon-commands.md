@@ -2,13 +2,13 @@
 
 The full command set exposed by a stock **Call of Duty 4: Modern Warfare** dedicated server (idTech3 engine), captured directly from a live server with `cmdlist` (68 commands). This document normalises that raw dump into a consistent reference: each command's **inputs**, **output / behaviour**, and the **output parsing regex** where the output is structured.
 
-> Source capture: `cmdlist` (68 commands). Cross-referenced with the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands). The richer CoD4**x** variant (extra ban/admin/plugin commands and confirmed output regexes) is documented in [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
+> Source capture: `cmdlist` (68 commands). Cross-referenced with the [BigBrotherBot (B3) CoD4 parser](https://github.com/BigBrotherBot/big-brother-bot/blob/master/b3/parsers/cod4.py) (status regex + command syntax) and the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands). The richer CoD4**x** variant (extra ban/admin/plugin commands and confirmed output regexes) is documented in [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
 
 ## How to read this
 
 - **Transport** — over RCON, prefix the command with `rcon <password>` (Quake3 UDP out-of-band packet). The response is one or more connectionless `print` packets; concatenate before parsing.
 - **Inputs** — `<required>`, `[optional]`. Player targets accept a **slot/client id** (from `status`) or a **name**.
-- **Output regex** — a `—` means the output is free-form / unstructured text or there is no parseable response. Status/dvar regexes below are **engine-standard but unverified against a confirmed capture** — validate before relying on them.
+- **Output regex** — a `—` means the output is free-form / unstructured text or there is no parseable response. The `status` regex is sourced from the BigBrotherBot (B3) parsers; the `serverinfo`/`dvarlist`/`bindlist` patterns are engine-standard templates worth validating against a real capture.
 - Strip colour codes (`\^\d`) from names before matching. Bad input prints a `Usage:` line; with no map loaded, server-state commands print `Server is not running.`
 
 ---
@@ -129,13 +129,17 @@ The full command set exposed by a stock **Call of Duty 4: Modern Warfare** dedic
 
 ## Parsing regexes
 
-> ⚠️ Unlike the CoD4x regexes (which are confirmed against captures in [../cod4x/rcon-system.md](../cod4x/rcon-system.md)), the patterns below are engine-standard templates and should be validated against a real capture before use.
+> The `status` pattern below is taken from the BigBrotherBot (B3) parsers — a widely-used, battle-tested RCON tool — so it is reliable. The `serverinfo`/`dvarlist`/`bindlist` patterns are engine-standard templates; validate them against a real capture.
 
-### `status` — player rows (approximate)
+### `status` — player rows
+
+Authoritative pattern from the BigBrotherBot CoD4 parser (`b3/parsers/cod4.py`, `_regPlayer`). The `guid` column is a **32-char hex** ID (`_guidLength = 32`). Compile with the case-insensitive flag.
 
 ```regex
-^\s*(?P<num>\d+)\s+(?P<score>-?\d+)\s+(?P<ping>CNCT|ZMBI|\d+)\s+(?P<guid>[0-9a-fA-F]+)\s+(?P<name>.+?)\s+(?P<lastmsg>\d+)\s+(?P<address>(?:[0-9.]+|loopback|bot):?\d*)\s+(?P<qport>\d+)\s+(?P<rate>\d+)\s*$
+^\s*(?P<slot>\d+)\s+(?P<score>[\d-]+)\s+(?P<ping>\d+)\s+(?P<guid>[0-9a-f]+)\s+(?P<name>.*?)\s+(?P<last>\d+)\s*(?P<ip>(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)):?(?P<port>-?\d{1,5})\s*(?P<qport>-?\d{1,5})\s+(?P<rate>\d+)$
 ```
+
+> The numeric `ping` group does not match connecting players (`CNCT`/`ZMBI`); filter those rows separately.
 
 ### `serverinfo` / `systeminfo` — cvar pairs
 
@@ -148,6 +152,7 @@ The full command set exposed by a stock **Call of Duty 4: Modern Warfare** dedic
 ## Behavioural notes
 
 - Stock CoD4 keys bans in `ban.txt` by GUID; prefer `clientkick`/`banClient` (slot id) over the name-based variants because colour-coded names are hard to type.
+- BigBrotherBot (B3) drives the common moderation commands as `clientkick <slot>` (kick), `banclient <slot>` (ban), `unbanuser <name>` (unban), `tell <slot> <msg>`, `say <msg>`, and `set <name> "<value>"`.
 - Outputs may be split across multiple packets; reassemble before applying regex.
 - For confirmed ban/unban output formats and additional admin/plugin commands, use the CoD4x reference: [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
 

@@ -26,3 +26,7 @@ This set is **self-contained** — each document stands alone and is the canonic
 | [multi-server-fleet.md](multi-server-fleet.md)         | Operators, portal          | Shared base + per-home fleet topology, ports, per-server RCON secrets.                                                    |
 | [anticheat-data-flow.md](anticheat-data-flow.md)       | portal moderation          | `getss`/`getmodules`, demos, arrival hooks, plugin events.                                                                |
 | [server-build-and-abi.md](server-build-and-abi.md)     | maintainers                | Server build (x86), auth library, plugin ABI v4.000 gating, install/load.                                                 |
+
+## Proposal — portal-cod4x-plugin integration
+
+The [`proposal/`](proposal/README.md) folder contains the **design proposal** for a first-party `portal-cod4x-plugin` that replaces the external integration with an in-process plugin (events, portal-owned bans and admin power, in-game commands, screenshot/demo ingest, offline tolerance). Start at the [proposal index](proposal/README.md).

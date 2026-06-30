@@ -41,7 +41,15 @@
       "path": "../portal-web"
     },
     {
+      "name": "portal-cod4x-plugin",
+      "path": "../portal-cod4x-plugin"
+    },
+    {
+      "name": ".github",
       "path": "../.github"
+    },
+    {
+      "path": "../actions"
     }
   ],
   "settings": {

@@ -2,7 +2,7 @@
 
 The full command set exposed by a **CoD4X18** dedicated server, captured directly from a live server with `cmdlist` (74 commands). This document normalises that raw dump into a consistent reference: each command's **inputs**, **output / behaviour**, and the **output parsing regex** where the output is structured.
 
-> Source capture: `cmdlist` (74 commands). Cross-referenced with [rcon-system.md](rcon-system.md) (canonical wire protocol + regexes), [admin-system.md](admin-system.md) (power levels + ban system), and the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands).
+> Source capture: `cmdlist` (74 commands). Cross-referenced with [rcon-system.md](rcon-system.md) (canonical wire protocol + regexes), [admin-system.md](admin-system.md) (power levels + ban system), the CoD4X server source (`src/sv_cmds.c` → `SV_AddOperatorCommands`, which registers each command with its in-game power), the [BigBrotherBot (B3) CoD4 parser](https://github.com/BigBrotherBot/big-brother-bot/blob/master/b3/parsers/cod4.py), and the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands).
 
 ## How to read this
 
@@ -113,27 +113,47 @@ See [plugin-system.md](plugin-system.md).
 
 ## Cvars, config & engine
 
-| Command         | Inputs            | Output / behaviour                                        | Output regex                                            |
-| --------------- | ----------------- | --------------------------------------------------------- | ------------------------------------------------------- |
-| `set`           | `<var> <value>`   | Set a cvar.                                               | —                                                       |
-| `seta`          | `<var> <value>`   | Set a cvar and archive it (persisted to config).          | —                                                       |
-| `sets`          | `<var> <value>`   | Set a cvar flagged as serverinfo (shown in `serverinfo`). | —                                                       |
-| `setu`          | `<var> <value>`   | Set a cvar flagged as userinfo.                           | —                                                       |
-| `setcvartotime` | `<var>`           | Set a cvar to the current server time.                    | —                                                       |
-| `setfromcvar`   | `<dest> <src>`    | Set one cvar's value from another cvar.                   | —                                                       |
-| `reset`         | `<var>`           | Reset a cvar to its default value.                        | —                                                       |
-| `toggle`        | `<var> [values…]` | Toggle a cvar between 0/1 or a list of values.            | —                                                       |
-| `vstr`          | `<var>`           | Execute the contents of a string cvar as a command.       | —                                                       |
-| `wait`          | `[frames]`        | Delay subsequent buffered commands by N frames.           | —                                                       |
-| `exec`          | `<file>`          | Execute a config file.                                    | —                                                       |
-| `writeconfig`   | `<file>`          | Write the current archived cvars/binds to a config file.  | —                                                       |
-| `writenvcfg`    | —                 | Write the network-variable config.                        | —                                                       |
-| `cvarlist`      | `[filter]`        | List all cvars (optionally filtered).                     | `^(?P<flags>[\w-]+)\s+(?P<name>\S+)\s+"(?P<value>.*)"$` |
-| `which`         | `<command\|cvar>` | Report which plugin/module registered a command or cvar.  | —                                                       |
-| `path`          | —                 | Print the filesystem search paths.                        | —                                                       |
-| `echo`          | `<text>`          | Echo text back to the console.                            | `^(?P<text>.*)$`                                        |
-| `addCommand`    | `<name> <power>`  | Register/whitelist a command at a power level.            | —                                                       |
-| `setPerk`       | `<slot> <perk>`   | Debug: grant a perk to a player.                          | —                                                       |
+| Command         | Inputs               | Output / behaviour                                                       | Output regex                                            |
+| --------------- | -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
+| `set`           | `<var> <value>`      | Set a cvar.                                                              | —                                                       |
+| `seta`          | `<var> <value>`      | Set a cvar and archive it (persisted to config).                         | —                                                       |
+| `sets`          | `<var> <value>`      | Set a cvar flagged as serverinfo (shown in `serverinfo`).                | —                                                       |
+| `setu`          | `<var> <value>`      | Set a cvar flagged as userinfo.                                          | —                                                       |
+| `setcvartotime` | `<var>`              | Set a cvar to the current server time.                                   | —                                                       |
+| `setfromcvar`   | `<dest> <src>`       | Set one cvar's value from another cvar.                                  | —                                                       |
+| `reset`         | `<var>`              | Reset a cvar to its default value.                                       | —                                                       |
+| `toggle`        | `<var> [values…]`    | Toggle a cvar between 0/1 or a list of values.                           | —                                                       |
+| `vstr`          | `<var>`              | Execute the contents of a string cvar as a command.                      | —                                                       |
+| `wait`          | `[frames]`           | Delay subsequent buffered commands by N frames.                          | —                                                       |
+| `exec`          | `<file>`             | Execute a config file.                                                   | —                                                       |
+| `writeconfig`   | `<file>`             | Write the current archived cvars/binds to a config file.                 | —                                                       |
+| `writenvcfg`    | —                    | Write the network-variable config.                                       | —                                                       |
+| `cvarlist`      | `[filter]`           | List all cvars (optionally filtered).                                    | `^(?P<flags>[\w-]+)\s+(?P<name>\S+)\s+"(?P<value>.*)"$` |
+| `which`         | `<command\|cvar>`    | Report which plugin/module registered a command or cvar.                 | —                                                       |
+| `path`          | —                    | Print the filesystem search paths.                                       | —                                                       |
+| `echo`          | `<text>`             | Echo text back to the console.                                           | `^(?P<text>.*)$`                                        |
+| `addCommand`    | `<original> <alias>` | Register a translated command-name alias (`Cmd_AddTranslatedCommand_f`). | —                                                       |
+| `setPerk`       | `<slot> <perk>`      | Debug: grant a perk to a player.                                         | —                                                       |
+
+---
+
+## Command power levels (from server source)
+
+`SV_AddOperatorCommands` in the CoD4X server source registers each operator command either with a defined in-game minimum power (`Cmd_AddPCommand`) or as console/RCON-only (`Cmd_AddCommand`). Connecting via the RCON password always runs at power 100.
+
+| In-game min power | Commands                                               |
+| ----------------- | ------------------------------------------------------ |
+| 1                 | `systeminfo`, `serverinfo`, `ministatus`               |
+| 35                | `kick`                                                 |
+| 45                | `getmodules`                                           |
+| 50                | `map_restart`, `tempban`, `dumpuser`, `record`         |
+| 60                | `map`, `undercover`                                    |
+| 70                | `say`, `screensay`, `tell`, `screentell`, `stoprecord` |
+| 80                | `gametype`, `permban`, `unban`                         |
+
+**Console/RCON-only** (registered without a power — effectively 100): `status`, `map_rotate`, `writenvcfg`, `addCommand`, `downloadmap`, `killserver`, `setPerk`, `fast_restart`, `heartbeat`, `clientkick`, `onlykick`, `unbanUser`, `banUser`, `banClient`, `consay`, `contell`, `stringUsage`, `scriptUsage`.
+
+> Plugin, admin-store, anti-cheat and ban-list commands (`plugins`, `loadPlugin`, `unloadPlugin`, `pluginInfo`, `dumpbanlist`, `getss`, `which`, `AdminAddAdmin`, `AdminListCommands`, etc.) are registered outside `SV_AddOperatorCommands` (plugin handler / HL2Rcon / anti-cheat) and are governed by the powers in [admin-system.md](admin-system.md).
 
 ---
 

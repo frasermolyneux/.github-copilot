@@ -2,13 +2,13 @@
 
 The full command set exposed by a **Call of Duty: World at War** server, captured directly with `cmdlist` (225 commands). Unlike the CoD2/CoD4 server dumps, this list contains the **full client + server command set** — most entries are client-side console/input commands that are **not usable over RCON**. This document normalises the raw dump into a consistent reference and clearly separates the server/admin subset (the part relevant to `portal-servers-integration`) from client-only commands.
 
-> Source capture: `cmdlist` (225 commands). Cross-referenced with the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands). For confirmed output regexes from the same engine family, see [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
+> Source capture: `cmdlist` (225 commands). Cross-referenced with the [BigBrotherBot (B3) CoD5 parser](https://github.com/BigBrotherBot/big-brother-bot/blob/master/b3/parsers/cod5.py) (status regex + command syntax) and the community [zeroy RCON wiki](https://wiki.zeroy.com/index.php/Call_of_Duty:_Rcon_Commands). For confirmed output regexes from the same engine family, see [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).
 
 ## How to read this
 
 - **Transport** — server commands run over RCON by prefixing `rcon <password>` (Quake3 UDP out-of-band packet). Client-only commands (movement binds, menus, demo playback, matchmaking) cannot be driven over RCON and are listed for completeness.
 - **Inputs** — `<required>`, `[optional]`. Player targets accept a **slot/client id** (from `status`) or a **name**.
-- **Output regex** — a `—` means the output is free-form / unstructured text or there is no parseable response. Status/dvar regexes below are **engine-standard but unverified against a confirmed capture** — validate before relying on them.
+- **Output regex** — a `—` means the output is free-form / unstructured text or there is no parseable response. The `status` regex is sourced from the BigBrotherBot (B3) parsers; the `serverinfo`/`dvarlist`/`bindlist` patterns are engine-standard templates worth validating against a real capture.
 - Strip colour codes (`\^\d`) from names before matching. Bad input prints a `Usage:` line; with no map loaded, server-state commands print `Server is not running.`
 
 ---
@@ -246,13 +246,17 @@ These are **hold/release input commands** bound to keys — `+x` starts the acti
 
 ## Parsing regexes
 
-> ⚠️ Unlike the CoD4x regexes (confirmed against captures in [../cod4x/rcon-system.md](../cod4x/rcon-system.md)), the patterns below are engine-standard templates and should be validated against a real capture before use.
+> The `status` pattern below is taken from the BigBrotherBot (B3) parsers — a widely-used, battle-tested RCON tool — so it is reliable. The `serverinfo`/`dvarlist`/`bindlist` patterns are engine-standard templates; validate them against a real capture.
 
-### `status` — player rows (approximate)
+### `status` — player rows
+
+Authoritative pattern from the BigBrotherBot CoD parser (`b3/parsers/cod.py`, `_regPlayer`), inherited via the CoD5 parser (`b3/parsers/cod5.py`, `_guidLength = 8`). The `guid` column is **numeric** for stock CoD5; PunkBuster IDs (32 hex) are reported separately. Compile with the case-insensitive flag.
 
 ```regex
-^\s*(?P<num>\d+)\s+(?P<score>-?\d+)\s+(?P<ping>CNCT|ZMBI|\d+)\s+(?P<guid>[0-9a-fA-F]+)\s+(?P<name>.+?)\s+(?P<lastmsg>\d+)\s+(?P<address>(?:[0-9.]+|loopback|bot):?\d*)\s+(?P<qport>\d+)\s+(?P<rate>\d+)\s*$
+^\s*(?P<slot>\d+)\s+(?P<score>[\d-]+)\s+(?P<ping>\d+)\s+(?P<guid>\d+)\s+(?P<name>.*?)\s+(?P<last>\d+)\s*(?P<ip>(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)):?(?P<port>-?\d{1,5})\s*(?P<qport>-?\d{1,5})\s+(?P<rate>\d+)$
 ```
+
+> The numeric `ping` group does not match connecting players (`CNCT`/`ZMBI`); filter those rows separately.
 
 ### `serverinfo` / `systeminfo` — cvar pairs
 
@@ -266,5 +270,6 @@ These are **hold/release input commands** bound to keys — `+x` starts the acti
 
 - Only the **Server / admin** and server-side **Shared engine** commands above are usable over RCON; the client-only sections are informational.
 - Stock CoD5 keys bans in `ban.txt` by GUID; prefer `clientkick`/`banClient` (slot id) over name-based variants because colour-coded names are hard to type.
+- BigBrotherBot (B3) drives the common moderation commands as `clientkick <slot>` (kick), `banclient <slot>` (ban), `unbanuser <name>` (unban), `tell <slot> <msg>`, `say <msg>`, and `set <name> "<value>"`.
 - Outputs may be split across multiple packets; reassemble before applying regex.
 - For confirmed ban/unban output formats, use the CoD4x reference: [../cod4x/rcon-commands.md](../cod4x/rcon-commands.md).

@@ -143,6 +143,17 @@
     {
       "name": "twenty-one",
       "path": "../twenty-one"
+    },
+    {
+      "path": "../../CoD4x_Server"
+    },
+    {
+      "name": "cod4x_plugin_http",
+      "path": "../../cod4x_plugin_http"
+    },
+    {
+      "name": "portal-cod4x-plugin",
+      "path": "../portal-cod4x-plugin"
     }
   ],
   "settings": {
