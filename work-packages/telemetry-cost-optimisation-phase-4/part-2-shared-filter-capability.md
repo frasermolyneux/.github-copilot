@@ -21,22 +21,22 @@ Passing the shared filter is not sufficient. Trace each protected class through 
 
 Run equivalent tests for both shared stacks where applicable:
 
-| Case | Expected |
-| --- | --- |
-| Successful dependency below threshold | Filtered. |
-| Successful dependency above threshold | Retained. |
-| Failed dependency at any duration | Retained. |
-| Retained dependency result code (for example 429/503) | Retained. |
-| Successful request below threshold | Filtered. |
-| Successful request above threshold | Retained. |
-| HTTP 4xx/5xx request | Retained. |
-| Successful health endpoint | Filtered. |
-| Failed health endpoint | Failure/exception/resource-health evidence retained. |
-| Exception | Retained. |
-| Audit/security event | Retained with required fields. |
-| Correlated failed/slow operation | Trace/dependency/request correlation remains usable. |
-| Live config change (where supported) | Rules reload without corrupting the pipeline. |
-| Host/SDK/resource sampling enabled | Protected classes bypass every applicable sampling stage and arrive at the destination. |
+| Case                                                  | Expected                                                                                |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Successful dependency below threshold                 | Filtered.                                                                               |
+| Successful dependency above threshold                 | Retained.                                                                               |
+| Failed dependency at any duration                     | Retained.                                                                               |
+| Retained dependency result code (for example 429/503) | Retained.                                                                               |
+| Successful request below threshold                    | Filtered.                                                                               |
+| Successful request above threshold                    | Retained.                                                                               |
+| HTTP 4xx/5xx request                                  | Retained.                                                                               |
+| Successful health endpoint                            | Filtered.                                                                               |
+| Failed health endpoint                                | Failure/exception/resource-health evidence retained.                                    |
+| Exception                                             | Retained.                                                                               |
+| Audit/security event                                  | Retained with required fields.                                                          |
+| Correlated failed/slow operation                      | Trace/dependency/request correlation remains usable.                                    |
+| Live config change (where supported)                  | Rules reload without corrupting the pipeline.                                           |
+| Host/SDK/resource sampling enabled                    | Protected classes bypass every applicable sampling stage and arrive at the destination. |
 
 Run the matrix at two levels: deterministic unit/processor-order tests, then an end-to-end dev integration or deployed smoke test that queries aggregate destination counts for uniquely classified non-sensitive events. Include classic SDK adaptive/fixed sampling and Functions `host.json` sampling where the pilot uses them.
 

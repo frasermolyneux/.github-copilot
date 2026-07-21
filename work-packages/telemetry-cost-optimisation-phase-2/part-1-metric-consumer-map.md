@@ -39,17 +39,17 @@ Search all workspace repos, then use read-only Azure Resource Graph/Monitor inve
 
 Produce one row per family:
 
-| Field | Required value |
-| --- | --- |
-| Role/component | Safe emitting role and destination component. |
-| Instrument/family | Stable name/namespace and owning code/resource. |
-| GB/day and rows/day | Equal complete-day baseline. |
-| Dimensions/cardinality | Cardinality and any sensitive dimension risk. |
-| Consumers | Named alert/workbook/dashboard/SLO/runbook, or `None found` with search evidence. |
-| Classification | `Canonical keep`, `Derived remove`, `Duplicate remove`, `Platform keep`, or `Unknown keep`. |
-| Replacement | KQL/metric expression or canonical instrument. |
-| Owning repo/package | Where implementation belongs. |
-| Rollback | Prior instrument/config/query. |
+| Field                  | Required value                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| Role/component         | Safe emitting role and destination component.                                               |
+| Instrument/family      | Stable name/namespace and owning code/resource.                                             |
+| GB/day and rows/day    | Equal complete-day baseline.                                                                |
+| Dimensions/cardinality | Cardinality and any sensitive dimension risk.                                               |
+| Consumers              | Named alert/workbook/dashboard/SLO/runbook, or `None found` with search evidence.           |
+| Classification         | `Canonical keep`, `Derived remove`, `Duplicate remove`, `Platform keep`, or `Unknown keep`. |
+| Replacement            | KQL/metric expression or canonical instrument.                                              |
+| Owning repo/package    | Where implementation belongs.                                                               |
+| Rollback               | Prior instrument/config/query.                                                              |
 
 ## 1.E — Design rules
 

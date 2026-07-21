@@ -12,38 +12,38 @@ All volumes are historical observations, not guaranteed future savings. The lega
 
 ## Documents
 
-| Document | Purpose |
-| --- | --- |
-| [evidence-and-safety.md](evidence-and-safety.md) | Sanitised baseline, known uncertainties, protected signals, and measurement method. |
-| [target-policy.md](target-policy.md) | Target telemetry classes, retention rules, filtering/sampling boundaries, and rollout guardrails. |
+| Document                                         | Purpose                                                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| [evidence-and-safety.md](evidence-and-safety.md) | Sanitised baseline, known uncertainties, protected signals, and measurement method.               |
+| [target-policy.md](target-policy.md)             | Target telemetry classes, retention rules, filtering/sampling boundaries, and rollout guardrails. |
 
 ## Locked decisions
 
-| # | Decision | Choice |
-| --- | --- | --- |
-| 1 | Safety gate | Restore SiteWatch structured availability and prove a controlled alert before any cost-reduction phase. |
-| 2 | Filter location | Prefer source-side logger/provider/filter configuration. Do not use workspace transformations as the first remedy. |
-| 3 | Protected telemetry | Retain 100% of audit/security events, exceptions, failed requests/dependencies, slow calls above the agreed threshold, structured availability results, and SiteWatch terminal failures/recoveries. |
-| 4 | Routine traces | Suppress successful SiteWatch `System.Net.Http.HttpClient.*` lifecycle logs below `Warning`; preserve retry warnings and terminal failures. |
-| 5 | Metrics | Emit canonical observations and derive aggregates in Azure Monitor where practical; do not emit count/success/failure/rate/min/max/average variants without a named consumer. |
-| 6 | Check topology | Keep all three SiteWatch regions. After the signal is proven, move the check cadence from 30 seconds to a configurable 60-second production default. |
-| 7 | Requests/dependencies | Filter only successful, fast traffic. Failures, retained status codes, and slow operations remain unsampled and queryable. |
-| 8 | Rollout | Pilot changes in dev, then one production application or SiteWatch region where routing permits. Compare equal complete-day windows and keep a configuration rollback. |
-| 9 | Shared policy | `observability-opentelemetry` and `observability-appinsights` remain the implementation owners for common filtering. App repos supply documented overrides rather than bespoke processors. |
-| 10 | Credentials | Never log expanded probe URLs, query strings, tokens, response bodies, or secrets. Rotate any credential that may have appeared in telemetry. |
-| 11 | Cost estimates | Treat phase estimates as non-additive. Record measured GB/day and retained-signal checks at each exit gate. |
-| 12 | Workspace configuration | Workspace/table retention changes and commitment-tier changes are out of scope for this package. |
+| #   | Decision                | Choice                                                                                                                                                                                              |
+| --- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Safety gate             | Restore SiteWatch structured availability and prove a controlled alert before any cost-reduction phase.                                                                                             |
+| 2   | Filter location         | Prefer source-side logger/provider/filter configuration. Do not use workspace transformations as the first remedy.                                                                                  |
+| 3   | Protected telemetry     | Retain 100% of audit/security events, exceptions, failed requests/dependencies, slow calls above the agreed threshold, structured availability results, and SiteWatch terminal failures/recoveries. |
+| 4   | Routine traces          | Suppress successful SiteWatch `System.Net.Http.HttpClient.*` lifecycle logs below `Warning`; preserve retry warnings and terminal failures.                                                         |
+| 5   | Metrics                 | Emit canonical observations and derive aggregates in Azure Monitor where practical; do not emit count/success/failure/rate/min/max/average variants without a named consumer.                       |
+| 6   | Check topology          | Keep all three SiteWatch regions. After the signal is proven, move the check cadence from 30 seconds to a configurable 60-second production default.                                                |
+| 7   | Requests/dependencies   | Filter only successful, fast traffic. Failures, retained status codes, and slow operations remain unsampled and queryable.                                                                          |
+| 8   | Rollout                 | Pilot changes in dev, then one production application or SiteWatch region where routing permits. Compare equal complete-day windows and keep a configuration rollback.                              |
+| 9   | Shared policy           | `observability-opentelemetry` and `observability-appinsights` remain the implementation owners for common filtering. App repos supply documented overrides rather than bespoke processors.          |
+| 10  | Credentials             | Never log expanded probe URLs, query strings, tokens, response bodies, or secrets. Rotate any credential that may have appeared in telemetry.                                                       |
+| 11  | Cost estimates          | Treat phase estimates as non-additive. Record measured GB/day and retained-signal checks at each exit gate.                                                                                         |
+| 12  | Workspace configuration | Workspace/table retention changes and commitment-tier changes are out of scope for this package.                                                                                                    |
 
 ## Delivery phases
 
-| Phase | Recommendation mapping | Delivers | Folder |
-| --- | --- | --- | --- |
-| 0 | Safety prerequisite + recommendation 2 | Part 1 restores SiteWatch availability delivery and proves alerting; Part 2 fixes the failing probe and credential-bearing logging path. Investigation is intentionally lightweight and assigned to a stronger agent. | [telemetry-cost-optimisation-phase-0/](../telemetry-cost-optimisation-phase-0/README.md) |
-| 1 | Recommendation 1 | Suppress routine SiteWatch HTTP lifecycle traces while retaining retry, terminal failure, recovery, exception, and availability evidence. | [telemetry-cost-optimisation-phase-1/](../telemetry-cost-optimisation-phase-1/README.md) |
-| 2 | Recommendation 3 | Map metric consumers, remove redundant derived series, and keep the minimum canonical metric/availability contract. | [telemetry-cost-optimisation-phase-2/](../telemetry-cost-optimisation-phase-2/README.md) |
-| 3 | Recommendation 4 | Make SiteWatch cadence configurable and roll production from 30 seconds to 60 seconds without reducing regional coverage. | [telemetry-cost-optimisation-phase-3/](../telemetry-cost-optimisation-phase-3/README.md) |
-| 4 | Recommendation 5 | Pilot and roll out successful-fast request/dependency filtering across connected applications, with per-app thresholds and exclusions. | [telemetry-cost-optimisation-phase-4/](../telemetry-cost-optimisation-phase-4/README.md) |
-| 5 | Recommendation 6 | Codify the estate telemetry policy in shared packages, org guidance, templates, and compliance checks; align remaining applications. | [telemetry-cost-optimisation-phase-5/](../telemetry-cost-optimisation-phase-5/README.md) |
+| Phase | Recommendation mapping                 | Delivers                                                                                                                                                                                                              | Folder                                                                                   |
+| ----- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| 0     | Safety prerequisite + recommendation 2 | Part 1 restores SiteWatch availability delivery and proves alerting; Part 2 fixes the failing probe and credential-bearing logging path. Investigation is intentionally lightweight and assigned to a stronger agent. | [telemetry-cost-optimisation-phase-0/](../telemetry-cost-optimisation-phase-0/README.md) |
+| 1     | Recommendation 1                       | Suppress routine SiteWatch HTTP lifecycle traces while retaining retry, terminal failure, recovery, exception, and availability evidence.                                                                             | [telemetry-cost-optimisation-phase-1/](../telemetry-cost-optimisation-phase-1/README.md) |
+| 2     | Recommendation 3                       | Map metric consumers, remove redundant derived series, and keep the minimum canonical metric/availability contract.                                                                                                   | [telemetry-cost-optimisation-phase-2/](../telemetry-cost-optimisation-phase-2/README.md) |
+| 3     | Recommendation 4                       | Make SiteWatch cadence configurable and roll production from 30 seconds to 60 seconds without reducing regional coverage.                                                                                             | [telemetry-cost-optimisation-phase-3/](../telemetry-cost-optimisation-phase-3/README.md) |
+| 4     | Recommendation 5                       | Pilot and roll out successful-fast request/dependency filtering across connected applications, with per-app thresholds and exclusions.                                                                                | [telemetry-cost-optimisation-phase-4/](../telemetry-cost-optimisation-phase-4/README.md) |
+| 5     | Recommendation 6                       | Codify the estate telemetry policy in shared packages, org guidance, templates, and compliance checks; align remaining applications.                                                                                  | [telemetry-cost-optimisation-phase-5/](../telemetry-cost-optimisation-phase-5/README.md) |
 
 ```mermaid
 flowchart LR

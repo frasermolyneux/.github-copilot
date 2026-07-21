@@ -26,14 +26,14 @@ Verify:
 
 Compare at least three equal complete UTC days before and after; prefer seven days:
 
-| Measure | Required outcome |
-| --- | --- |
-| Four routine lifecycle trace class | Approximately zero after deployment. |
-| Total SiteWatch `AppTraces` GB/day | Material reduction, reported as measured rather than projected. |
-| Availability result count | Matches expected checks × regions × executions, allowing documented retries/outages. |
-| Exception/failure/retry counts | No unexplained reduction. |
-| Dependency failure and latency visibility | Preserved. |
-| Alert input/fire/recovery | Preserved. |
+| Measure                                   | Required outcome                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| Four routine lifecycle trace class        | Approximately zero after deployment.                                                 |
+| Total SiteWatch `AppTraces` GB/day        | Material reduction, reported as measured rather than projected.                      |
+| Availability result count                 | Matches expected checks × regions × executions, allowing documented retries/outages. |
+| Exception/failure/retry counts            | No unexplained reduction.                                                            |
+| Dependency failure and latency visibility | Preserved.                                                                           |
+| Alert input/fire/recovery                 | Preserved.                                                                           |
 
 Do not claim the historical 18.0325 GB as the achieved saving; use the fresh post-transition run rate.
 

@@ -4,23 +4,23 @@ This is the target contract for telemetry feeding the shared production workspac
 
 ## Signal matrix
 
-| Signal | Target handling | Sampling/filtering rule | Required consumer/evidence |
-| --- | --- | --- | --- |
-| Audit/security event | Retain | 100%; bypass generic severity and sampling filters | Audit queries, incident response, or compliance purpose documented. |
-| Exception | Retain | 100% | Exception triage and alerting. |
-| Failed request | Retain | 100%; retain HTTP 4xx/5xx ranges unless a specific expected status is separately classified | Failure alert, troubleshooting, and rate calculation. |
-| Failed dependency | Retain | 100%; retain agreed transient/limit result codes such as 429/503 | Dependency failure and saturation diagnosis. |
-| Slow request/dependency | Retain | 100% above an app-owned threshold | Performance regression diagnosis and latency SLO. |
-| Successful fast request/dependency | Reduce | Filter at source or sample using the shared package | Retain enough canonical observations for traffic and latency trends; exemptions require a named consumer. |
-| Health/live/ready request | Reduce | Filter routine success; retain failure and associated exception | Resource health/metric alert remains authoritative. |
-| Structured availability result | Retain | 100%; one result per check execution with success, duration, location, target, and sanitised message | Reconciled availability alerts and availability reporting. |
-| SiteWatch retry | Retain as warning | One warning per retry with attempt, exception/status class, and delay; no URL/query/body | Operational diagnosis. |
-| SiteWatch terminal failure | Retain as error | One error plus exception/status class and sanitised endpoint identifier; no secret-bearing values | Incident diagnosis and alert corroboration. |
-| SiteWatch successful lifecycle | Drop | Suppress framework request-start/send/headers/end logs below `Warning` | Structured availability + dependency span replace textual lifecycle logs. |
-| SiteWatch recovery | Retain | Emit a transition event when a previously failing logical check succeeds | Incident closure and flapping analysis. |
-| Custom metric | Retain selectively | One canonical measurement or counter; derive rate/min/max/average in Azure Monitor | Named alert, workbook, dashboard, SLO, or capacity decision. |
-| Debug/verbose trace | Drop in production | Disabled unless time-boxed for an incident | Incident ticket and automatic expiry/rollback. |
-| Informational business/job event | Selective | Retain start/failure/completion when it is a job/audit contract; remove per-item success chatter | Named operational workflow. |
+| Signal                             | Target handling    | Sampling/filtering rule                                                                              | Required consumer/evidence                                                                                |
+| ---------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Audit/security event               | Retain             | 100%; bypass generic severity and sampling filters                                                   | Audit queries, incident response, or compliance purpose documented.                                       |
+| Exception                          | Retain             | 100%                                                                                                 | Exception triage and alerting.                                                                            |
+| Failed request                     | Retain             | 100%; retain HTTP 4xx/5xx ranges unless a specific expected status is separately classified          | Failure alert, troubleshooting, and rate calculation.                                                     |
+| Failed dependency                  | Retain             | 100%; retain agreed transient/limit result codes such as 429/503                                     | Dependency failure and saturation diagnosis.                                                              |
+| Slow request/dependency            | Retain             | 100% above an app-owned threshold                                                                    | Performance regression diagnosis and latency SLO.                                                         |
+| Successful fast request/dependency | Reduce             | Filter at source or sample using the shared package                                                  | Retain enough canonical observations for traffic and latency trends; exemptions require a named consumer. |
+| Health/live/ready request          | Reduce             | Filter routine success; retain failure and associated exception                                      | Resource health/metric alert remains authoritative.                                                       |
+| Structured availability result     | Retain             | 100%; one result per check execution with success, duration, location, target, and sanitised message | Reconciled availability alerts and availability reporting.                                                |
+| SiteWatch retry                    | Retain as warning  | One warning per retry with attempt, exception/status class, and delay; no URL/query/body             | Operational diagnosis.                                                                                    |
+| SiteWatch terminal failure         | Retain as error    | One error plus exception/status class and sanitised endpoint identifier; no secret-bearing values    | Incident diagnosis and alert corroboration.                                                               |
+| SiteWatch successful lifecycle     | Drop               | Suppress framework request-start/send/headers/end logs below `Warning`                               | Structured availability + dependency span replace textual lifecycle logs.                                 |
+| SiteWatch recovery                 | Retain             | Emit a transition event when a previously failing logical check succeeds                             | Incident closure and flapping analysis.                                                                   |
+| Custom metric                      | Retain selectively | One canonical measurement or counter; derive rate/min/max/average in Azure Monitor                   | Named alert, workbook, dashboard, SLO, or capacity decision.                                              |
+| Debug/verbose trace                | Drop in production | Disabled unless time-boxed for an incident                                                           | Incident ticket and automatic expiry/rollback.                                                            |
+| Informational business/job event   | Selective          | Retain start/failure/completion when it is a job/audit contract; remove per-item success chatter     | Named operational workflow.                                                                               |
 
 ## Shared implementation boundaries
 
