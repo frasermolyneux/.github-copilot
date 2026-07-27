@@ -147,6 +147,10 @@
     {
       "name": "portal-cod4x-plugin",
       "path": "../portal-cod4x-plugin"
+    },
+    {
+      "name": "dotnet-caching",
+      "path": "../dotnet-caching"
     }
   ],
   "settings": {

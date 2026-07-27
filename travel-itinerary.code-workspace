@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../actions"
+		},
+		{
+			"path": "../travel-itinerary"
+		}
+	]
+}
