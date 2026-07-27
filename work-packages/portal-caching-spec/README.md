@@ -13,7 +13,7 @@ The `portal-*` estate uses a consistent, multi-tier caching system to reduce red
 
 | Decision              | Choice                                                                                                                                                                                  |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Library               | Own `caching` repo; packages `MX.Caching`, `MX.Caching.Abstractions`, `MX.Caching.TableStorage`, `MX.Caching.Testing`.                                                                  |
+| Library               | Own `dotnet-caching` repo; packages `MX.Caching`, `MX.Caching.Abstractions`, `MX.Caching.TableStorage`, `MX.Caching.Testing`.                                                           |
 | Primitive             | .NET 9 `HybridCache` (L1+L2 read-through, stampede protection, serialization, tag invalidation).                                                                                        |
 | Facade                | Thin `MX.Caching` facade adding the policy model + transparent client decorator.                                                                                                        |
 | L2 backend            | Azure **Table Storage** on **one shared cache storage account** provisioned in `portal-core`.                                                                                           |
@@ -35,7 +35,7 @@ The `portal-*` estate uses a consistent, multi-tier caching system to reduce red
 
 | Phase        | Scope                                                                                                                                                                  | Folder                                                         |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| 0            | `caching` repo + `MX.Caching*` packages.                                                                                                                               | [portal-caching-phase-0/](../portal-caching-phase-0/README.md) |
+| 0            | `dotnet-caching` repo + `MX.Caching*` packages.                                                                                                                        | [portal-caching-phase-0/](../portal-caching-phase-0/README.md) |
 | 1            | Client caching capability (`.WithCaching(...)` decorator + policy model in `MX.Api.Client`).                                                                           | [portal-caching-phase-1/](../portal-caching-phase-1/README.md) |
 | 2            | Repository API caching: shared cache account + LiveStatus move + extended connected-players endpoint + default policies + server cache-aside; roll out to 6 consumers. | [portal-caching-phase-2/](../portal-caching-phase-2/README.md) |
 | 3            | Servers Integration API caching: live-players read-through + FTP listing + default policies; roll out to 3 consumers.                                                  | [portal-caching-phase-3/](../portal-caching-phase-3/README.md) |

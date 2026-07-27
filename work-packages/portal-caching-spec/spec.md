@@ -14,7 +14,7 @@ Intra-request de-dupe is provided by L1 + stampede protection; there is **no sep
 
 ## MX.Caching facade over HybridCache
 
-Caching is provided by the `MX.Caching` packages (repo: `caching`) — a thin facade over .NET 9 `HybridCache`.
+Caching is provided by the `MX.Caching` packages (repo: `dotnet-caching`) — a thin facade over .NET 9 `HybridCache`.
 
 - HybridCache provides **L1 + L2 read-through, stampede protection (single-flight), serialization, and tag-based invalidation**. The facade does not reimplement these.
 - The facade adds exactly two things: (1) the **declarative defaults-plus-overrides policy model**; (2) a **transparent decorator** over the typed API interfaces (`IGameServersApi`, `IQueryApi`, …) so caching applies with no call-site change.

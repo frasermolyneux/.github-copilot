@@ -6,29 +6,29 @@ This folder is the **detailed, execute-it-verbatim** plan for the foundational p
 
 ## What Phase 0 delivers
 
-**No consumer is wired in Phase 0.** This phase only builds and publishes the shared caching library — a new `caching` repo and the `MX.Caching*` NuGet packages — that every later phase consumes. The client `.WithCaching(...)` capability (Phase 1) and the per-API rollout (Phases 2–3) are **out of scope** here.
+**No consumer is wired in Phase 0.** This phase only builds and publishes the shared caching library — a new `dotnet-caching` repo and the `MX.Caching*` NuGet packages — that every later phase consumes. The client `.WithCaching(...)` capability (Phase 1) and the per-API rollout (Phases 2–3) are **out of scope** here.
 
-- **Part 1 — repo & scaffolding** ([part-1-repo-and-scaffold.md](part-1-repo-and-scaffold.md)). Provision the `caching` repo via `platform-workloads`, scaffold it to org standards (solution, empty package projects, workflows, metadata, tasks). Exit: CI green on an empty skeleton that produces `.nupkg`s.
+- **Part 1 — repo & scaffolding** ([part-1-repo-and-scaffold.md](part-1-repo-and-scaffold.md)). Provision the `dotnet-caching` repo via `platform-workloads`, scaffold it to org standards (solution, empty package projects, workflows, metadata, tasks). Exit: CI green on an empty skeleton that produces `.nupkg`s.
 - **Part 2 — implement, test & publish the packages** ([part-2-packages.md](part-2-packages.md)). Implement `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`; resolve the tag-eviction-over-Table spike; test; cut the first NBGV release to NuGet. **Gated on NuGet publish** — no downstream phase starts until the packages restore from NuGet.org.
 
 ```mermaid
 flowchart LR
-  P1[Part 1: provision caching repo + scaffold skeleton] --> P2[Part 2: implement 4 packages + spike + tests]
+  P1[Part 1: provision dotnet-caching repo + scaffold skeleton] --> P2[Part 2: implement 4 packages + spike + tests]
   P2 --> G{{Publish gate:\nMX.Caching* on NuGet.org}}
   G --> EX{{Phase 0 exit:\npackages restorable, backend config-selectable}}
 ```
 
 ## Resolved decisions (locked for this plan)
 
-| #   | Decision          | Choice                                                                                                                                                              |
-| --- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Library location  | **Its own repo** (`caching`), not inside `api-client-abstractions` — `portal-repository` consumes it server-side and must not take a dependency on `MX.Api.Client`. |
-| 2   | Repo name         | `caching` (org style: descriptive, no `mx-` prefix; packages are `MX.*`).                                                                                           |
-| 3   | Packages          | `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`. `MX.Caching.Cosmos` **deferred**.                                         |
-| 4   | Primitives        | **.NET 9 `HybridCache`** does L1/L2/stampede/tags/serialization; the facade adds only the policy model + (later) the client decorator.                              |
-| 5   | Default backend   | **Table Storage** `IDistributedCache`, selected by config (`MxCaching:Backend`, default `TableStorage`). Redis/Cosmos are config-swappable later.                   |
-| 6   | Target frameworks | `net9.0;net10.0`; **NBGV** versioning starting `0.1`.                                                                                                               |
-| 7   | Publish feed      | **NuGet.org**, via `Release - Version and Tag` → `Release - Publish NuGet` (mirrors `api-client-abstractions`).                                                     |
+| #   | Decision          | Choice                                                                                                                                                                     |
+| --- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Library location  | **Its own repo** (`dotnet-caching`), not inside `api-client-abstractions` — `portal-repository` consumes it server-side and must not take a dependency on `MX.Api.Client`. |
+| 2   | Repo name         | `dotnet-caching` (org style: descriptive, no `mx-` prefix; packages are `MX.*`).                                                                                           |
+| 3   | Packages          | `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`. `MX.Caching.Cosmos` **deferred**.                                                |
+| 4   | Primitives        | **.NET 9 `HybridCache`** does L1/L2/stampede/tags/serialization; the facade adds only the policy model + (later) the client decorator.                                     |
+| 5   | Default backend   | **Table Storage** `IDistributedCache`, selected by config (`MxCaching:Backend`, default `TableStorage`). Redis/Cosmos are config-swappable later.                          |
+| 6   | Target frameworks | `net9.0;net10.0`; **NBGV** versioning starting `0.1`.                                                                                                                      |
+| 7   | Publish feed      | **NuGet.org**, via `Release - Version and Tag` → `Release - Publish NuGet` (mirrors `api-client-abstractions`).                                                            |
 
 Carried from the design: Table Storage on cost grounds (no Redis); the **tag-eviction-over-Table spike** is the only open technical risk and must be resolved before a `1.0`; consumers adopt in later phases (NuGet dependency gate).
 
@@ -43,7 +43,7 @@ Carried from the design: Table Storage on cost grounds (no Redis); the **tag-evi
 
 ## Definition of done for Phase 0
 
-- `caching` repo exists (via merged `platform-workloads` PR) with the `main-protection` ruleset and NuGet publish environment.
+- `dotnet-caching` repo exists (via merged `platform-workloads` PR) with the `main-protection` ruleset and NuGet publish environment.
 - Four packages published to NuGet.org (`0.x`), multi-TFM (`net9.0;net10.0`), NBGV-versioned, each with a package README, restorable by a scratch project.
 - `AddMxCaching(config)` selects the Table backend by default and `Memory` in tests with **no code change** (config-only).
 - Policy precedence (`config → override → default → uncached`) and the `NotCached` guard are covered by tests.
@@ -52,10 +52,10 @@ Carried from the design: Table Storage on cost grounds (no Redis); the **tag-evi
 
 ## Documents
 
-| Doc                                                        | Purpose                                                                                                                                        |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| [part-1-repo-and-scaffold.md](part-1-repo-and-scaffold.md) | Provision the `caching` repo via `platform-workloads` and scaffold it to org standards (solution, empty projects, workflows, metadata, tasks). |
-| [part-2-packages.md](part-2-packages.md)                   | Implement the four packages, resolve the tag-eviction spike, test, and publish the first NBGV release to NuGet.                                |
+| Doc                                                        | Purpose                                                                                                                                               |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [part-1-repo-and-scaffold.md](part-1-repo-and-scaffold.md) | Provision the `dotnet-caching` repo via `platform-workloads` and scaffold it to org standards (solution, empty projects, workflows, metadata, tasks). |
+| [part-2-packages.md](part-2-packages.md)                   | Implement the four packages, resolve the tag-eviction spike, test, and publish the first NBGV release to NuGet.                                       |
 
 ## Next
 

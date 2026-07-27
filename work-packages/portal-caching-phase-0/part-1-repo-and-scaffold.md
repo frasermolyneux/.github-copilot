@@ -1,6 +1,6 @@
 # Phase 0 · Part 1 — Repo Provisioning & Scaffolding
 
-Provision the new `caching` repo and scaffold it to org standards. **No package logic yet** — Part 1 ends with an empty, CI-green skeleton whose projects produce `.nupkg`s. Part 2 implements the packages.
+Provision the new `dotnet-caching` repo and scaffold it to org standards. **No package logic yet** — Part 1 ends with an empty, CI-green skeleton whose projects produce `.nupkg`s. Part 2 implements the packages.
 
 > Prerequisite reading: the [Phase 0 README](README.md) (decisions, golden rules) and [spec.md → MX.Caching facade](../portal-caching-spec/spec.md#mxcaching-facade-over-hybridcache).
 
@@ -8,8 +8,8 @@ Provision the new `caching` repo and scaffold it to org standards. **No package 
 
 Repos in this org are created from JSON workload definitions, **not** by hand.
 
-- **Do:** Add `terraform/workloads/dev-platform/caching.json` in `platform-workloads`, modelled on `dev-platform/api-client-abstractions.json`:
-  - `name`: `caching`
+- **Do:** Add `terraform/workloads/dev-platform/dotnet-caching.json` in `platform-workloads`, modelled on `dev-platform/api-client-abstractions.json`:
+  - `name`: `dotnet-caching`
   - `github.description`: e.g. *"MX.Caching: shared .NET 9/10 caching facade over HybridCache with a Table Storage backend and config-driven provider selection, published to NuGet."*
   - `github.topics`: `dotnet`, `caching`, `hybridcache`, `azure-table-storage`, `nuget`, `github-actions`
   - `github.add_sonarcloud_secrets: true`
@@ -48,7 +48,7 @@ Mirror `api-client-abstractions` / `observability-opentelemetry`.
 
 ## Part 1 exit gate
 
-- `caching` repo provisioned with protection ruleset + NuGet environment.
+- `dotnet-caching` repo provisioned with protection ruleset + NuGet environment.
 - Empty skeleton builds, tests (none yet) and format pass, CI green, `.nupkg`s produced.
 - No caching logic implemented yet.
 
