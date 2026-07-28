@@ -62,6 +62,8 @@ The exact commands the agent must use to validate its changes. Include:
 - Filter pattern to skip slow tests (e.g. `--filter "FullyQualifiedName!~IntegrationTests"`).
 - Local dev runners (`func host start`, `dotnet watch`, `npm run watch:css`) only if relevant.
 
+Every repository must have a root `.gitattributes`. Cross-platform .NET repositories use `* text=auto eol=lf` and matching C#/VB `.editorconfig` rules: `charset = utf-8`, `end_of_line = lf`, and `insert_final_newline = true`. Preserve binary attributes and documented Windows-only exceptions.
+
 ### 5. Do NOT
 
 A short, blunt list of things the agent must not do. Standard items:

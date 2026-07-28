@@ -79,6 +79,8 @@ This is **complementary** to the file-load model: if `./.github-copilot/` is che
 
 <!-- Concrete commands. Examples below — adapt per repo. -->
 
+This repository must maintain a root `.gitattributes`: cross-platform .NET repositories use `* text=auto eol=lf` with matching C#/VB `.editorconfig` rules: `charset = utf-8`, `end_of_line = lf`, and `insert_final_newline = true`. Preserve binary attributes and documented Windows-only exceptions.
+
 ```pwsh
 # Build
 dotnet build src/<Solution>.sln

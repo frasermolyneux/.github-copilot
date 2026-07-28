@@ -25,6 +25,9 @@ For C# and VB source files, use this baseline:
 
 ```ini
 [*.{cs,vb}]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
 dotnet_analyzer_diagnostic.category-naming.severity = warning
 dotnet_analyzer_diagnostic.category-style.severity = warning
 dotnet_analyzer_diagnostic.category-maintainability.severity = warning
@@ -60,6 +63,8 @@ dotnet_style_namespace_match_folder = true:warning
 ```
 
 Because the org baseline enables `CodeAnalysisTreatWarningsAsErrors`, any analyzer/style rule set to `warning` becomes build-blocking.
+
+The `charset`, `end_of_line`, and `insert_final_newline` directives are required together for cross-platform .NET source files. Pair them with a root `.gitattributes` rule of `* text=auto eol=lf`, preserving any binary attributes and documented Windows-only exceptions.
 
 ## Rule-level exceptions
 
@@ -113,6 +118,7 @@ dotnet_analyzer_diagnostic.severity = none
 ## Compliance
 
 - A repository-root `.editorconfig` exists in SDK-style .NET repositories and sets `root = true`.
+- Cross-platform .NET repositories set `end_of_line = lf` for C# and VB source files. Windows-only repositories may retain a documented exception.
 - Category severity baseline matches this standard unless a documented exception exists.
 - Rule-level severity downgrades below baseline include an inline justification comment.
 - If `CA1707` is downgraded for test naming, it is scoped to test files only and includes an inline rationale comment.
