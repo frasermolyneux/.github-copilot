@@ -20,15 +20,15 @@ flowchart LR
 
 ## Resolved decisions (locked for this plan)
 
-| #   | Decision          | Choice                                                                                                                                                                     |
-| --- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Library location  | **Its own repo** (`dotnet-caching`), not inside `api-client-abstractions` — `portal-repository` consumes it server-side and must not take a dependency on `MX.Api.Client`. |
-| 2   | Repo name         | `dotnet-caching` (org style: descriptive, no `mx-` prefix; packages are `MX.*`).                                                                                           |
-| 3   | Packages          | `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`. `MX.Caching.Cosmos` **deferred**.                                                |
-| 4   | Primitives        | **.NET 9 `HybridCache`** does L1/L2/stampede/tags/serialization; the facade adds only the policy model + (later) the client decorator.                                     |
+| #   | Decision          | Choice                                                                                                                                                                                                       |
+| --- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Library location  | **Its own repo** (`dotnet-caching`), not inside `api-client-abstractions` — `portal-repository` consumes it server-side and must not take a dependency on `MX.Api.Client`.                                   |
+| 2   | Repo name         | `dotnet-caching` (org style: descriptive, no `mx-` prefix; packages are `MX.*`).                                                                                                                             |
+| 3   | Packages          | `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`. `MX.Caching.Cosmos` **deferred**.                                                                                  |
+| 4   | Primitives        | **.NET 9 `HybridCache`** does L1/L2/stampede/tags/serialization; the facade adds only the policy model + (later) the client decorator.                                                                       |
 | 5   | Default backend   | **Memory** is the library default. **Table Storage** `IDistributedCache` is selected explicitly by config (`MxCaching:Backend=TableStorage`) for shared L2 caching. Redis/Cosmos are config-swappable later. |
-| 6   | Target frameworks | `net9.0;net10.0`; **NBGV** versioning starting `0.1`.                                                                                                                      |
-| 7   | Publish feed      | **NuGet.org**, via `Release - Version and Tag` → `Release - Publish NuGet` (mirrors `api-client-abstractions`).                                                            |
+| 6   | Target frameworks | `net9.0;net10.0`; **NBGV** versioning starting `0.1`.                                                                                                                                                        |
+| 7   | Publish feed      | **NuGet.org**, via `Release - Version and Tag` → `Release - Publish NuGet` (mirrors `api-client-abstractions`).                                                                                              |
 
 Carried from the design: Table Storage on cost grounds (no Redis); the **tag-eviction-over-Table spike** is the only open technical risk and must be resolved before a `1.0`; consumers adopt in later phases (NuGet dependency gate).
 
