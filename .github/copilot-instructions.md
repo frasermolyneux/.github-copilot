@@ -30,7 +30,7 @@ When working in this multi-root workspace, always identify the target repository
 |-------|-------|
 | Cloud | Azure exclusively (App Service, Functions, SQL, APIM, Key Vault, Storage, App Insights) |
 | IaC | Terraform with `azurerm` ~> 4.x, `azuread`, `azapi`, `azuredevops`, `github` providers |
-| Backend | .NET 9 (ASP.NET Core, Azure Functions), some .NET Framework 4.8 legacy |
+| Backend | .NET 10 LTS (ASP.NET Core, Azure Functions) for new/greenfield projects; some repos remain on .NET 9 until migrated, some .NET Framework 4.8 legacy |
 | Frontend | Razor Views, SCSS via npm |
 | Testing | xUnit + Moq; Playwright for integration tests |
 | CI/CD | GitHub Actions using reusable composites from `actions/` repo |

@@ -31,7 +31,7 @@ Do not deviate. The `src/` folder contains the `.sln` and project subfolders.
 
 ## Target framework matrix
 
-The standard matrix is **`9.0.x` + `10.0.x`** for libraries and most apps:
+The library baseline multi-targets **`9.0.x` + `10.0.x`** to keep existing net9.0 consumers working alongside net10.0:
 
 ```yaml
 dotnet-version: |
@@ -39,7 +39,9 @@ dotnet-version: |
   10.0.x
 ```
 
-Use a single version (`9.0.x` or `10.0.x`) only when the project's csproj explicitly targets just that framework. Functions projects often pin a single version to match the Functions runtime.
+New (greenfield) apps target **.NET 10 LTS** only — `<TargetFramework>net10.0</TargetFramework>` per `standards.dotnet-project.instructions.md` — and use a single `dotnet-version: 10.0.x`. .NET 9 support ended 12 May 2026, so do not scaffold new single-target apps on `9.0.x`.
+
+Existing single-target apps that have not yet migrated off .NET 9 keep `dotnet-version: 9.0.x` until an explicit migration ticket moves them. Functions projects often pin a single version to match the Functions runtime.
 
 ## Job permissions
 
