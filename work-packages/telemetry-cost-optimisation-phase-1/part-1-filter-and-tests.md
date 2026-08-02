@@ -1,5 +1,7 @@
 # Phase 1 · Part 1 — Implement the SiteWatch HTTP Category Filter
 
+Implementation evidence: [part-1-implementation-evidence.md](part-1-implementation-evidence.md)
+
 ## 1.A — Fresh baseline and characterization
 
 Before editing:

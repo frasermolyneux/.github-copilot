@@ -26,7 +26,7 @@ flowchart LR
 | 2   | Repo name         | `dotnet-caching` (org style: descriptive, no `mx-` prefix; packages are `MX.*`).                                                                                           |
 | 3   | Packages          | `MX.Caching.Abstractions`, `MX.Caching`, `MX.Caching.TableStorage`, `MX.Caching.Testing`. `MX.Caching.Cosmos` **deferred**.                                                |
 | 4   | Primitives        | **.NET 9 `HybridCache`** does L1/L2/stampede/tags/serialization; the facade adds only the policy model + (later) the client decorator.                                     |
-| 5   | Default backend   | **Table Storage** `IDistributedCache`, selected by config (`MxCaching:Backend`, default `TableStorage`). Redis/Cosmos are config-swappable later.                          |
+| 5   | Default backend   | **Memory** is the library default. **Table Storage** `IDistributedCache` is selected explicitly by config (`MxCaching:Backend=TableStorage`) for shared L2 caching. Redis/Cosmos are config-swappable later. |
 | 6   | Target frameworks | `net9.0;net10.0`; **NBGV** versioning starting `0.1`.                                                                                                                      |
 | 7   | Publish feed      | **NuGet.org**, via `Release - Version and Tag` → `Release - Publish NuGet` (mirrors `api-client-abstractions`).                                                            |
 
@@ -45,7 +45,7 @@ Carried from the design: Table Storage on cost grounds (no Redis); the **tag-evi
 
 - `dotnet-caching` repo exists (via merged `platform-workloads` PR) with the `main-protection` ruleset and NuGet publish environment.
 - Four packages published to NuGet.org (`0.x`), multi-TFM (`net9.0;net10.0`), NBGV-versioned, each with a package README, restorable by a scratch project.
-- `AddMxCaching(config)` selects the Table backend by default and `Memory` in tests with **no code change** (config-only).
+- `AddMxCaching(config)` selects the memory backend by default; Table Storage is selected explicitly through configuration with **no code change**.
 - Policy precedence (`config → override → default → uncached`) and the `NotCached` guard are covered by tests.
 - The tag-eviction-over-Table spike is resolved and documented (tag side-index built if required).
 - No consumer has been wired (that is Phase 2+).

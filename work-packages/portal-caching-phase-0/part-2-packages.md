@@ -12,7 +12,7 @@ Pure contracts so both the future client decorator and server cache-aside depend
   - `IMxCache` — `GetOrCreateAsync<T>(key, factory, policy, tags, ct)`, `TryGetAsync<T>`, `SetAsync<T>`, `RemoveAsync(key)`, `RemoveByTagAsync(tag)`.
   - `CachePolicy` — `Tier` (`InProcess` / `Distributed` / `Tiered` / `None`), `Ttl`, optional `L1Ttl`/`L2Ttl`, `Tags`, `NegativeTtl`.
   - `CacheTier` enum; a `CacheKey` builder contract (client + method + normalised args + **version prefix**).
-  - `CacheOptions` — `Backend` enum (`TableStorage` default, `Memory`, `Redis`, `Cosmos`) + per-backend option holders (`TableStorageCacheOptions { Endpoint }`). Per-policy `Enabled` + the `Backend` switch are the **config kill-switch** (no feature flag) — set `Memory`, disable a policy, or drop a TTL to 0 to turn caching off per environment.
+  - `CacheOptions` — `Backend` enum (`Memory` default, `TableStorage`, `Redis`, `Cosmos`) + per-backend option holders (`TableStorageCacheOptions { Endpoint }`). Per-policy `Enabled` + the `Backend` switch are the **config kill-switch** (no feature flag) — use the memory backend, disable a policy, or drop a TTL to 0 to turn caching off per environment.
   - `IMxCacheMetrics` — hit / miss / evict counters emitted via `System.Diagnostics.Metrics.Meter` (vendor-neutral), so both tiers observe identically and each host's observability collects them.
 - **Acceptance:** builds with **zero** external package references; public API reviewed for minimality.
 

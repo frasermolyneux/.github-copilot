@@ -18,7 +18,7 @@ Caching is provided by the `MX.Caching` packages (repo: `dotnet-caching`) — a 
 
 - HybridCache provides **L1 + L2 read-through, stampede protection (single-flight), serialization, and tag-based invalidation**. The facade does not reimplement these.
 - The facade adds exactly two things: (1) the **declarative defaults-plus-overrides policy model**; (2) a **transparent decorator** over the typed API interfaces (`IGameServersApi`, `IQueryApi`, …) so caching applies with no call-site change.
-- The L2 backend is **Azure Table Storage** (`IDistributedCache`), selected by configuration (`MxCaching:Backend`, default `TableStorage`). Every L2-using service points at **one shared cache storage account** provisioned in `portal-core`.
+- The library defaults to the in-memory backend. The L2 backend is **Azure Table Storage** (`IDistributedCache`) when selected explicitly by configuration (`MxCaching:Backend=TableStorage`); every L2-using service points at **one shared cache storage account** provisioned in `portal-core`.
 - Metrics are emitted via `System.Diagnostics.Metrics.Meter` (vendor-neutral); each host's existing observability collects them.
 - The **kill-switch is config**: `Backend=Memory`, per-policy `Enabled=false`, or TTL=0 turns caching off per environment with no redeploy.
 - **Server-side cache-aside uses the same facade** via a service/repository decorator, so keys, tags, and metrics match the client tier.
