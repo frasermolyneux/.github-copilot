@@ -67,7 +67,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Web>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 ```
 
@@ -84,7 +84,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Functions>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 ```
 
