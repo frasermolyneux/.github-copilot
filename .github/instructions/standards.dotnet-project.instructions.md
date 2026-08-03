@@ -6,7 +6,8 @@ applyTo: '**/*.csproj,**/Directory.Build.props,**/Directory.Packages.props'
 
 ## Target framework
 
-- All new .NET projects target **.NET 9** (`<TargetFramework>net9.0</TargetFramework>`).
+- All new .NET projects target **.NET 10 LTS** (`<TargetFramework>net10.0</TargetFramework>`). .NET 9 support ended 12 May 2026 — do not scaffold new projects on it.
+- Existing repos still on .NET 9 keep that TFM until their own migration is planned; do not blanket-upgrade a repo's TFM without an explicit migration ticket. NuGet libraries multi-targeting `net9.0;net10.0` for backward compatibility with existing consumers are unaffected — see `dotnet-nuget-library.instructions.md`.
 - Some legacy projects remain on .NET Framework 4.8 — do not upgrade those without an explicit migration ticket.
 
 ## Required project properties
@@ -15,7 +16,7 @@ Every new `.csproj` (typically inherited via `Directory.Build.props` at solution
 
 ```xml
 <PropertyGroup>
-  <TargetFramework>net9.0</TargetFramework>
+  <TargetFramework>net10.0</TargetFramework>
   <Nullable>enable</Nullable>
   <ImplicitUsings>enable</ImplicitUsings>
   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -69,7 +70,7 @@ When using central package management, declare versions in `Directory.Packages.p
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
     <!-- ... -->
   </ItemGroup>
 </Project>
@@ -80,7 +81,7 @@ Per-`.csproj` references then become `<PackageReference Include="..." />` (no `V
 ## Compliance
 
 - `<Nullable>enable</Nullable>` and `<ImplicitUsings>enable</ImplicitUsings>` set (typically via Directory.Build.props)
-- `<TargetFramework>net9.0</TargetFramework>` for new projects
+- `<TargetFramework>net10.0</TargetFramework>` for new projects
 - SDK-style baseline warning/style settings present via root Directory.Build.props:
   - `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`
   - `<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>`

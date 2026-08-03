@@ -114,7 +114,7 @@ quality:
     build-target: dotnet-web-ci
     skip-format-check: true
     dotnet-project: <MyOrg.MyApp.Web>
-    dotnet-version: 9.0.x
+    dotnet-version: 10.0.x
     src-folder: src
   secrets:
     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
