@@ -29,6 +29,10 @@
       "path": "../craftpledge"
     },
     {
+      "name": "talkwithtiles",
+      "path": "../talkwithtiles"
+    },
+    {
       "name": "demo-manager",
       "path": "../demo-manager"
     },
@@ -37,8 +41,24 @@
       "path": "../geo-location"
     },
     {
+      "name": "trip-side-kick",
+      "path": "../trip-side-kick"
+    },
+    {
+      "name": "twenty-one",
+      "path": "../twenty-one"
+    },
+    {
+      "name": "travel-itinerary",
+      "path": "../travel-itinerary"
+    },
+    {
       "name": "invision-api-client",
       "path": "../invision-api-client"
+    },
+    {
+      "name": "dotnet-caching",
+      "path": "../dotnet-caching"
     },
     {
       "name": "molyneux-me",
@@ -89,6 +109,10 @@
       "path": "../platform-workloads"
     },
     {
+      "name": "platform-status-web",
+      "path": "../platform-status-web"
+    },
+    {
       "name": "polly-test",
       "path": "../polly-test"
     },
@@ -129,28 +153,12 @@
       "path": "../portal-web"
     },
     {
-      "name": "runbooks",
-      "path": "../runbooks"
-    },
-    {
-      "name": "talkwithtiles",
-      "path": "../talkwithtiles"
-    },
-    {
-      "name": "travel-itinerary",
-      "path": "../travel-itinerary"
-    },
-    {
-      "name": "twenty-one",
-      "path": "../twenty-one"
-    },
-    {
       "name": "portal-cod4x-plugin",
       "path": "../portal-cod4x-plugin"
     },
     {
-      "name": "dotnet-caching",
-      "path": "../dotnet-caching"
+      "name": "runbooks",
+      "path": "../runbooks"
     }
   ],
   "settings": {

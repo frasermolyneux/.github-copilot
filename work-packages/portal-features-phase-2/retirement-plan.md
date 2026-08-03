@@ -17,7 +17,7 @@ Delete the legacy maps implementation and the `Feature.Maps.V2` flag, host by ho
    - `Helpers/MapPopularityTagHelper.cs`, the legacy `MapRotationCfgParser` (now in the package), and the legacy maps nav contributor.
 4. **Permissions:** make the in-host `IPermissionContributor` exclude the maps domains **unconditionally** (Maps' permissions now come solely from `MapsPermissions`). The composed policy set and claim-type strings must be unchanged.
 
-**Acceptance:** build (Release) + test + format green; Playwright snapshots of the maps pages/nav match; policy set unchanged; no `Maps.V2` reference remains in `portal-web`.
+**Acceptance:** build (Release) + unit/integration test + format green; discovery-driven host Playwright proves the unconditional RCL routes resolve once, Maps navigation and real policy wiring remain correct, representative pages fit the real layout, and the small shared-shell visual baseline is unchanged; policy set unchanged; no `Maps.V2` reference remains in `portal-web`. Do not move Maps workflows into this host suite.
 
 ---
 
@@ -75,7 +75,7 @@ Delete the legacy maps implementation and the `Feature.Maps.V2` flag, host by ho
 - [ ] All five hosts register the Maps packages **unconditionally**; no `Feature.Maps.V2` reference anywhere.
 - [ ] Legacy maps controllers/views/nav/commands/jobs deleted; hosts net-negative maps LOC.
 - [ ] `MapsLegacyExclusionConvention` removed; no route collisions; policy set unchanged.
-- [ ] Build/test/format + characterization/Playwright green in all five hosts.
+- [ ] Maps feature-owned Playwright remains green for the retained package; build/test/format + characterization/thin host-composition Playwright green in the relevant hosts.
 - [ ] `Feature.Maps.V2` removed from App Config.
 - [ ] `code-review` sub-agent run per repo; High/Medium findings resolved.
 
@@ -89,6 +89,7 @@ Delete the legacy maps implementation and the `Feature.Maps.V2` flag, host by ho
 # portal-web
 dotnet build src/XtremeIdiots.Portal.Web/XtremeIdiots.Portal.Web.csproj
 dotnet test  src --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Web.IntegrationTests/XtremeIdiots.Portal.Web.IntegrationTests.csproj
 dotnet format src/XtremeIdiots.Portal.Web.sln --verify-no-changes
 
 # portal-server-events

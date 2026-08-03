@@ -6,8 +6,8 @@ The **execute-it-verbatim** plan for migrating the **AutoAdmin** automated-enfor
 
 ## What Phase 3 delivers
 
-- **Part 1 — build & publish `portal-feature-autoadmin`** ([part-1-feature-build.md](part-1-feature-build.md)): `.Abstractions` / `.Web` / `.Processing` containing the VPN, moderation, and protected-names code moved out of `portal-server-events` and `portal-web`. **Gated on NuGet publish.**
-- **Part 2 — integrate behind `Feature.AutoAdmin.V2`** ([part-2-host-integration.md](part-2-host-integration.md)): **three** hosts (`portal-server-events`, `portal-web`, `portal-repository-func`) register the packages flag-gated, side-by-side with legacy, validated by characterization + Playwright, then enabled dev → prd → soak.
+- **Part 1 — build & publish `portal-feature-autoadmin`** ([part-1-feature-build.md](part-1-feature-build.md)): `.Abstractions` / `.Web` / `.Processing` containing the VPN, moderation, and protected-names code moved out of `portal-server-events` and `portal-web`, plus a non-packable feature-owned Playwright project using the SDK reference host. **Feature browser tests are part of the NuGet publish gate.**
+- **Part 2 — integrate behind `Feature.AutoAdmin.V2`** ([part-2-host-integration.md](part-2-host-integration.md)): **three** hosts (`portal-server-events`, `portal-web`, `portal-repository-func`) register the packages flag-gated, side-by-side with legacy. Portal-web Playwright is restricted to discovery/composition, real policy/layout, feature-flag parity, and the small shared-shell visual suite; AutoAdmin workflows remain owned by the feature repo.
 
 ## AutoAdmin footprint (validated against the current code)
 
@@ -43,12 +43,12 @@ The **execute-it-verbatim** plan for migrating the **AutoAdmin** automated-enfor
 
 ## Main risk to watch
 
-The **VPN/moderation settings UI is woven into the shared `GlobalSettings` / `GameServers` pages** (strongly-typed `VpnProtection` / `Moderation` view-model properties + validators), unlike Maps' dedicated controllers. Extracting them into AutoAdmin `ISettingsSection`s means moving that binding/validation into the sections. Phase 0 rendered these namespaces as in-host `ISettingsSection`s; Phase 3 **moves those sections** to the package. Treat the settings-section extraction as the highest-risk step and gate it hard on Playwright parity of the global + per-server settings pages.
+The **VPN/moderation settings UI is woven into the shared `GlobalSettings` / `GameServers` pages** (strongly-typed `VpnProtection` / `Moderation` view-model properties + validators), unlike Maps' dedicated controllers. Extracting them into AutoAdmin `ISettingsSection`s means moving that binding/validation into the sections. Phase 0 rendered these namespaces as in-host `ISettingsSection`s; Phase 3 **moves those sections** to the package. Treat the settings-section extraction as the highest-risk step: gate the section's validation and save/load workflows in the feature repository, then gate real shared-page composition and off/on parity in `portal-web`.
 
 ## Golden rules
 
 - No git write ops / no secrets unless asked; follow each repo's `AGENTS.md`.
-- Behaviour identical in both flag states; characterization + Playwright are the oracle.
+- Behaviour identical in both flag states; characterization + feature-owned functional Playwright + host-composition Playwright are the oracle.
 - Surface the **publish gate**: finish Part 1, publish/review the packages, then Part 2. No cross-repo project references.
 - Build + test + `dotnet format --verify-no-changes` green before any step is "done".
 - **Exactly one path runs per environment** when the flag flips.
@@ -56,7 +56,8 @@ The **VPN/moderation settings UI is woven into the shared `GlobalSettings` / `Ga
 ## Phase 3 definition of done
 
 - `portal-feature-autoadmin` published to NuGet.org and restorable.
-- `portal-server-events` + `portal-web` + `portal-repository-func` reference the packages, flag-gated; **flag off = legacy, on = feature**, both behaviourally identical (characterization + Playwright), including moderation ordered **after** command dispatch (observation-only) and the tag-reconcile ordering.
+- AutoAdmin feature-owned Playwright proves Protected Names, profile block, both settings scopes, validation, and settings round-trip before publish.
+- `portal-server-events` + `portal-web` + `portal-repository-func` reference the packages, flag-gated; **flag off = legacy, on = feature**, both behaviourally identical (characterization + feature-owned functional Playwright + host-composition Playwright), including moderation ordered **after** command dispatch (observation-only) and the tag-reconcile ordering.
 - `Feature.AutoAdmin.V2` enabled in **dev** and **prd** and soaked, no regressions.
 - Legacy VPN/moderation/protected-names code **still present** and working when the flag is off.
 - `code-review` sub-agent run per repo; High/Medium findings resolved.

@@ -12,7 +12,7 @@ Hosts touched: **`portal-server-events`**, **`portal-web`**, and **`portal-repos
 
 1. **Create the flag** `Feature.AutoAdmin.V2` in App Configuration for `dev` and `prd`, default **off**. The feature name is the bare string `AutoAdmin.V2` (key `FeatureManagement:AutoAdmin.V2`, matching `IsEnabled("AutoAdmin.V2")`; `Feature.AutoAdmin.V2` is the prose label). **Seed it once** (default off) as a `portal-environments` change; **flips are manual** App Config edits per label — no Terraform apply, no redeploy.
 2. **Reference the packages** at `0.1.x`: `portal-server-events` → `.Abstractions` + `.Processing`; `portal-web` → `.Abstractions` + `.Web`; `portal-repository-func` → `.Abstractions` + `.Processing` (for the VPN-detected-tags reconcile job).
-3. **Baselines (flag off):** characterization snapshots for the moderation pipeline (a toxic message → `Observation` recorded, command **still dispatched** — moderation never skips it), the VPN kick decision on **both connect and ip-resolved** (incl. the **welcome being suppressed when VPN kicks on connect**), the VPN-detected tag written in real time on connect/ip-resolved, and the protected-name check on connect; Playwright snapshots for the Protected Names page, the protected-names profile block, and the **VPN + Moderation sections** on both the global settings page and a game-server settings page.
+3. **Baselines (flag off):** first confirm the published AutoAdmin commit passed its feature-owned Playwright suite. Capture characterization snapshots for the moderation pipeline (a toxic message → `Observation` recorded, command **still dispatched** — moderation never skips it), the VPN kick decision on **both connect and ip-resolved** (incl. the **welcome being suppressed when VPN kicks on connect**), the VPN-detected tag written in real time on connect/ip-resolved, and the protected-name check on connect. In `portal-web`, capture semantic composition baselines for discovery, real authorization, and placement of the Protected Names page/profile block and the **VPN + Moderation sections** in both shared settings pages; keep screenshots only for the selected high-risk shared shells. Do not repeat the settings/protected-name workflows owned by the feature repo.
 
 **Acceptance:** flag exists (off); packages restore; baselines captured; hosts build/test/format green.
 
@@ -52,7 +52,7 @@ Hosts touched: **`portal-server-events`**, **`portal-web`**, and **`portal-repos
 4. **Settings sections:** when the flag is on, the package `VpnProtectionSettingsSection` + `ChatModerationSettingsSection` render on the global + game-server settings pages; **suppress** the legacy in-host VPN/moderation sections. Verify round-trip (save/load) is byte-identical against the **feature-owned** (wire-compatible) contracts.
 5. **Permissions:** when the flag is on, `AutoAdminPermissions` provides `Players.ProtectedNames.Write`; **exclude** it from the legacy in-host permission contributor (avoid duplicate-claim). Composed policy set unchanged.
 
-**Acceptance (2.B):** with the flag **off**, everything matches baseline. With the flag **on** (dev): Playwright snapshots of the Protected Names page, the profile block, and the VPN/moderation settings sections (global + per-server) match; settings save/load round-trips identically; no route collision; policy set unchanged; `dotnet build` (Release) + test + format green.
+**Acceptance (2.B):** start independent test hosts with `FeatureManagement:AutoAdmin.V2=false` and `true`. Off matches the legacy semantic baseline; on proves the RCL `ApplicationPart` is discovered, Protected Names routes resolve exactly once, the profile/settings contributors are not duplicated, real host policies allow/deny correctly, and each contributed surface renders in the real shared layout. The feature-owned suite remains the settings save/load and validation oracle; portal-web checks representative persisted fixtures are readable and the small shared-shell visual baseline remains green. No route collision; policy set unchanged; `dotnet build` (Release) + unit/integration tests + format green.
 
 ---
 
@@ -75,7 +75,7 @@ Hosts touched: **`portal-server-events`**, **`portal-web`**, and **`portal-repos
 ## 2.D — Cutover (enable, validate, soak)
 
 1. **Enable in dev** — `Feature.AutoAdmin.V2 = on` (dev label); restart the three hosts.
-2. **Validate in dev** — full characterization + Playwright with the flag **on**; then flag **off** + restart and confirm legacy parity. Pay special attention to the **moderation observation** (fires after command dispatch, does not block), the **settings round-trip**, and the **VPN-detected-tags reconcile**.
+2. **Validate in dev** — full characterization + thin host-composition Playwright with the flag **on**; then flag **off** + restart and confirm legacy parity. The AutoAdmin feature-repository Playwright suite remains the workflow/settings-round-trip oracle. Pay special attention to the **moderation observation** (fires after command dispatch, does not block), representative persisted-settings compatibility, and the **VPN-detected-tags reconcile**.
 3. **Enable in prd** — flag on (prd label); restart; **soak**, monitoring App Insights (moderation/VPN audit events, Content Safety dependency calls, errors).
 4. **Do not remove legacy** — that is Phase 4.
 
@@ -91,7 +91,7 @@ Hosts touched: **`portal-server-events`**, **`portal-web`**, and **`portal-repos
 - [ ] Moderation runs at `Order = 260` (after command dispatch) and is observation-only (records an `Observation`, no effect on the command), preserved in both states.
 - [ ] The VPN guard runs on **both** connect + ip-resolved and **suppresses the welcome on a connect kick** (connection coupling preserved) in both flag states.
 - [ ] Tag-reconcile ordering (03:00 reset → 03:30 connected → 04:00 VPN-detected) preserved.
-- [ ] Characterization + Playwright parity in both flag states.
+- [ ] Characterization + host-composition Playwright parity in both flag states; published AutoAdmin feature-owned Playwright suite green.
 - [ ] `Feature.AutoAdmin.V2` on in dev and prd, soaked, no regressions.
 - [ ] Legacy VPN/moderation/protected-names code still present and functional when off.
 - [ ] Build/test/format green in all three hosts; `code-review` run per repo.
@@ -111,5 +111,6 @@ dotnet format src/XtremeIdiots.Portal.Server.Events.slnx --verify-no-changes
 # portal-web
 dotnet build src/XtremeIdiots.Portal.Web/XtremeIdiots.Portal.Web.csproj
 dotnet test  src --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Web.IntegrationTests/XtremeIdiots.Portal.Web.IntegrationTests.csproj
 dotnet format src/XtremeIdiots.Portal.Web.sln --verify-no-changes
 ```

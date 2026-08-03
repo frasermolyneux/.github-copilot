@@ -39,11 +39,15 @@ Build the `portal-feature-sdk` repo: two packages (`FeatureSdk`, `FeatureSdk.Web
 | `XtremeIdiots.Portal.FeatureSdk`             | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.Repository.Api.Client.V1`, `XtremeIdiots.Portal.Integrations.Servers.Api.Client.V1`, `MX.GeoLocation.Abstractions` (DTO-only, for `IpIntelligenceDto` on `PlayerConnection`), `MX.Observability.ApplicationInsights` (for `IAuditLogger`/`IJobTelemetry`), `Microsoft.Extensions.Caching.Memory`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Options`, `Microsoft.Extensions.Logging.Abstractions` |
 | `XtremeIdiots.Portal.FeatureSdk.Web`         | `Microsoft.NET.Sdk.Razor` | `net9.0;net10.0` | ProjectRef `FeatureSdk`; `FrameworkReference Microsoft.AspNetCore.App`                                                                                                                                                                                                                                                                                                                                                                                      |
 | `XtremeIdiots.Portal.FeatureSdk.Testing`     | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | ProjectRef `FeatureSdk`                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `XtremeIdiots.Portal.FeatureSdk.Web.Testing` | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | ProjectRef `FeatureSdk.Web`                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `XtremeIdiots.Portal.FeatureSdk.Web.Testing` | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | ProjectRef `FeatureSdk.Web`; `Microsoft.Playwright`; `FrameworkReference Microsoft.AspNetCore.App`                                                                                                                                                                                                                                                                                                                                                           |
 | `XtremeIdiots.Portal.FeatureSdk.Tests`       | test                      | `net9.0;net10.0` | `FeatureSdk`, `FeatureSdk.Testing`, xUnit, Moq, coverlet                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `XtremeIdiots.Portal.FeatureSdk.Web.Tests`   | test                      | `net9.0;net10.0` | `FeatureSdk.Web`, `FeatureSdk.Web.Testing`, xUnit, Moq                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `XtremeIdiots.Portal.FeatureSdk.Web.TestHost.Sample` | `Microsoft.NET.Sdk.Razor` (private, non-packable) | `net9.0;net10.0` | `FeatureSdk.Web`; one controller/view/static asset plus navigation/profile/dashboard/settings contributors                                                                                                                                                                                                                                                                                                                                                  |
+| `XtremeIdiots.Portal.FeatureSdk.Web.IntegrationTests` | test (non-packable)       | `net9.0;net10.0` | `FeatureSdk.Web.Testing`, `FeatureSdk.Web.TestHost.Sample`, `Microsoft.Playwright`, xUnit                                                                                                                                                                                                                                                                                                                                                                    |
 
 Each package project: `GeneratePackageOnBuild=true`, `PackageId` = project name, a `Description`, `PackageReadmeFile=README.md`, and a per-project `README.md` packed to root.
+
+The sample host and integration-test projects are solution members but never packed. Their explicit project names are part of the standard browser-test convention used by feature repositories.
 
 **Acceptance:** Solution builds; four `.nupkg` produced.
 
@@ -385,9 +389,22 @@ public interface ISettingsSection : IGameScoped { string Namespace { get; } stri
 ## 1.6 — `.Testing` companions
 
 - **`FeatureSdk.Testing`:** `FakeServerEventContext` (settable server/player/live state), `FakeRconGateway` (records calls, configurable `Supports`), `FakeFeatureCache` (pass-through/no-op with call capture), `FakeAuditLogger`, `PipelineHarness` (register handlers, feed an event, capture the ordered list of handlers that ran), `ConnectionHarness` (runs a `PlayerConnection` through the registered collaborators and captures the order + whether the greeter was skipped), recording fakes for the four connection collaborators, and a `JobContext` factory.
-- **`FeatureSdk.Web.Testing`:** fake `NavigationContext` / `PlayerProfileContext` / `DashboardContext`, and a stub `IAuthorizationService` (allow/deny by policy).
+- **`FeatureSdk.Web.Testing` unit fakes:** fake `NavigationContext` / `PlayerProfileContext` / `DashboardContext`, a stub `IAuthorizationService` (allow/deny by policy), fake authenticated principals/roles/claims, deterministic Repository/API-client fakes, recording contributors, and in-memory global/per-server settings persistence.
+- **`FeatureSdk.Web.Testing` reference host:** `FeatureWebTestHostBuilder` accepts the feature Web assembly, service/configuration overrides, fake principal, policy outcomes, supported game, and optional seed settings. It creates a real `WebApplication`, calls `AddPortalFeatureCore()` + `AddPortalFeatureWeb()` + `AddFeatureControllers(featureAssembly)`, maps controllers/Razor pages/static web assets, and starts Kestrel on an OS-assigned loopback port. It exposes minimal SDK-owned test pages that render:
+  - navigation from `INavigationModelBuilder`;
+  - profile blocks for a configured player/game;
+  - dashboard widgets;
+  - global and per-server settings sections, with GET/POST round-trip through the SDK settings contract.
+- **Playwright infrastructure:** `FeaturePlaywrightFixture` installs no browsers itself but launches Chromium from the standard Playwright installation, creates a fresh browser context per scenario/role, and exposes the host base URI. `FeatureBrowserSession` captures console errors, uncaught page errors, failed same-origin requests, HTTP 5xx responses, and unexpected external requests; disposal/assertion fails with all captured diagnostics. Supply helpers for authenticated/anonymous contexts and stable `data-testid` conventions, but keep feature assertions in each feature repository.
+- **Contract boundary:** the reference host is deliberately minimal and versioned with `FeatureSdk.Web.Testing`. It validates RCL/Web-plane behaviour without referencing or copying `portal-web` views, CSS, services, or internal test fixtures. It must not offer screenshot baselines that imply portal-web pixel parity.
+- **Reference-host sample:** add a private sample Razor Class Library under the SDK test projects with one controller/view/static asset and one nav/profile/dashboard/settings contribution. Use it only to prove the testing package itself.
+- **CI runner contract:** do not rely on `FullyQualifiedName~IntegrationTests` alone. Run `XtremeIdiots.Portal.FeatureSdk.Web.IntegrationTests.csproj` directly, install Chromium first, write a TRX result, and fail the job when `ResultSummary/Counters/@total` is `0`. Before the SDK publish gate, update `frasermolyneux/actions/dotnet-playwright-tests` (publish a new immutable version) to accept an exact `test-project` input and enforce those install/direct-run/non-zero semantics; feature repositories consume that version.
 
-**Acceptance (1.6):** A sample `IServerEventHandler` and a sample `INavigationContributor` can be unit-tested with only the `.Testing` packages.
+**Acceptance (1.6):**
+- A sample `IServerEventHandler` and a sample `INavigationContributor` can be unit-tested with only the `.Testing` packages.
+- The sample RCL launches on a random loopback port and Chromium proves its route, static asset, contributor rendering, anonymous/allowed/denied visibility, and settings POST→GET round-trip.
+- A deliberately triggered console error, HTTP 500, failed same-origin request, and external request each fail with useful diagnostics.
+- Two role/browser contexts do not share authentication or storage state; host and browser dispose cleanly.
 
 ---
 
@@ -406,11 +423,14 @@ Cover at minimum:
 - **RconGateway:** each `GameType` routes to the correct `IServersApiClient` sub-client (mock the client); `Supports` matrix.
 - **Registries:** duplicate namespace / duplicate claim type throw.
 - **Web:** nav builder filters by policy (stub `IAuthorizationService`) and game; profile-block/dashboard runners order + filter.
+- **Web reference host:** sample RCL discovery; controller/view/static-asset serving; navigation/profile/dashboard/settings rendering; global/per-server settings round-trip; principal/policy isolation; browser diagnostic capture.
 
 **Validate (1.3–1.7):**
 ```pwsh
 dotnet build src/XtremeIdiots.Portal.FeatureSdk.sln
-dotnet test  src/XtremeIdiots.Portal.FeatureSdk.sln
+dotnet test  src/XtremeIdiots.Portal.FeatureSdk.sln --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.FeatureSdk.Web.IntegrationTests/XtremeIdiots.Portal.FeatureSdk.Web.IntegrationTests.csproj --results-directory TestResults --logger "trx;LogFileName=playwright.trx"
+# The CI action installs Chromium and fails unless TestResults/playwright.trx reports Counters.total > 0.
 dotnet format src/XtremeIdiots.Portal.FeatureSdk.sln --verify-no-changes
 ```
 
@@ -423,6 +443,7 @@ dotnet format src/XtremeIdiots.Portal.FeatureSdk.sln --verify-no-changes
 **Acceptance / gate:**
 - `XtremeIdiots.Portal.FeatureSdk`, `.Web`, `.Testing`, `.Web.Testing` are visible on NuGet.org at `0.1.x`.
 - A **scratch console app** restores `XtremeIdiots.Portal.FeatureSdk` and calls `AddPortalFeatureCore()` against fake clients without error.
+- A **scratch Razor Class Library test project** restores `FeatureSdk.Web.Testing`, launches the reference host with its assembly, and loads one controller route in Chromium without referencing `portal-web`.
 
 **STOP.** Do not start [part-2-integration.md](part-2-integration.md) until this gate passes. This is the NuGet dependency gate — no cross-repo project references to bridge it.
 
@@ -433,6 +454,8 @@ dotnet format src/XtremeIdiots.Portal.FeatureSdk.sln --verify-no-changes
 - [ ] `portal-feature-sdk` provisioned, scaffolded (library repo), CI green.
 - [ ] `FeatureSdk` (contracts + infra) and `FeatureSdk.Web` build; `.Testing` companions build.
 - [ ] Unit tests cover pipeline, jobs, cache, RCON routing, structural validation, registries, web filtering.
+- [ ] Reference-host integration tests prove an RCL route, contributors, authorization, settings round-trip, static assets, browser isolation, and diagnostic capture in Chromium.
+- [ ] The versioned Playwright action targets an explicit test project, installs Chromium, publishes TRX, and fails when zero tests execute; the SDK CI uses it.
 - [ ] `dotnet format --verify-no-changes` clean.
 - [ ] Packages published to NuGet.org `0.1.x` and restorable by a scratch project.
 - [ ] `code-review` sub-agent run; High/Medium findings resolved.

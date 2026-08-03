@@ -245,6 +245,39 @@ if (features.IsEnabled("Maps.V2"))
 
 **Feature web packages are Razor Class Libraries.** A `.Web` package ships its controllers, views, and static assets as an RCL (`Microsoft.NET.Sdk.Razor`); `AddFeatureControllers(assembly)` registers an MVC `ApplicationPart` so the host discovers the controllers, and static assets are served under `_content/<package>`. Features **reuse the central design system** (Bootstrap + the portal-web token set and UI-standards components) and ship little or no bespoke CSS — the SCSS/npm build stays central in `portal-web`. A feature that genuinely needs styling ships *compiled* CSS via RCL static assets; features never run npm. The host filters every surface by game **and** authorization.
 
+### UI testing ownership
+
+UI testing follows the same ownership boundary as the Web plane: **feature behaviour is proven in the feature repository before publish; host composition is proven in `portal-web` after package consumption.** Moving a controller or view into an RCL must not move its primary browser coverage back into the host.
+
+| Layer | Owner | Required coverage |
+| --- | --- | --- |
+| Feature web unit/component | `portal-feature-<name>` | Contributors, view models, validators, controller actions, policy/game metadata, and settings serialization/round-trip. |
+| Feature functional browser | `portal-feature-<name>` | Chromium against an SDK reference host: feature routes, forms/workflows, feature navigation/profile/dashboard/settings surfaces, static assets, authorization visibility, and no console/page/same-origin request errors. |
+| Host composition browser | `portal-web` | Package/ApplicationPart discovery, real portal layout and design-system compatibility, real authorization-policy wiring, route/contributor uniqueness, and feature-flag off/on parity during migration. |
+| Host visual compatibility | `portal-web` | A deliberately small screenshot-baseline suite for high-risk shared-shell surfaces. Full feature visual suites do not live here. |
+| Optional deployed smoke | `portal-web` deployment workflow | If adopted, keep to small read-only checks against the deployed Development app after deployment; do not duplicate stateful feature workflows. |
+
+`XtremeIdiots.Portal.FeatureSdk.Web.Testing` supplies the reusable reference host used by feature repositories. It must provide:
+
+- a minimal ASP.NET Core app with MVC, Razor, static web assets, and `AddFeatureControllers(assembly)`;
+- fake authentication principals and configurable policy outcomes;
+- deterministic fake/recording host services for Repository/API clients and in-memory settings persistence;
+- rendering shells for navigation, profile blocks, dashboard widgets, and settings sections;
+- a Kestrel-on-loopback Playwright fixture, isolated browser contexts, and assertions for console errors, page errors, failed same-origin requests/responses, and unexpected external requests.
+
+The reference host validates the **published Web-plane contract**, not `portal-web` internals. It may include a minimal stable layout and test CSS, but it does not copy the portal-web application or claim pixel parity with the production design system.
+
+Feature repositories use semantic assertions (`role`, label, route, stable `data-testid`, persisted payload) as the default. Screenshot comparison is reserved for `portal-web` because the central design system and shared layout remain host-owned. If those assets later become a versioned shared RCL, visual ownership can move with that dependency.
+
+To avoid host test edits for every feature, portal-web coverage must be discovery-driven wherever the SDK already exposes metadata:
+
+- discover RCL controllers from all registered MVC `ApplicationPart`s, not only the portal-web assembly;
+- derive navigation/profile/dashboard/settings coverage from registered contributors;
+- assert unique routes, contributor keys/order, settings namespaces, and permission claims;
+- allow the test host to set `FeatureManagement:<Name>` before application composition so both flag states can be started deterministically.
+
+**Browser test gate.** A feature with a `.Web` package is not publishable until its feature-owned Playwright project is run directly and executes at least one test successfully. A solution-wide name filter is insufficient because `dotnet test` succeeds when a filter matches zero tests. Host-side Playwright cannot compensate for missing feature-repository coverage.
+
 ### Jobs & reconciliation plane
 
 Two job shapes, both on the timer hosts. Reconciliation is a distinct shape because the estate's reconciliations have **ordering, idempotency, and system-vs-manual** constraints.
@@ -386,7 +419,7 @@ Package granularity is **driven by dependency boundaries, not by plane** — the
 | `XtremeIdiots.Portal.FeatureSdk`     | framework-agnostic contracts (settings, events + pipeline, jobs, permissions, game, context, connection collaborators, tag substrate) **and** host infrastructure (dispatchers, job runner, default `IRconGateway`, default `IFeatureCache` L0/L1, context factory, no-op connection collaborators) | `MX.Api.Client`, Repository + Servers typed clients, `MX.GeoLocation.Abstractions` (DTO-only, for `IpIntelligenceDto`), `MX.Observability.*` |
 | `XtremeIdiots.Portal.FeatureSdk.Web` | ASP.NET Core contracts (nav / profile / dashboard / settings) + web host infrastructure (aggregators, RCL/ApplicationPart support, tag helpers)                                                                                                                                                     | `FeatureSdk`, ASP.NET Core MVC                                                                                                               |
 
-Each ships a `.Testing` companion (`FeatureSdk.Testing`, `FeatureSdk.Web.Testing`) with fakes: fake context, fake RCON gateway, fake cache, an in-memory pipeline harness, and fake web contexts.
+Each ships a `.Testing` companion. `FeatureSdk.Testing` contains the processing fakes (context, RCON gateway, cache, pipeline/connection harnesses). `FeatureSdk.Web.Testing` contains fake web contexts **and the reusable reference web host + Playwright fixture** that lets every feature test its RCL without referencing `portal-web`.
 
 **Per feature — up to three packages, only those the feature needs:**
 
@@ -403,6 +436,8 @@ Rules:
 - **`portal-repository` references no feature package** (structural validation), so the `.Abstractions → FeatureSdk` chain never reaches the data plane.
 
 All packages: multi-target `net9.0`/`net10.0`, NBGV versioning, `.Testing` companions where they have non-trivial logic.
+
+Feature repositories that publish `.Web` also contain a non-packable `XtremeIdiots.Portal.Features.<Name>.Web.IntegrationTests` project. It references the feature `.Web`, `.Abstractions`, `FeatureSdk.Web.Testing`, `Microsoft.Playwright`, xUnit, and any deterministic client fakes needed by the scenarios. The standard CI path runs unit tests separately, then uses the versioned Playwright action to install Chromium, run that exact project, publish TRX, and fail if zero tests execute.
 
 ## Discovery & registration pattern
 

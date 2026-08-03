@@ -7,7 +7,7 @@ The **execute-it-verbatim** plan for **removing the legacy in-host VPN Protectio
 ## Preconditions (do not start otherwise)
 
 - `Feature.AutoAdmin.V2` has been **on in prd** and **soaked** with no regressions (Phase 3 exit gate passed).
-- Characterization + Playwright parity confirmed with the flag on, including the moderation **`Observation`** (fires after command dispatch, does not block), the **settings round-trip**, and the **VPN-detected-tags reconcile**.
+- AutoAdmin feature-owned Playwright is green for the package version running in prd, including Protected Names and both settings scopes/round-trips; portal-web host-composition Playwright parity is confirmed with the flag on. Characterization covers the moderation **`Observation`** (fires after command dispatch, does not block) and the **VPN-detected-tags reconcile**.
 - The `portal-feature-autoadmin` packages are the ones running in prd.
 
 > **Rollback note:** the flag is only an interim rollback lever. **Once a host is made unconditional and its legacy code is deleted, flipping the flag no longer restores legacy for that host** — rollback from that point is a **redeploy** (git revert). Sequence host-by-host so at most one host is mid-migration, validate after each, and remove the flag definition last (4.D).
@@ -41,7 +41,7 @@ Per host, in this order, validating after each:
 
 1. **Make the package path unconditional** — remove the `if (features.IsEnabled("AutoAdmin.V2"))` guard; in `portal-web` also remove the `AutoAdminLegacyExclusionConvention` (legacy controller is about to be deleted).
 2. **Delete the legacy code** for that host.
-3. **Validate** (build/test/format + characterization/Playwright).
+3. **Validate** (build/test/format + characterization/thin host-composition Playwright). The feature-repository suite remains the permanent owner of AutoAdmin UI workflows.
 
 Only **after all three hosts are clean and validated**:
 
@@ -54,7 +54,8 @@ Only **after all three hosts are clean and validated**:
 - No `Feature.AutoAdmin.V2` reference remains in any host; the flag is removed from App Config.
 - No legacy VPN/moderation/protected-names code (or the in-host VPN-detected-tags reconcile body) remains; all three hosts net-negative AutoAdmin LOC.
 - `AutoAdminLegacyExclusionConvention` removed; no route collision; policy set + settings round-trip unchanged; tag-reconcile ordering preserved.
-- Build/test/format + characterization/Playwright green in all three hosts.
+- AutoAdmin feature-owned Playwright remains green; build/test/format + characterization/thin host-composition Playwright green in the relevant hosts.
+- The reusable `FeatureSdk.Web.Testing` contract has been exercised by both Maps and AutoAdmin feature repositories, including routes, contributors, policies, forms/settings persistence, browser isolation, and diagnostic capture; no host-internal dependency was introduced.
 - **SDK tagged `v1.0`** (core frozen; additive-only thereafter).
 - `code-review` sub-agent run per repo; High/Medium findings resolved.
 

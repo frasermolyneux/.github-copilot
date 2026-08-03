@@ -18,7 +18,7 @@ Core owns the *canonical* and the *shared*; features own the *specific*. Where a
 
 | Doc                                      | Purpose                                                                                                                                                                                                                     |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [architecture.md](architecture.md)       | The target model: extension **planes**, the Feature SDK contracts (settings, server-events pipeline, jobs, web, permissions, game), the shared context + cache, packaging, DI discovery, cutover mechanism, and versioning. |
+| [architecture.md](architecture.md)       | The target model: extension **planes**, the Feature SDK contracts (settings, server-events pipeline, jobs, web, permissions, game), UI-testing ownership, the shared context + cache, packaging, DI discovery, cutover mechanism, and versioning. |
 | [feature-catalog.md](feature-catalog.md) | The **feature set**: platform-core vs feature boundary, the feature modules and their packages, reconciliation ownership, game scope, permissions ownership, and the migration order.                                       |
 | [decisions.md](decisions.md)             | The **locked decisions** that govern the platform, the deferred governance step, and the success criteria.                                                                                                                  |
 

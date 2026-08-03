@@ -142,10 +142,15 @@ portal-feature-maps/
                                                       #   RedirectToGameServerMapSyncJob, MapRotationCleanupJob
                                                       #   (no MapChange handler — persistence stays platform)
     XtremeIdiots.Portal.Features.Maps.*.Tests/
+    XtremeIdiots.Portal.Features.Maps.Web.IntegrationTests/
+                                                      # Playwright + FeatureSdk.Web.Testing reference host;
+                                                      # owns maps routes/forms/nav browser coverage
   terraform/                                          # only if the feature owns infra (usually none — reuse host infra)
 ```
 
 Three packages (`.Abstractions` + `.Web` + `.Processing`), each NBGV-versioned with a `.Testing` companion where it has non-trivial handlers. `.Web` is a Razor Class Library; `.Processing` carries both the event handlers and the scheduled/reconciliation jobs.
+
+The `Web.IntegrationTests` project is **not packed**. It is part of the feature repository's PR/publish gate and runs Chromium against the reusable `FeatureSdk.Web.Testing` reference host. `portal-web` keeps only composition, real-policy, feature-flag parity, and limited shared-shell visual checks.
 
 ## Migration order
 
@@ -167,7 +172,8 @@ Every feature migration follows the same **build → side-by-side → retire** r
 2. **`.Abstractions`** — move the feature's settings contract(s) + validators and its `IPermissionContributor`; ship migrating contracts as **wire-compatible copies** so persisted JSON deserialises under both paths during side-by-side; snapshot-test the permission definitions equal today's. `Settings.Contracts.V1` keeps only platform namespaces and shrinks as features migrate.
 3. **`.Processing`** *(if it has events/jobs)* — move handlers/commands/jobs; replace any per-game RCON `switch` with `IRconGateway`; wrap scheduled jobs in `IJobTelemetry`; preserve reconciliation phase/order and the forum-sync system-vs-manual merge. Feature-specific dependencies are provided via the feature's options builder; shared clients are consumed from host DI (SDK-asserted).
 4. **`.Web`** *(if it has UI)* — move controllers/views (RCL), nav/profile/dashboard/settings contributors; reuse the central design system (no npm).
-5. **Characterization tests** — record legacy behaviour first, then assert the feature path matches.
-6. **Wire behind `Feature.<Name>.V2`**, one path at a time; enable dev → validate → enable prd → soak.
-7. **Retire** — remove the legacy in-host implementation and the flag; flip the namespace's settings-contract guidance (see [deferred governance](decisions.md#deferred-governance-settings-contract-guidance-reconciliation)).
-8. **SDK changes are additive only** and follow package-first-then-consume (surface at planning as a NuGet dependency gate).
+5. **Feature-owned UI tests** — add `Web.IntegrationTests` using the `FeatureSdk.Web.Testing` reference host; cover routes, authorization visibility, forms/workflows, contributors, settings round-trip, assets, and browser errors. This suite must pass before publish.
+6. **Characterization tests** — record legacy behaviour first, then assert the feature path matches. Browser assertions are semantic by default; portal-web owns the small visual compatibility baseline.
+7. **Wire behind `Feature.<Name>.V2`**, one path at a time; in `portal-web` run only composition/real-policy/route-uniqueness and flag-off/on parity checks; enable dev → validate → enable prd → soak.
+8. **Retire** — remove the legacy in-host implementation and the flag; keep the feature-owned suite as the permanent regression owner, and leave only unconditional composition checks in `portal-web`; flip the namespace's settings-contract guidance (see [deferred governance](decisions.md#deferred-governance-settings-contract-guidance-reconciliation)).
+9. **SDK changes are additive only** and follow package-first-then-consume (surface at planning as a NuGet dependency gate).
