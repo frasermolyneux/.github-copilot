@@ -337,7 +337,7 @@ flowchart LR
 
 - **The SDK owns `IFeatureCache` and ships a built-in L0 (request/scope) + L1 (in-process) implementation** that works from day one.
 - The context **de-duplicates reads within a single event/request** (L0) and shares stable reference reads across handlers (L1).
-- **L2 (distributed) is adopted later.** When the [portal-caching](../portal-caching-spec/README.md) `MX.Api.Client` cache decorator lands, `IFeatureCache` adopts it for L2 behind the same interface — no feature changes.
+- **L2 (distributed) is deferred.** `IFeatureCache` keeps L2 behind the same interface; when added it sits on the org's `MX.Api.Client` cache capability (`WithCaching` / `SharedCacheConfiguration`, per-client scoped) rather than a bespoke store — no feature changes. See `patterns.api-client.instructions.md`.
 
 ## Cross-cutting: game capability model
 

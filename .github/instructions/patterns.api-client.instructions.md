@@ -57,7 +57,15 @@ The fake holds an in-memory map of canned responses. Tests register expected res
 - Testing package references `Abstractions` and provides DTO factory + fake.
 - Version namespace prefix matches the API segment version (`Controllers.V1` → `Abstractions.V1`).
 
+## Caching a unified (multi-sub-API) client
+
+When one `AddXxxApiClient` registers **multiple typed sub-APIs** by passing the same options delegate to several `AddTypedApiClient` calls, do **not** replay a consumer `.WithCaching(...)` delegate directly into each registration — a per-sub-API cache expression fails the single-client scope check and throws `ArgumentException` at DI composition, crashing host startup. Instead:
+
+- Capture the consumer delegate once into a `SharedCacheConfiguration`, apply it per sub-API via `WithSharedCaching(...)`, then call `ValidateAllOperationsMatched()` after all registrations (surfaces typos targeting an unregistered interface).
+- Ship curated read-only defaults with `AddDefaultCachePolicies<TSubApi>(...)`; never cache mutating or live-data surfaces.
+- Add a **DI-composition boot test** that builds the real service provider and resolves the unified client plus every typed sub-API — this guards the startup-crash class in CI.
+
 ## Cross-references
 
-- `shared.api-client-abstractions.instructions.md` — base interfaces and types
+- `shared.api-client-abstractions.instructions.md` — base interfaces, result types, and caching opt-in
 - `patterns.versioned-apis.instructions.md` — server-side versioning that consumer clients mirror

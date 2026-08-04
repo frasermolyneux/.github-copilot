@@ -34,6 +34,21 @@ services.AddTypedApiClient<ICustom, CustomImpl, CustomOptions, CustomBuilder>(co
 
 Configuration is **fluent-builder only** — there are no out-of-box appsettings binding helpers. Consumers wire URL/auth from `Configuration[...]` lookups inside the `options =>` lambda.
 
+## Caching (opt-in)
+
+`MX.Api.Client` provides declarative response caching over the typed clients (L1 in-memory by default; L2 distributed via HybridCache when configured). It is **off unless the consumer opts in**:
+
+```csharp
+services.AddXxxApiClient(opts => opts
+    .WithBaseUrl(...)
+    .WithEntraIdAuthentication(...)
+    .WithCachePartition("<stable-non-secret>")      // required when caching is enabled
+    .WithCaching(c => c.UseLibraryDefaults()));       // apply the library's curated read-only policies
+```
+
+- Client libraries register curated, read-only default policies via `AddDefaultCachePolicies<TClient>(...)`; consumers layer `Override` / `Add` / `Disable` / `NotCached` / `WithoutLibraryDefaults` on top. Only successful (`2xx` / `NotFound`) results are cached.
+- **Unified clients** (one `AddXxxApiClient` that fans a single options delegate across many typed sub-APIs — e.g. the Repository client) MUST route the consumer delegate through `SharedCacheConfiguration` + `WithSharedCaching(...)` and finish with `ValidateAllOperationsMatched()`. Passing a raw multi-sub-API `.WithCaching(...)` delegate straight to each `AddTypedApiClient` throws `ArgumentException` at DI-composition time and crashes host startup. See `patterns.api-client.instructions.md`.
+
 ## Consumer pattern
 
 ```csharp
