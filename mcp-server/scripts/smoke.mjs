@@ -9,6 +9,12 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const serverPath = join(__dirname, "..", "dist", "index.js");
+const requestTimeout = process.env.MCP_SMOKE_TIMEOUT_MS ?? "15000";
+const requestTimeoutMs = Number(requestTimeout);
+
+if (!/^\d+$/.test(requestTimeout) || !Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs <= 0) {
+  throw new Error("MCP_SMOKE_TIMEOUT_MS must be a positive integer");
+}
 
 const EXPECTED_TOOLS = [
   "get_quickstart",
@@ -37,6 +43,7 @@ const child = spawn(process.execPath, [serverPath], {
 let buffer = "";
 const pending = new Map();
 let nextId = 1;
+let childExit;
 
 child.stderr.on("data", (chunk) => {
   process.stderr.write(`[server] ${chunk}`);
@@ -52,7 +59,8 @@ child.stdout.on("data", (chunk) => {
     try {
       const msg = JSON.parse(line);
       if (msg.id != null && pending.has(msg.id)) {
-        const { resolve } = pending.get(msg.id);
+        const { resolve, timer } = pending.get(msg.id);
+        clearTimeout(timer);
         pending.delete(msg.id);
         resolve(msg);
       }
@@ -63,22 +71,46 @@ child.stdout.on("data", (chunk) => {
 });
 
 child.on("error", (err) => {
-  process.stderr.write(`[smoke] spawn error: ${err.message}\n`);
-  process.exit(1);
+  markChildUnavailable(`failed to spawn: ${err.message}`);
 });
 
+child.stdin.on("error", (err) => {
+  markChildUnavailable(`closed its input stream: ${err.message}`);
+});
+
+child.on("close", (code, signal) => {
+  markChildUnavailable(signal ? `exited due to signal ${signal}` : `exited with code ${code}`);
+});
+
+function markChildUnavailable(reason) {
+  childExit ??= reason;
+  rejectPendingRequests(childExit);
+}
+
+function rejectPendingRequests(reason) {
+  for (const [id, { reject, timer }] of pending) {
+    clearTimeout(timer);
+    pending.delete(id);
+    reject(new Error(`Server ${reason} while waiting for response`));
+  }
+}
+
 function send(method, params) {
+  if (childExit) {
+    return Promise.reject(new Error(`Server ${childExit} before request ${method}`));
+  }
+
   const id = nextId++;
   const payload = { jsonrpc: "2.0", id, method, params };
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve, reject });
-    child.stdin.write(JSON.stringify(payload) + "\n");
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (pending.has(id)) {
         pending.delete(id);
-        reject(new Error(`Timed out waiting for response to ${method}`));
+        reject(new Error(`Timed out after ${requestTimeoutMs}ms waiting for response to ${method}`));
       }
-    }, 5000);
+    }, requestTimeoutMs);
+    pending.set(id, { resolve, reject, timer });
+    child.stdin.write(JSON.stringify(payload) + "\n");
   });
 }
 
