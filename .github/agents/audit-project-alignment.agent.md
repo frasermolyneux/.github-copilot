@@ -4,6 +4,8 @@ description: Use when you need a read-only drift report for a target repository 
 tools: [read, search]
 argument-hint: Target repository folder/path to audit.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 # audit-project-alignment
 

@@ -1,6 +1,6 @@
 ---
-description: "Use when Conventions for any GitHub Actions workflow that builds, tests, deploys, or releases .NET projects. Layered on top of workflows.instructions.md and workflows.frasermolyneux-actions.instructions.md."
-applyTo: '.github/workflows/{build-and-test,pr-verify,codequality,deploy-dev,deploy-prd,release-version-and-tag,release-publish-nuget,copilot-setup-steps}.yml'
+description: "Automatic .NET CI conventions for canonical workflow filenames that build, test, deploy, release, or prepare .NET repositories."
+applyTo: '.github/workflows/{build-and-test,pr-verify,codequality,deploy-dev,deploy-prd,release-version-and-tag,release-publish-nuget,copilot-setup-steps}.{yml,yaml}'
 ---
 
 # .NET Workflow Conventions
@@ -75,18 +75,9 @@ dotnet format <solution-or-src-path> --verify-no-changes
 - Pinned `frasermolyneux/actions/dotnet-ci@dotnet-ci/v2`, `dotnet-web-ci@dotnet-web-ci/v2`, and `dotnet-func-ci@dotnet-func-ci/v2` include this gate natively; workflows using these pins are compliant without an extra workflow-level format step.
 - Add an explicit workflow-level `dotnet format --verify-no-changes` step only when .NET commands run outside those composites, when the workflow is pinned below v2, or when `skip-format-check: "true"` is intentionally set.
 
-## Setup-dotnet (manual setup workflows)
+## .NET in Copilot setup workflows
 
-When a workflow installs .NET directly (e.g. `copilot-setup-steps.yml`), use:
-
-```yaml
-- name: Setup .NET
-  uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2
-  with:
-    dotnet-version: |
-      9.0.x
-      10.0.x
-```
+For `.github/workflows/copilot-setup-steps.yml`, follow `workflows.copilot-setup-steps.instructions.md`. Install only the SDK version the repository actually requires; do not use a default .NET 9 + .NET 10 multi-version installation. If dependency restore needs repository files, run an exact `dotnet restore <solution-or-project>` step after `copilot-setup/v2`.
 
 ## Sonar / quality
 

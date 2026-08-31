@@ -1,180 +1,36 @@
-# AGENTS.md — <repo-name>
+# AGENTS.md — REPLACE_WITH_REPOSITORY_NAME
 
-<!-- One line: what this repo is + tech stack. Example:
-"ASP.NET Core 9 web front-end for the XtremeIdiots Portal. Razor + SCSS, Application Insights, deployed to Azure App Service via GitHub Actions." -->
+REPLACE_WITH_ONE_SENTENCE_REPOSITORY_PURPOSE_AND_STACK
 
-This file is the brief for the **GitHub Copilot coding agent** (and any other agent that follows the [agents.md](https://agents.md) convention) when it runs in a cloud runner without the local VS Code multi-root workspace context.
+Use `.github/copilot-instructions.md` for repository-wide facts and commands. Keep this file only when a portable cross-agent execution brief is intentional, and do not repeat those instructions here.
 
-> If you are a human reading this in VS Code, prefer `.github/copilot-instructions.md` for project orientation. `AGENTS.md` is the agent execution brief.
+## Key locations
 
----
+- `REPLACE_WITH_STRUCTURALLY_IMPORTANT_PATH` — REPLACE_WITH_WHY_IT_MATTERS
+- `REPLACE_WITH_STRUCTURALLY_IMPORTANT_PATH` — REPLACE_WITH_WHY_IT_MATTERS
 
-## Required reading (read these BEFORE doing any work)
+## Commands
 
-The `copilot-setup-steps.yml` workflow checks out `frasermolyneux/.github-copilot` at `./.github-copilot/` in the runner, so the paths below resolve.
+Include only commands verified for this repository. Remove commands and headings that do not apply.
+Mention setup-installed tools or pre-restored dependencies only when they materially change how agents execute these commands. Do not reference a shared `.github-copilot` checkout.
 
-1. `.github/copilot-instructions.md` — repo-specific orientation, build commands, conventions
-2. `.github-copilot/.github/instructions/personal.working-preferences.instructions.md` — Fraser's always-on rules: git hands-off, default to assigned branch, run `code-review` agent before reporting done
-3. `.github-copilot/.github/copilot-instructions.md` — org-wide context catalog (use as index for the layered instruction files below)
-4. Stack-specific files — see **Stack guardrails** below
-
----
-
-## Org conventions via MCP (when available)
-
-If a `frasermolyneux-copilot` MCP server is configured in your client (`~/.copilot/mcp-config.json`, VS Code user `mcp.json`, or an equivalent stdio MCP wire-up), **prefer its catalog tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
-
-This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
-
----
-
-## Stack guardrails
-
-<!-- List only the layers this repo consumes. Discover via:
-  - terraform_remote_state blocks in terraform/*.tf → which platform-* contracts apply
-  - <PackageReference Include="MX.*" /> in *.csproj → which shared NuGets apply
-  - frasermolyneux/actions/ references in .github/workflows/*.yml → which composites apply -->
-
-### Tenant facts (always-on)
-- `.github-copilot/.github/instructions/tenant.subscriptions.instructions.md`
-- `.github-copilot/.github/instructions/tenant.regions.instructions.md`
-- `.github-copilot/.github/instructions/tenant.identity.instructions.md`
-- `.github-copilot/.github/instructions/tenant.dns.instructions.md`
-- `.github-copilot/.github/instructions/tenant.network-topology.instructions.md`
-
-### Enforceable standards (apply to your changes)
-- `.github-copilot/.github/instructions/standards.oidc-and-secrets.instructions.md` — **no client secrets, ever**
-- `.github-copilot/.github/instructions/standards.branching-and-prs.instructions.md`
-<!-- Terraform repos add: -->
-- `.github-copilot/.github/instructions/standards.azure-naming.instructions.md`
-- `.github-copilot/.github/instructions/standards.azure-tagging.instructions.md`
-- `.github-copilot/.github/instructions/standards.terraform-style.instructions.md`
-<!-- .NET repos add: -->
-- `.github-copilot/.github/instructions/standards.dotnet-project.instructions.md`
-
-### Patterns (apply where relevant)
-<!-- Pick only the ones used by this repo. Examples:
-- patterns.terraform-remote-state.instructions.md
-- patterns.api-client.instructions.md
-- patterns.repository.instructions.md
-- patterns.versioned-apis.instructions.md
-- patterns.nbgv-versioning.instructions.md
-- patterns.scss-build.instructions.md -->
-
-### Platform consumption contracts (only those this repo consumes)
-<!-- e.g.:
-- platform.workloads.instructions.md
-- platform.monitoring.instructions.md
-- platform.connectivity.instructions.md -->
-
-### Shared library / automation contracts (only those this repo consumes)
-<!-- e.g.:
-- shared.api-client-abstractions.instructions.md
-- shared.observability-appinsights.instructions.md
-- shared.actions.instructions.md -->
-
----
-
-## Build, test, format
-
-<!-- Concrete commands. Examples below — adapt per repo. -->
-
-This repository must maintain a root `.gitattributes`: cross-platform .NET repositories use `* text=auto eol=lf` with matching C#/VB `.editorconfig` rules: `charset = utf-8`, `end_of_line = lf`, and `insert_final_newline = true`. Preserve binary attributes and documented Windows-only exceptions.
-
-```pwsh
-# Build
-dotnet build src/<Solution>.sln
-
-# Tests (excluding integration tests, matching CI)
-dotnet test src/<Solution>.sln --filter "FullyQualifiedName!~IntegrationTests"
-
-# Single test
-dotnet test src/<Solution>.sln --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
-
-# Format check
-dotnet format src/<Solution>.sln --verify-no-changes
+```text
+REPLACE_WITH_EXACT_BOOTSTRAP_COMMAND_OR_REMOVE
+REPLACE_WITH_EXACT_BUILD_COMMAND_OR_REMOVE
+REPLACE_WITH_EXACT_TARGETED_TEST_COMMAND_OR_REMOVE
+REPLACE_WITH_EXACT_FORMAT_COMMAND_OR_REMOVE
 ```
 
-### .NET completion gate (required for sign-off)
+## Repository-specific constraints
 
-Before declaring any .NET-related change complete (for example changes to `.cs`, `.csproj`, `.sln`, `.slnx`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, or `.vscode/tasks.json`), validate both build and format checks:
+- REPLACE_WITH_NON_OBVIOUS_CONSTRAINT_THAT_AFFECTS_IMPLEMENTATION
 
-1. Prefer VS Code tasks when available in the target repo:
-  - run the build task (prefer `dotnet: build`)
-  - run the format task (prefer `dotnet: format`, which must include `--verify-no-changes`)
-2. Fallback when tasks are not available:
+## Scoped documentation
 
-```pwsh
-dotnet build <solution-or-src-path>
-dotnet format <solution-or-src-path> --verify-no-changes
-```
+- `REPLACE_WITH_REPOSITORY_LOCAL_PATH` — REPLACE_WITH_WHEN_TO_CONSULT_IT
 
-If either validation fails, do not sign off completion.
+## Do not
 
-<!-- Terraform repos: -->
+- REPLACE_WITH_MATERIAL_REPOSITORY_SPECIFIC_RISK
 
-```pwsh
-terraform -chdir=terraform fmt -check -recursive
-terraform -chdir=terraform init -backend-config=backends/dev.backend.hcl
-terraform -chdir=terraform validate
-terraform -chdir=terraform plan -var-file=tfvars/dev.tfvars
-```
-
----
-
-## Do NOT
-
-- ❌ Do not `git commit`, `git push`, force-push, rebase, `reset --hard`, or create/delete branches. Work on the branch you were assigned to.
-- ❌ Do not introduce client secrets, connection strings, or hard-coded subscription IDs / GUIDs. Auth is OIDC + managed identity only — see `standards.oidc-and-secrets.instructions.md`.
-- ❌ Do not bypass `terraform fmt`, `dotnet format`, test runs, or other validation gates.
-- ❌ Do not change resource naming/tagging conventions — they are enforced (`standards.azure-naming.instructions.md`, `standards.azure-tagging.instructions.md`).
-- ❌ Do not pull context from sibling workspace folders. Only what is inside this repo and `./.github-copilot/` is in scope.
-- ❌ Do not assume tools/SDKs are installed beyond what `.github/workflows/copilot-setup-steps.yml` provisions. If you need more, add the step and explain why.
-- ❌ Do not modify `.github/workflows/`, `.github/dependabot.yml`, `version.json`, `Directory.Build.props`, or any `platform-*` consumption wiring unless that is the explicit task.
-
-<!-- Repo-specific "do nots" go here. Examples:
-- portal-repository-func: Do not add FTP/RCON/Service Bus/GeoLocation dependencies — wrong repo.
-- portal-server-agent: Do not add Service Bus consumer logic — that belongs in portal-server-events. -->
-
----
-
-## Opening the PR
-
-You MUST use `.github/PULL_REQUEST_TEMPLATE.md` as your PR body — do **not** write a freeform body. The org template is inherited from `frasermolyneux/.github` and GitHub pre-populates it when you open the PR. Concretely:
-
-1. Fill `## Summary` (one line) and `Closes #<issue>`.
-2. Tick the relevant `## Type of change` box.
-3. Paste the **actual command output** from your Build, Tests, and Format check runs into `## Validation evidence`. Show the real summary line, not "tests passed".
-4. Fill `## Risk and rollout` — blast radius, auto-deploy?, manual steps post-merge, rollback plan.
-5. Tick **every** box in `## Agent attestation`.
-6. Delete `## Consumer impact` only if no published contract (Abstractions / Client NuGet / Service Bus DTO / Terraform output) changed.
-
-Complete the `## Agent attestation` section before requesting review; reviewers use it as a readiness checklist.
-
----
-
-## Pre-PR checks (run before you open the PR)
-
-- [ ] Build succeeds locally / in CI
-- [ ] Tests pass (excluding integration tests where applicable)
-- [ ] Format check passes (`terraform fmt -check` / `dotnet format --verify-no-changes`)
-- [ ] For .NET changes, build + format were run using VS Code tasks when available, with fallback commands used only when tasks are missing
-- [ ] No new secrets / GUIDs / connection strings introduced
-- [ ] Changes align with files in **Stack guardrails**
-- [ ] `code-review` sub-agent run; High/Medium findings resolved or justified in the PR body
-
----
-
-## Escalation
-
-If you hit any of the conditions below, **open the PR as draft** and **apply the `needs-decision` label** instead of pushing forward to ready-for-review. Post a comment on the originating issue summarising what's blocking you and what decision is needed.
-
-This protects against the agent silently expanding scope, bypassing a contract change, or merging a half-resolved review finding.
-
-Stop and escalate when:
-
-- Required reading file is missing or conflicting.
-- The change would require touching `.github/workflows/`, `version.json`, or `platform-*` wiring outside the stated scope.
-- A `code-review` finding is High severity and you cannot resolve it without expanding scope.
-- A required tool/SDK is unavailable in the runner and `copilot-setup-steps.yml` would need significant modification.
-- The acceptance criteria are ambiguous or contradict the linked instruction files.
+Generation is incomplete if any `REPLACE_WITH_` token remains. Remove empty sections rather than retaining generic guidance.

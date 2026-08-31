@@ -1,6 +1,6 @@
 ---
-description: "Use when .NET project file (csproj/Directory.Build.props) conventions for the frasermolyneux organization."
-applyTo: '**/*.csproj,**/Directory.Build.props,**/Directory.Packages.props'
+description: "Automatic organization conventions for .NET project and central build configuration files."
+applyTo: '**/*.csproj,**/*.fsproj,**/*.vbproj,**/Directory.Build.props,**/Directory.Packages.props'
 ---
 # Standard — .NET Project Files
 

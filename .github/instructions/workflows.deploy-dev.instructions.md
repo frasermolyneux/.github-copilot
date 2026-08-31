@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Deploy Dev workflow — manual deployment to the Development environment. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, and workflows.frasermolyneux-actions.instructions.md."
-applyTo: '**/deploy-dev.yml'
+description: "Automatic canonical template rules for .github/workflows/deploy-dev.yml."
+applyTo: '.github/workflows/deploy-dev.yml,.github/workflows/deploy-dev.yaml'
 ---
 
 # `deploy-dev.yml` Pattern

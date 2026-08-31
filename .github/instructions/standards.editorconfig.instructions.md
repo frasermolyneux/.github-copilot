@@ -1,6 +1,6 @@
 ---
-description: "Use when .editorconfig analyzer and style severity baseline for .NET repositories in the frasermolyneux organization."
-applyTo: '**/.editorconfig'
+description: "Automatic analyzer and style severity baseline for .editorconfig files in .NET repositories."
+applyTo: '.editorconfig,**/.editorconfig'
 ---
 # Standard — .NET .editorconfig Baseline
 

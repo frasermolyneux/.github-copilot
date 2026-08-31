@@ -1,17 +1,17 @@
 ---
 name: code-review
-description: Use when you need a read-only review of in-progress changes against org tenant facts, standards, patterns, and platform/shared consumption contracts before declaring work complete.
+description: Optional, manually requested read-only review of in-progress changes against org tenant facts, standards, patterns, and platform/shared consumption contracts.
 tools: [read, search]
 argument-hint: Summary of what changed, why, scope hint, and any explicit out-of-scope areas.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 # code-review
 
 You are a focused, read-only reviewer for changed files.
 
-Invoked by the main agent **before declaring non-trivial work as "done"**, per `personal.working-preferences.instructions.md`. Acts as a structured rubber-duck pass over the diff and the files it touches.
-
-This is the **completion gate** for the working-preferences rule. The main agent must surface the findings (or note that none were raised) before reporting completion to the user.
+This agent is available for explicit, manual invocation when the user wants a structured rubber-duck pass over a diff and the files it touches. It is not an automatic completion gate.
 
 ## Inputs
 
@@ -89,10 +89,7 @@ Stylistic observations, follow-up ideas, or things that need human judgement.
 Brief list — what the change got right. Optional but useful when verdict is "Safe to proceed".
 ```
 
-The main agent should then either fix the High/Medium findings before declaring done, or explicitly tell the user which findings it is deferring and why.
-
 ## Cross-references
 
-- `personal.working-preferences.instructions.md` — defines when this agent must be invoked.
 - `audit-project-alignment.agent.md` — whole-repo drift audit (broader scope, different trigger).
 - `audit-project-workflows.agent.md` — workflow-specific drift audit.

@@ -1,6 +1,5 @@
 ---
-description: "Use when Shared conventions for any .NET library in this org that publishes one or more NuGet packages."
-applyTo: '**/src/**/*.cs,**/version.json,**/*.csproj,**/Directory.Build.props,**/Directory.Packages.props'
+description: "Use only when a .NET repository publishes one or more organization NuGet packages."
 ---
 
 # .NET NuGet Library Conventions
@@ -51,7 +50,7 @@ For NuGet-publishing repositories, keep the org warning/style baseline in root `
 
 - Versioning is driven by Nerdbank.GitVersioning (`version.json` at the repo root).
 - Release flow: `release-version-and-tag.yml` creates a tag, then `release-publish-nuget.yml` publishes to NuGet.org and creates a GitHub Release.
-- Other standard workflows: `build-and-test.yml`, `pr-verify.yml`, `codequality.yml` (SonarCloud + CodeQL), `dependabot-automerge.yml`, `copilot-setup-steps.yml`.
+- Other standard workflows: `build-and-test.yml`, `pr-verify.yml`, `codequality.yml` (SonarCloud + CodeQL), and `dependabot-automerge.yml`. Add `copilot-setup-steps.yml` only when pre-agent prerequisites are required.
 
 ## GitHub NuGet Integration
 

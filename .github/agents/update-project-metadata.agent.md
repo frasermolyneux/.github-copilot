@@ -4,6 +4,8 @@ description: Use when you need to align a target repository's metadata files (RE
 tools: [read, search, edit]
 argument-hint: Target repository folder/path to update.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 # update-project-metadata
 
@@ -36,8 +38,9 @@ The universal rules in `metadata.instructions.md` apply to all applicable steps 
 - [ ] `CONTRIBUTING.md` matches the canonical verbatim content in `metadata.contributing.instructions.md`.
 - [ ] `SECURITY.md` matches the canonical verbatim content in `metadata.security.instructions.md`.
 - [ ] `.github/copilot-instructions.md` is concise, actionable, codebase-specific, and follows the guidelines in `metadata.copilot-instructions.instructions.md`.
-- [ ] `AGENTS.md` exists at repository root and follows `metadata.agents.instructions.md`, including required reading, stack guardrails, validation commands, and escalation guidance.
-- [ ] For .NET repositories, `AGENTS.md` includes the tasks-first .NET completion gate requiring both build and `dotnet format --verify-no-changes` with fallback commands when tasks are unavailable.
+- [ ] `AGENTS.md` exists only when a portable execution brief is intentional and follows `metadata.agents.instructions.md`.
+- [ ] `AGENTS.md` contains exact repository commands, no unresolved template tokens, no shared-catalog reading or cloud-runner `.github-copilot` path requirement, and no duplication of `.github/copilot-instructions.md`.
+- [ ] Setup steps appear in `AGENTS.md` only when installed tools or deterministic dependency restore materially affect execution.
 - [ ] A `docs/` folder exists at the repo root; loose documentation files (other than the core metadata files) have been moved into it.
 
 ## Output format

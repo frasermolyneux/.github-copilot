@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-connectivity — DNS zones (public and private) and DNS resource group."
-applyTo: '**/*.tf,**/*.tfvars'
+description: "Use only when a repository consumes DNS outputs from platform-connectivity."
 ---
 # platform-connectivity — Consumer Contract
 

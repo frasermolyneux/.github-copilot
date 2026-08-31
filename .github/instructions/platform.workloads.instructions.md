@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-workloads — workload identities, GitHub/ADO wiring, resource groups, state storage."
-applyTo: '**/*.tf,**/*.tfvars,**/workloads/*.json'
+description: "Use only when defining or consuming platform-workloads identities, resource groups, CI wiring, or Terraform state."
 ---
 # platform-workloads — Consumer Contract
 

@@ -1,157 +1,45 @@
 ---
-description: "Use when Canonical guidance for per-repo AGENTS.md files — the cloud-agent entry point that survives outside the local VS Code workspace."
+description: "Automatic content rules for the repository-root AGENTS.md execution brief."
 applyTo: 'AGENTS.md'
 ---
 # AGENTS.md — Generation Guidelines
 
-`AGENTS.md` lives at the **repository root** and is the **primary brief for the GitHub Copilot coding agent** (and any other AI agent that follows the [agents.md](https://agents.md) convention) when it runs in a cloud runner.
+Create `AGENTS.md` only when portability across agents or execution environments is intentional. Repository-native `.github/copilot-instructions.md` remains authoritative for routine repository work.
 
-This file matters because the cloud agent **does not** load the layered `applyTo:` instructions in `.github-copilot/.github/instructions/`. It loads `.github/copilot-instructions.md` and (increasingly) `AGENTS.md`. Without an `AGENTS.md`, the agent works in the dark.
+## Canonical role
 
-Apply the universal rules in `metadata.instructions.md` first.
+`AGENTS.md` is a concise cross-agent execution brief. It must not repeat repository-wide facts, commands, catalogs, or policies already present in `.github/copilot-instructions.md`.
 
-## Required structure
+Do not require a checkout of `frasermolyneux/.github-copilot`, mandatory shared-catalog reading, or MCP access. Link only to repository-local scoped documentation that the agent may need for a particular work area.
 
-Every per-repo `AGENTS.md` must contain these sections, in this order:
+Mention Copilot setup steps only when installed tools or restored dependencies materially affect agent execution. Never describe `.github-copilot` as a runner-relative path or imply that setup clones shared instructions; repository-native instructions and skills are authoritative.
 
-### 1. Heading + one-line repo summary
+## Required content
 
-```markdown
-# AGENTS.md — <repo name>
+Include only applicable sections:
 
-<one-line: what this repo is and the tech stack>
-```
+1. **Repository purpose and stack** — a few accurate lines.
+2. **Key locations** — only paths that explain the repository structure.
+3. **Commands** — exact, verified bootstrap, build, targeted test, and format commands for this repository.
+4. **Repository-specific constraints** — non-obvious implementation boundaries not already stated in repository instructions.
+5. **Scoped documentation** — repository-local links with a clear condition for consulting each one.
+6. **Do not** — a short list of material repository-specific risks.
 
-### 2. Required reading
+Omit a command or section when it does not apply. Never include simultaneous generic .NET and Terraform examples, generic PR procedures, review-agent processes, personal Git preferences, tenant/platform catalogs, or pre-PR checklists.
 
-Hard-coded list of files the agent **must read** before doing any work. Use repository-root-relative paths so they work in the cloud runner (where `frasermolyneux/.github-copilot` is checked out at `./.github-copilot/` by `copilot-setup-steps.yml`).
+## Generation process
 
-Standard required reads:
+1. Read the existing repository instructions and inspect the actual stack, scripts, workflows, and important directories.
+2. Preserve accurate repository-specific content from an existing `AGENTS.md`.
+3. Start from `templates/AGENTS.md`, replacing every `REPLACE_WITH_` token.
+4. Remove empty or inapplicable sections.
+5. Confirm every command and path resolves within the target repository.
+6. Confirm the result adds portable execution value without duplicating `.github/copilot-instructions.md`.
 
-```markdown
-## Required reading (read these first)
-
-1. `.github/copilot-instructions.md` — repo-specific orientation
-2. `.github-copilot/.github/instructions/personal.working-preferences.instructions.md` — Fraser's always-on rules (git hands-off, default to `main`, `code-review` gate)
-3. `.github-copilot/.github/copilot-instructions.md` — org-wide context catalog
-4. Stack-specific instruction files for the work area (see Stack guardrails below)
-```
-
-### 2a. Catalog via MCP (when available)
-
-Immediately after the Required reading list, insert the bootstrap snippet below verbatim. It tells MCP-capable agents to call the org catalog server when one is wired into the client. The snippet is intentionally **conditional** — it reads as a no-op in a repo where no MCP server is configured, and activates cleanly once one is. Do not rephrase it to claim a server "is" configured (local MCP wiring is optional and per-developer). Keep this byte-identical to the version in `metadata.copilot-instructions.instructions.md` (that file is the source-of-truth).
-
-````markdown
-## Org conventions via MCP (when available)
-
-If a `frasermolyneux-copilot` MCP server is configured in your client (`~/.copilot/mcp-config.json`, VS Code user `mcp.json`, or an equivalent stdio MCP wire-up), **prefer its catalog tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
-
-This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
-````
-
-### 3. Stack guardrails
-
-Per-stack lists of which `standards.*` / `patterns.*` / `platform.*` / `shared.*` files apply to this repo. Pull from `.github-copilot/.github/copilot-instructions.md` and only include the layers this repo actually consumes (discovered via `terraform_remote_state` blocks, `<PackageReference>` entries, etc.).
-
-### 4. Build / test / run commands
-
-The exact commands the agent must use to validate its changes. Include:
-
-- Build, test, format-check (e.g. `terraform fmt -check -recursive`, `dotnet format --verify-no-changes`).
-- Single-test invocation pattern.
-- Filter pattern to skip slow tests (e.g. `--filter "FullyQualifiedName!~IntegrationTests"`).
-- Local dev runners (`func host start`, `dotnet watch`, `npm run watch:css`) only if relevant.
-
-Every repository must have a root `.gitattributes`. Cross-platform .NET repositories use `* text=auto eol=lf` and matching C#/VB `.editorconfig` rules: `charset = utf-8`, `end_of_line = lf`, and `insert_final_newline = true`. Preserve binary attributes and documented Windows-only exceptions.
-
-### 5. Do NOT
-
-A short, blunt list of things the agent must not do. Standard items:
-
-```markdown
-## Do NOT
-
-- ❌ Do not `git commit`, `git push`, force-push, rebase, reset --hard, or create/delete branches. Work on the assigned branch.
-- ❌ Do not introduce client secrets, connection strings, or hard-coded subscription IDs / GUIDs. Auth is OIDC + managed identity only.
-- ❌ Do not bypass `terraform fmt`, `dotnet format`, test runs, or other validation gates.
-- ❌ Do not change resource naming/tagging conventions (see `standards.azure-naming.instructions.md` / `standards.azure-tagging.instructions.md`).
-- ❌ Do not pull context from sibling workspace folders — only what's inside this repo and `./.github-copilot/`.
-- ❌ Do not assume tools/SDKs are installed beyond what `copilot-setup-steps.yml` provisions.
-```
-
-Append repo-specific "do nots" (e.g. portal-repository-func: "Do not add FTP/RCON/Service Bus dependencies — wrong repo").
-
-### 6. Opening the PR
-
-A blunt, non-negotiable mandate that the agent uses the org PR template verbatim — **not** a freeform body.
-
-```markdown
-## Opening the PR
-
-You MUST use `.github/PULL_REQUEST_TEMPLATE.md` as your PR body — do **not** write a freeform body. The org template is inherited from `frasermolyneux/.github` and GitHub pre-populates it when you open the PR. Concretely:
-
-1. Fill `## Summary` (one line) and `Closes #<issue>`.
-2. Tick the relevant `## Type of change` box.
-3. Paste the **actual command output** from your Build, Tests, and Format check runs into `## Validation evidence`. Show the real summary line, not "tests passed".
-4. Fill `## Risk and rollout` — blast radius, auto-deploy?, manual steps post-merge, rollback plan.
-5. Tick **every** box in `## Agent attestation`.
-6. Delete `## Consumer impact` only if no published contract (Abstractions / Client NuGet / Service Bus DTO / Terraform output) changed.
-
-Complete the `## Agent attestation` section before requesting review; reviewers use it as a readiness checklist.
-```
-
-### 7. Pre-PR checks
-
-Concrete checklist of commands the agent runs **before** opening the PR. Distinct from the PR body — these are the things the agent verifies locally so it can paste the output into `## Validation evidence`.
-
-```markdown
-## Pre-PR checks (run before you open the PR)
-
-- [ ] Build succeeds
-- [ ] Tests pass (excluding integration tests where applicable)
-- [ ] Format check passes
-- [ ] No new secrets / GUIDs / connection strings introduced
-- [ ] Changes match the conventions referenced in Required reading
-- [ ] `code-review` sub-agent run; High/Medium findings resolved or justified in the PR body
-```
-
-### 8. Escalation
-
-A short list of conditions under which the agent must **stop and ask** rather than push forward.
-
-Standard escalation behaviour — include verbatim at the top of every per-repo Escalation section:
-
-```markdown
-## Escalation
-
-If you hit any of the conditions below, **open the PR as draft** and **apply the `needs-decision` label** instead of pushing forward to ready-for-review. Post a comment on the originating issue summarising what's blocking you and what decision is needed.
-
-This protects against the agent silently expanding scope, bypassing a contract change, or merging a half-resolved review finding.
-```
-
-Then list the repo-specific conditions (missing required-reading file, scope creep into another repo, breaking contract change, unresolvable High `code-review` finding, runner tooling gap, ambiguous acceptance criteria, etc.).
-
-The `needs-decision` label is the human's filter for "agent needs me" — humans triage these before any other PRs. The draft status keeps the PR out of the merge queue until the decision is made.
-
-## Style and length
-
-- **Concise and agent-friendly.** Target ~60–120 lines. Bullets and code blocks over prose.
-- **Use repository-root-relative paths**, never `../../`. Paths must resolve in the cloud runner. In the **Stack guardrails** section, listing the bare basename of a file under `.github-copilot/.github/instructions/` (e.g. `tenant.subscriptions`, `standards.dotnet-project`, `patterns.api-client`) is acceptable as a terser alternative to the full path — the agent will resolve it via search. Use full paths in **Required reading** so links are click-through-friendly.
-- **Avoid duplication** with `.github/copilot-instructions.md` — `AGENTS.md` is the agent-task-execution brief; `copilot-instructions.md` is the project orientation. They can reference each other.
-- **Self-sufficient.** Assume the agent will not load anything beyond what is explicitly listed in Required reading.
-
-## Iteration
-
-After authoring/updating, ask the user for feedback on any gaps and refine. As the repo evolves (new stack, new platform consumer, new test category), update `AGENTS.md`.
-
-## Reference template
-
-See `.github-copilot/templates/AGENTS.md` for the canonical skeleton.
+Target roughly 25–60 lines. Prefer direct bullets and exact commands over explanatory prose.
 
 ## Cross-references
 
-- `metadata.instructions.md` — universal metadata rules
-- `metadata.copilot-instructions.instructions.md` — sister file for `.github/copilot-instructions.md`
-- `personal.working-preferences.instructions.md` — always-on git/branching/code-review rules
-- [agents.md](https://agents.md) — the cross-tool convention this file implements
-- `mcp-server/README.md` — MCP server install / wire-up / tool contract
+- `metadata.instructions.md` — universal metadata editing rules.
+- `metadata.copilot-instructions.instructions.md` — repository-wide instruction guidance.
+- `templates/AGENTS.md` — concise generation skeleton.

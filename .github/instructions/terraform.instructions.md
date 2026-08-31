@@ -1,5 +1,5 @@
 ---
-description: "Use when Shared Terraform conventions for all gh-frasermolyneux repositories that contain Terraform code."
+description: "Automatic baseline conventions for Terraform, tfvars, and backend configuration files."
 applyTo: '**/*.tf,**/*.tfvars,**/backends/*.hcl'
 ---
 
@@ -87,6 +87,7 @@ All Terraform stacks consume the standard workflow set from `frasermolyneux/acti
 - `deploy-dev.yml` — Manual dispatch for Dev plan and apply.
 - `deploy-prd.yml` — Push to `main`, weekly schedule, or manual dispatch; runs Dev apply then Prd apply.
 - `destroy-development.yml` / `destroy-environment.yml` — Manual teardown.
-- `codequality.yml`, `dependabot-automerge.yml`, `copilot-setup-steps.yml` — Maintenance.
+- `codequality.yml`, `dependabot-automerge.yml` — Maintenance.
+- `copilot-setup-steps.yml` — Optional pre-agent prerequisites only; omit when the normal runner is sufficient.
 
 See the org-level `copilot-instructions.md` and `.github/instructions/workflows.deploy-prd.instructions.md` for scheduling rules.

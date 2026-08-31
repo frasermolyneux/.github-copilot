@@ -1,6 +1,5 @@
 ---
-description: "Use when Catalog of frasermolyneux/actions composite actions and reusable workflows, with the canonical pinned versions. Use this as the single source of truth for action references — per-workflow instructions reference this file rather than duplicating versions."
-applyTo: '.github/workflows/**/*.yml'
+description: "Reference catalog of frasermolyneux/actions composites and reusable workflows with canonical version pins."
 ---
 
 # `frasermolyneux/actions` Catalog
@@ -13,6 +12,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 - Reusable workflows (`uses: frasermolyneux/actions/.github/workflows/<name>.yml@<ref>`) currently pin to `@main` because they are versioned by the catalog repo's main branch — this is the documented exception.
 - When bumping a tag, update this file once and propagate to every Layer-3 instruction that references it.
 - For a brand-new composite action pin, merge `actions/` first and verify the rolling tag exists before rolling the pin into consumer repos.
+- `copilot-setup/v2` is prepared but not yet a usable consumer pin. Do not migrate consumer workflows until the tag exists.
 
 ## Composite actions
 
@@ -38,7 +38,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/wait-for-version` | `@wait-for-version/v1.0` | Poll an `info-url` until `expected-version` is live |
 | `frasermolyneux/actions/apim-api-import` | `@apim-api-import/v1.0` | Import an OpenAPI definition into Azure API Management |
 | `frasermolyneux/actions/dotnet-playwright-tests` | `@dotnet-playwright-tests/v1.1` | Run Playwright end-to-end tests against a deployed .NET app |
-| `frasermolyneux/actions/copilot-setup` | `@copilot-setup/v1` | Standard pre-session setup for Copilot coding-agent workflows (checkouts + optional runtimes) |
+| `frasermolyneux/actions/copilot-setup` | `@copilot-setup/v2` *(release prerequisite)* | Optional repository checkout and explicit runtime setup for Copilot coding-agent workflows |
 
 ## Reusable workflows
 

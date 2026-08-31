@@ -1,6 +1,6 @@
 ---
-description: "Use when Nerdbank.GitVersioning (NBGV) pattern — version.json placement, computed versions, release flow."
-applyTo: '**/version.json,**/*.csproj,**/*.sln'
+description: "Automatic Nerdbank.GitVersioning rules for version.json files; retrieve manually for broader release-flow guidance."
+applyTo: '**/version.json'
 ---
 # Pattern — NBGV Versioning
 

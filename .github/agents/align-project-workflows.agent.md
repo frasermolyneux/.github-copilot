@@ -4,6 +4,8 @@ description: Use when you need to align a target repository's canonical GitHub A
 tools: [read, search, edit]
 argument-hint: Target repo folder name/path and whether destroy-development.yml should be included.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # align-project-workflows
@@ -56,7 +58,7 @@ Run each applicable prompt in order against the target folder.
 | 5 | `update-deploy-dev-workflow` | `workflows.deploy-dev.instructions.md` | Deployable repos only |
 | 6 | `update-deploy-prd-workflow` | `workflows.deploy-prd.instructions.md` | Deployable repos only |
 | 7 | `update-codequality-workflow` | `workflows.codequality.instructions.md` | Always |
-| 8 | `update-copilot-setup-steps-workflow` | `workflows.copilot-setup-steps.instructions.md` | Always |
+| 8 | `update-copilot-setup-steps-workflow` | `workflows.copilot-setup-steps.instructions.md` | Evaluate every repo; create or retain only when pre-agent setup is required |
 | 9 | `update-release-version-and-tag-workflow` | `workflows.release-version-and-tag.instructions.md` | NuGet repos only |
 | 10 | `update-release-publish-nuget-workflow` | `workflows.release-publish-nuget.instructions.md` | NuGet repos only |
 | 11 | `update-destroy-environment-workflow` | `workflows.destroy-environment.instructions.md` | Terraform repos only |
@@ -91,8 +93,8 @@ After all applicable updates run:
 7. For `.github/dependabot.yml`, confirm `groups.all-updates.patterns: ["*"]` uses the exact key name `all-updates` and each ecosystem uses `timezone: "Etc/UTC"`.
 8. If Monday/Sunday slots overlap with another repo, confirm overlap is explicitly documented in `docs/ops-clock.md` and that each repo's Sunday Dependabot time matches its Monday codequality time.
 9. For `destroy-development.yml`, treat repo-specific pre-destroy extension steps as allowed when canonical trigger/permissions/concurrency/terraform-destroy inputs remain compliant.
+10. For `copilot-setup-steps.yml`, prefer absence when no pre-agent customization is required. When present, distinguish runtime-only setup from checkout-plus-deterministic-restore and verify that the `copilot-setup/v2` release prerequisite is satisfied before rollout.
 
 ## Bespoke workflows
 
 If the target repo contains bespoke workflows (`actions-versioning.yml`, `code-quality.yml`, `devops-secure-scanning.yml`, `estate-sync.yml`, `feature-development.yml`, `decommission-state-rm.yml`, `update-dashboard-from-staging.yml`), do **not** try to align them with a Layer-3 template — they have none. Apply only the universal/category rules from `workflows.instructions.md` and the category files.
-

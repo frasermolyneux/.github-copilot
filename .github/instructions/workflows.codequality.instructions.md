@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Code Quality workflow (Sonar + DevOps secure scanning + dependency review). Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, workflows.security.instructions.md, and workflows.scheduling.instructions.md."
-applyTo: '**/codequality.yml'
+description: "Automatic canonical template rules for .github/workflows/codequality.yml."
+applyTo: '.github/workflows/codequality.yml,.github/workflows/codequality.yaml'
 ---
 
 # `codequality.yml` Pattern

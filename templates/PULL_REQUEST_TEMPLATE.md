@@ -26,17 +26,16 @@ Closes #
 - [ ] dependencies
 - [ ] breaking change
 
-## Required reading consulted
+## Guidance consulted
 
 <!--
-For Copilot coding agent PRs: tick the ones that applied to this change.
+For Copilot coding agent PRs: tick the guidance that applied to this change.
 Humans can leave blank if the change is trivial.
 -->
 
-- [ ] `AGENTS.md` (repo brief)
-- [ ] `.github/copilot-instructions.md` (repo orientation)
-- [ ] `.github-copilot/.github/instructions/personal.working-preferences.instructions.md` (always-on rules)
-- [ ] Stack-specific instruction files referenced in `AGENTS.md` (`standards.*`, `patterns.*`, `platform.*`, `shared.*`)
+- [ ] Repository-native instructions
+- [ ] Targeted scoped instructions relevant to the changed files
+- [ ] Organization guidance or external contracts retrieved on demand
 
 ## Validation evidence
 
@@ -113,7 +112,6 @@ Every box below must be verifiable from the PR itself (diff, validation evidence
 Do not add ceremonial boxes — they get ticked mechanically and add no safety.
 -->
 
-- [ ] Ran `code-review` sub-agent; High/Medium findings resolved or justified above in **Reviewer focus areas**
 - [ ] PR body cites each acceptance criterion from the linked issue
 - [ ] No client secrets, GUIDs, connection strings, or hard-coded subscription IDs introduced (`standards.oidc-and-secrets.instructions.md`)
 

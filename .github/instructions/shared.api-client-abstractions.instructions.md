@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for api-client-abstractions — MX.Api.Abstractions NuGet (base types for typed API clients)."
-applyTo: '**/*.cs,**/*.csproj'
+description: "Use only when working with the MX.Api.Abstractions NuGet package."
 ---
 # api-client-abstractions — Consumer Contract
 

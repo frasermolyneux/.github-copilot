@@ -205,10 +205,47 @@ async function run() {
   if (recommendResp.error) throw new Error(`tools/call recommend_entries failed: ${JSON.stringify(recommendResp.error)}`);
   const recommendText = recommendResp.result?.content?.[0]?.text ?? "{}";
   const recommend = JSON.parse(recommendText);
-  if (!Array.isArray(recommend?.instructions) || !Array.isArray(recommend?.agents) || !Array.isArray(recommend?.prompts)) {
+  if (!Array.isArray(recommend?.instructions) || !Array.isArray(recommend?.agents) || !Array.isArray(recommend?.prompts) || !Array.isArray(recommend?.skills)) {
     throw new Error("recommend_entries returned invalid grouped recommendations");
   }
-  console.log(`recommend_entries returned instructions=${recommend.instructions.length}, prompts=${recommend.prompts.length}, agents=${recommend.agents.length}`);
+  console.log(`recommend_entries returned instructions=${recommend.instructions.length}, prompts=${recommend.prompts.length}, agents=${recommend.agents.length}, skills=${recommend.skills.length}`);
+
+  const setupRecommendResp = await send("tools/call", {
+    name: "recommend_entries",
+    arguments: { task: "configure Copilot cloud agent runtime and deterministic dependency restore setup workflow" },
+  });
+  if (setupRecommendResp.error) throw new Error(`tools/call setup recommend_entries failed: ${JSON.stringify(setupRecommendResp.error)}`);
+  const setupRecommendText = setupRecommendResp.result?.content?.[0]?.text ?? "{}";
+  const setupRecommend = JSON.parse(setupRecommendText);
+  if (!setupRecommend.instructions?.some((instruction) => instruction.name === "workflows.copilot-setup-steps")) {
+    throw new Error("recommend_entries did not discover workflows.copilot-setup-steps for cloud-agent setup");
+  }
+  console.log("recommend_entries discovered workflows.copilot-setup-steps for cloud-agent setup");
+
+  const skillsResp = await send("tools/call", {
+    name: "list_skills",
+    arguments: {},
+  });
+  if (skillsResp.error) throw new Error(`tools/call list_skills failed: ${JSON.stringify(skillsResp.error)}`);
+  const skillsText = skillsResp.result?.content?.[0]?.text ?? "[]";
+  const skills = JSON.parse(skillsText);
+  const boundarySkill = skills.find((skill) => skill.name === "nuget-dependency-boundary");
+  if (!boundarySkill || !boundarySkill.path.endsWith("nuget-dependency-boundary\\SKILL.md") && !boundarySkill.path.endsWith("nuget-dependency-boundary/SKILL.md")) {
+    throw new Error("list_skills did not discover nuget-dependency-boundary/SKILL.md");
+  }
+  console.log(`list_skills discovered ${boundarySkill.name}`);
+
+  const packageRecommendResp = await send("tools/call", {
+    name: "recommend_entries",
+    arguments: { task: "consumer work blocked by an unpublished cross-repository NuGet package" },
+  });
+  if (packageRecommendResp.error) throw new Error(`tools/call package recommend_entries failed: ${JSON.stringify(packageRecommendResp.error)}`);
+  const packageRecommendText = packageRecommendResp.result?.content?.[0]?.text ?? "{}";
+  const packageRecommend = JSON.parse(packageRecommendText);
+  if (!packageRecommend.skills?.some((skill) => skill.name === "nuget-dependency-boundary")) {
+    throw new Error("recommend_entries did not discover the NuGet dependency boundary skill");
+  }
+  console.log("recommend_entries discovered nuget-dependency-boundary for an unpublished package task");
 
   console.log("SMOKE OK");
 }

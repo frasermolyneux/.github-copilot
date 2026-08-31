@@ -1,40 +1,84 @@
 # .github-copilot
 
-Shared GitHub Copilot instructions, prompts, and agent specs for the frasermolyneux organization. Keep this repo open in the same VS Code workspace as any project so Copilot can apply the guidance automatically.
+Shared GitHub Copilot customization and an on-demand MCP catalog for the `frasermolyneux` organization.
 
-## Repository Purpose
-- Provide a single source of truth for Copilot instructions across projects.
-- Supply vetted prompt and agent templates that follow GitHub best practices.
-- Document how to extend and validate the instruction set as requirements evolve.
+## Customization model
+
+Each rule or procedure has one canonical location:
+
+| Primitive | Use |
+|---|---|
+| `.github/copilot-instructions.md` | Concise repository-wide facts and commands relevant to almost every task. |
+| `.github/instructions/*.instructions.md` | Path-scoped automatic rules when `applyTo` is present; manual/reference entries when it is absent. |
+| `AGENTS.md` | Concise portable execution brief when cross-agent support is intentional; it does not repeat repository instructions. |
+| Skills | Optional reusable multi-step procedures in `.github/skills/<name>/SKILL.md`. |
+| Prompt files | Manually invoked VS Code Local workflows, not automatic policy. |
+| Custom agents | Manually selected specialist personas or tool boundaries. |
+| MCP | On-demand access to organization standards or external/dynamic contracts missing from the current repository. |
+| Hooks | Fast deterministic enforcement only, not planning, review, or full-suite validation. |
+
+## Access strategy
+
+- **Repository-local routine work:** use the repository's native instructions.
+- **Local single-repository session needing organization knowledge:** query the `frasermolyneux-copilot` MCP catalog on demand.
+- **Multi-root session with `.github-copilot` deliberately open:** read the workspace files directly; do not also query MCP for the same information.
+- **Cloud coding agent:** use repository-native instructions and skills. A shared-repository checkout is not required merely to obtain instructions.
+- **GitHub.com Chat:** rely on the concise repository and organization instructions supported by that surface.
+
+Use targeted retrieval rather than reading the full catalog before work. An instruction without `applyTo` is intentionally manual/on-demand, not malformed.
+
+## Supported surfaces
+
+| Surface | Primary primitives |
+|---|---|
+| Copilot CLI | Repository instructions and AGENTS when present; skills for optional procedures; MCP on demand for missing organization knowledge. |
+| VS Code Chat Local | Repository and scoped instructions automatically; prompt files manually; direct catalog files in an intentional multi-root workspace or MCP on demand in a single-repository workspace. |
+| VS Code Agents / Agent Host | Repository and scoped instructions, manually selected custom agents, skills, and on-demand MCP. |
+| GitHub.com Chat | Concise repository and organization instructions supported by GitHub.com. |
+| Copilot App | Repository context and skills; MCP only when configured and needed. |
+| Cloud coding agent | Repository instructions, portable AGENTS guidance, and repository skills; no mandatory shared clone. |
+| Copilot code review | Concise repository and scoped review instructions supported by the review surface; not prompts, custom agents, or MCP. |
 
 ## Structure
-- `docs/` – developer-facing documentation (overview, governance, [ops clock](docs/ops-clock.md), change log).
-- `templates/` – starter files matching the Copilot guides.
-- `.github/copilot-instructions.md` – repository-wide guidance that always loads with Copilot.
-- `.github/instructions/*.instructions.md` – path-specific rules targeted through glob frontmatter.
-- `.github/prompts/*.prompt.md` – reusable prompts for Copilot Chat.
 
-## Alignment With VS Code Guidance
-- **Custom instructions** – mirror the structure documented in [Custom Instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions) so repository and path rules load consistently.
-- **Prompt files** – follow the metadata, intent, input, guardrail, and validation guidance in [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files); cross-link the governing instruction file.
-- **Custom agents** – configure `.github/agents/*.agent.md` files per [Custom Agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents) and ensure tool lists match the prompts that invoke them.
-- **MCP servers** – document any Model Context Protocol integrations per [MCP Servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers) so agents, prompts, and instructions share the same credentials and connection names.
+- `.github/instructions/` — path-scoped automatic instructions plus manual reference contracts and the catalog quickstart.
+- `.github/prompts/` — reusable manual workflows.
+- `.github/agents/` — specialist agents.
+- `.github/skills/` — optional procedures.
+- `templates/` — generated-file baselines.
+- `mcp-server/` — TypeScript stdio catalog server.
+- `docs/` — focused supporting documentation.
 
-## Daily Usage Flow
-1. Clone this repo alongside the active project and open both in a multi-root VS Code workspace.
-2. Keep Copilot Chat and inline completions enabled so repository instructions are respected automatically.
-3. Start new prompts/instructions/agents from the templates, then cross-check with the official docs above to confirm metadata, tool lists, and MCP references stay in sync.
-4. Run the verification checklist in each guide before committing changes and capture evidence (test output, diffs, MCP connection notes).
+## Copilot cloud-agent setup
 
-## Maintaining the Repository
-- Treat docs and templates as code: open PRs, request review, and describe how changes affect Copilot output.
-- Update `.github/instructions/*.instructions.md` whenever folders change so globs stay accurate.
-- Capture rationale for major instruction changes inside `docs/overview.md`.
+Most repositories should not have `.github/workflows/copilot-setup-steps.yml`; Copilot performs the normal repository checkout itself.
+
+When setup is needed, `workflows.copilot-setup-steps.instructions.md` defines three distinct patterns:
+
+1. **No setup** — omit the workflow.
+2. **Runtime only** — use `copilot-setup/v2`, enable only required runtimes with exact repository-derived versions, and leave repository checkout disabled.
+3. **Restore required** — enable repository checkout, then run exact deterministic restore commands such as `dotnet restore <solution-or-project>` or `npm ci` outside the shared action.
+
+Keep setup limited to prerequisites, with no shared catalog clone, expensive validation, secrets, or unnecessary cloud authentication. A separate code-review setup workflow is considered only when review needs a materially different environment.
+
+**Release checkpoint:** the v2 contract is prepared in `frasermolyneux/actions`, but migration must wait until the `copilot-setup/v2` tag exists.
+
+## MCP development
+
+```powershell
+npm --prefix mcp-server ci
+npm --prefix mcp-server run build
+npm --prefix mcp-server run smoke
+```
+
+See [`mcp-server/README.md`](mcp-server/README.md) for local installation and the tool contract.
 
 ## References
-- [Add repository instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions?tool=vscode)
-- [Custom Instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
-- [Prompt Files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
-- [Custom Agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
-- [MCP Servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
-- [How to write a great agents.md](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/)
+
+- [Repository custom instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)
+- [VS Code custom instructions](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
+- [Prompt files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
+- [Custom agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+- [Agent Skills](https://agentskills.io/)
+- [MCP servers](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
+- [AGENTS.md convention](https://agents.md)

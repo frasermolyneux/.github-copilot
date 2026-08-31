@@ -1,6 +1,5 @@
 ---
-description: "Use when Typed API client pattern (interfaces, generated clients, testing helpers, fluent DI options)."
-applyTo: '**/*.cs,**/*.csproj'
+description: "Use only when implementing the organization's optional typed API client architecture."
 ---
 # Pattern — Typed API Client
 

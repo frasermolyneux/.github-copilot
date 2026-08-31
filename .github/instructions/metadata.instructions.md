@@ -1,5 +1,5 @@
 ---
-description: "Use when Universal guidelines for project metadata files (README, CONTRIBUTING, SECURITY, .github/copilot-instructions.md) shared across the frasermolyneux organization."
+description: "Automatic shared guidelines for repository README, CONTRIBUTING, SECURITY, and Copilot instruction metadata files."
 applyTo: '{README,CONTRIBUTING,SECURITY}.md,.github/copilot-instructions.md'
 ---
 # Metadata Files — Universal Guidelines

@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Dependabot configuration file (.github/dependabot.yml). Layered on top of workflows.scheduling.instructions.md."
-applyTo: '**/.github/dependabot.yml'
+description: "Automatic canonical configuration rules for .github/dependabot.yml."
+applyTo: '.github/dependabot.yml,.github/dependabot.yaml'
 ---
 
 # `.github/dependabot.yml` Pattern

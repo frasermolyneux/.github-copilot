@@ -1,6 +1,5 @@
 ---
-description: "Use when Network topology for the frasermolyneux Azure tenant — hub-and-spoke layout, address-space allocation, peering rules."
-applyTo: '**'
+description: "Reference for the frasermolyneux Azure hub-and-spoke topology, address allocation, and peering rules."
 ---
 # Tenant — Network Topology
 
