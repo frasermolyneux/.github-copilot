@@ -1,5 +1,5 @@
 ---
-description: "Use when Canonical content rules for a repository's CODEOWNERS file."
+description: "Automatic content rules for repository CODEOWNERS files."
 applyTo: '.github/CODEOWNERS,CODEOWNERS,docs/CODEOWNERS'
 ---
 # CODEOWNERS — Generation Guidelines

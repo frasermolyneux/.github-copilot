@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Dependabot Auto-Merge workflow that auto-squashes Dependabot PRs."
-applyTo: '**/dependabot-automerge.yml'
+description: "Automatic canonical template rules for .github/workflows/dependabot-automerge.yml."
+applyTo: '.github/workflows/dependabot-automerge.yml,.github/workflows/dependabot-automerge.yaml'
 ---
 
 # `dependabot-automerge.yml` Pattern
@@ -71,4 +71,3 @@ jobs:
 9. Auto-merge job is gated by `needs.dependabot-policy.outputs.*`.
 10. Auto-merge command remains `gh pr merge --auto --squash`.
 11. Top-level permissions remain `{}` and per-job permissions are least-privilege.
-

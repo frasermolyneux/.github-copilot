@@ -1,6 +1,5 @@
 ---
-description: "Use when Layer-1 catalog of platform-* infrastructure repos and how to find the right consumption contract."
-applyTo: '**'
+description: "Reference catalog for selecting the relevant platform-* infrastructure consumption contract."
 ---
 # Platform Repos — Catalog
 

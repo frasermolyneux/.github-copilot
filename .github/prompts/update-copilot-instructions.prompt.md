@@ -12,5 +12,5 @@ If this prompt is not applicable to the target repository, report the reason and
 3. Apply universal metadata rules from `.github-copilot/.github/instructions/metadata.instructions.md`.
 4. Analyze the target codebase and update `.github/copilot-instructions.md` for that repository only.
 5. If the target repo is one of `portal-web`, `portal-server-events`, `portal-servers-integration`, `portal-server-agent`, or `portal-repository`, include explicit platform-settings-contract guidance that matches org standards.
-6. Return a concise summary of changes and any follow-up questions.
-
+6. Do not add a shared-catalog reading requirement or an MCP bootstrap section.
+7. Return a concise summary of changes and any follow-up questions.

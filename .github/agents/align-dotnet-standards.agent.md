@@ -4,6 +4,8 @@ description: Use when you need to align a target repository to org .NET baseline
 tools: [read, search, edit]
 argument-hint: Target repository folder/path to align for .NET standards.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # align-dotnet-standards

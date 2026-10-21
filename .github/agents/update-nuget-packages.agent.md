@@ -4,6 +4,8 @@ description: Use when you need to update NuGet packages to latest stable version
 tools: [execute, read, search, edit, todo]
 argument-hint: "Target scope: a repo name (e.g. 'portal-web'), a comma-separated list (e.g. 'portal-web, geo-location'), or 'all' for every .NET repo in the workspace."
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 You are a NuGet package update specialist. Your job is to update NuGet packages to their latest stable versions across one or more .NET repositories in this workspace, while honouring each repository's Dependabot ignore rules.

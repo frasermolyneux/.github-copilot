@@ -4,6 +4,8 @@ description: Use when you need to standardize VS Code .NET tasks.json files in a
 tools: [read, search, edit]
 argument-hint: Target repository folder/path to align for VS Code .NET tasks.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # align-vscode-dotnet-tasks

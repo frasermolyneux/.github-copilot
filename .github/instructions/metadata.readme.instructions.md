@@ -1,5 +1,5 @@
 ---
-description: "Use when Canonical structure and content rules for a repository's README.md."
+description: "Automatic canonical structure and content rules for the repository-root README.md."
 applyTo: 'README.md'
 ---
 # README.md — Structure and Content

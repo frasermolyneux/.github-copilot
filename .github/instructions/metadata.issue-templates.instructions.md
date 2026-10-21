@@ -1,5 +1,5 @@
 ---
-description: "Use when Canonical content rules for the org-wide ISSUE_TEMPLATE/ folder (provided by the `.github` repo) and any per-repo override. Includes the \"Delegate to coding agent\" form that's the headline reason these exist."
+description: "Automatic canonical content rules for files under .github/ISSUE_TEMPLATE."
 applyTo: '.github/ISSUE_TEMPLATE/**,.github/issue_template/**'
 ---
 # ISSUE_TEMPLATE/ — Generation Guidelines
@@ -42,7 +42,7 @@ This form is the single biggest leverage point for safe remote-agent delegation.
 
 `needs-triage` means a developer triages first and decides whether to hand the issue to Copilot.
 
-> **Agent-side attestation lives in the PR template, not here.** The `## Agent attestation` checkbox block is part of `PULL_REQUEST_TEMPLATE.md` so the gate runs against the PR body regardless of how the work was kicked off (issue form, direct prompt, manual dispatch). See `metadata.pull-request-template.instructions.md`.
+> **Agent-side attestation lives in the PR template, not here.** The `## Agent attestation` checkbox block is part of `PULL_REQUEST_TEMPLATE.md` so the checks are recorded in the PR body regardless of how the work was kicked off (issue form, direct prompt, manual dispatch). See `metadata.pull-request-template.instructions.md`.
 
 The form is filed in the target repo (so a "which repo?" dropdown is unnecessary). Do **not** auto-assign Copilot in the form. Keep triage ownership with developers: `needs-triage` flags the issue for review, and `coding-agent` signals it is likely suitable for Copilot once triaged.
 

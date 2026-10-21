@@ -1,8 +1,8 @@
 # gh-copilot-mcp — MCP server for `.github-copilot`
 
-A small stdio [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the instruction, prompt, agent, and skill catalog from [`frasermolyneux/.github-copilot`](https://github.com/frasermolyneux/.github-copilot) to any MCP-capable client — VS Code Copilot Chat, Copilot CLI, GitHub Copilot App, Claude Desktop, and so on.
+A small stdio [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes the instruction, prompt, agent, and skill catalog from [`frasermolyneux/.github-copilot`](https://github.com/frasermolyneux/.github-copilot) to MCP-capable local clients.
 
-The catalog is the same one VS Code loads when you open `.github-copilot` as a folder in a multi-root workspace. This server makes it reachable from single-repo sessions and headless CI environments where that trick doesn't work.
+Use it on demand from a local single-repository session when organization guidance or an external contract is not stated in that repository. In a multi-root workspace where `.github-copilot` is deliberately open, use the files directly instead of querying MCP for the same information.
 
 See the [repository README](../README.md) for the wider purpose of the catalog itself.
 
@@ -113,7 +113,7 @@ All tools return a single text block whose body is JSON.
 | `get_catalog`             | `{}`                                                                             | `{ generatedAtUtc, freshness, counts, kindHelp, quickstart, instructionsByPrefix }` |
 | `get_quickstart`          | `{}`                                                                             | `{ startHere, kindHelp, taskRouting, referenceInstruction }`                        |
 | `list_instruction_groups` | `{}`                                                                             | `Array<{ prefix, description, count, examples }>`                                   |
-| `recommend_entries`       | `{ task: string }`                                                               | `{ inferredFocus, recommendedFlow, instructions, prompts, agents }`                 |
+| `recommend_entries`       | `{ task: string }`                                                               | `{ inferredFocus, recommendedFlow, instructions, prompts, agents, skills }`         |
 | `list_instructions`       | `{ prefix?: string, applyToContains?: string, limit?: number, offset?: number }` | `{ total, offset, limit, hasMore, items }`                                          |
 | `get_instruction`         | `{ name: string }`                                                               | `{ name, description, applyTo, path, frontmatter, content }`                        |
 | `search_instructions`     | `{ query: string, limit?: number }`                                              | `Array<{ name, snippet, score }>`                                                   |
@@ -133,10 +133,10 @@ Search scoring: `+3` per case-insensitive substring match in `name`, `+2` in `de
 
 Suggested discovery flow:
 
-1. Call `get_catalog` for the top-level map, freshness, and the machine-readable quickstart pointer.
-2. Call `get_quickstart` if you want guidance on whether to use instructions, prompts, or agents.
-3. Call `list_instruction_groups` or `list_instructions({ prefix: ... })` to browse a focused domain.
-4. Call `recommend_entries({ task: ... })` when you know the task but not the right entrypoints.
+1. Use repository-native instructions for routine work.
+2. Call `recommend_entries({ task: ... })` when organization guidance is needed but the exact entry is unknown.
+3. Use search or a focused list call, then retrieve only the selected entry.
+4. Call `get_catalog` only for a top-level inventory or freshness check.
 
 ## Resources
 
@@ -147,30 +147,27 @@ Each file is also exposed as an MCP resource, so clients that browse `resources/
 | `frasermolyneux-copilot://instructions/{name}` | `frasermolyneux-copilot://instructions/patterns.api-client`       |
 | `frasermolyneux-copilot://prompts/{name}`      | `frasermolyneux-copilot://prompts/update-build-and-test-workflow` |
 | `frasermolyneux-copilot://agents/{name}`       | `frasermolyneux-copilot://agents/code-review`                     |
-| `frasermolyneux-copilot://skills/{name}`       | `frasermolyneux-copilot://skills/azure-compute`                   |
+| `frasermolyneux-copilot://skills/{name}`       | `frasermolyneux-copilot://skills/nuget-dependency-boundary`       |
 
 Resource bodies are the raw `.md` file (frontmatter included), MIME type `text/markdown`.
 
 ## Content root resolution
 
-The server needs to know where `.github/instructions/`, `.github/prompts/`, `.github/agents/`, and `.github/skills/` live. It looks in this order:
+The server needs to know where `.github/instructions/`, `.github/prompts/`, `.github/agents/`, and `.github/skills/<name>/SKILL.md` live. It looks in this order:
 
 1. **`GH_COPILOT_CONTENT_ROOT`** — absolute path to the repository root (the folder *containing* `.github/`). **Recommended for every wire-up.** Eliminates ambiguity entirely.
 2. **Walk-up fallback** — from the script's directory, ascending at most 10 levels, accepting only directories that contain the **three core catalogs** (`instructions/`, `prompts/`, `agents/`). This keeps accidental collision with a consumer repo's own `.github/instructions/` effectively impossible while still allowing `skills/` to be introduced incrementally.
 
 On startup the server logs the resolved root and per-kind item counts to stderr (e.g. `content root: /…/.github-copilot (instructions=66, prompts=16, agents=6, skills=0)`) so a mis-resolution is visible. If nothing matches, startup fails with a clear message and non-zero exit.
 
-## Bootstrap snippet for consumer repos
+## Access strategy
 
-Drop the following into a consumer repo's `.github/copilot-instructions.md` so any MCP-capable agent knows the catalog is available:
-
-````markdown
-## Org conventions via MCP (when available)
-
-If a `frasermolyneux-copilot` MCP server is configured in your client (`~/.copilot/mcp-config.json`, VS Code user `mcp.json`, or an equivalent stdio MCP wire-up), **prefer its catalog tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
-
-This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
-````
+- Repository-native instructions are authoritative for routine work.
+- Local single-repository sessions query this server only when organization knowledge is missing locally.
+- Multi-root sessions with `.github-copilot` open use direct files and do not also query MCP for the same information.
+- Cloud coding agents use repository-native instructions and skills. They do not require this repository to be cloned merely to obtain instructions.
+- Prefer `recommend_entries`, search, and focused list calls over reading the whole catalog.
+- For cloud-agent runtime or deterministic dependency setup, retrieve `workflows.copilot-setup-steps`. It prefers no setup workflow when none is needed and documents the prepared v2 contract; consumer rollout must wait until the `copilot-setup/v2` tag exists.
 
 ## Development
 
@@ -200,7 +197,7 @@ mcp-server/
 
 ## Caveats
 
-- **MCP clients don't auto-load catalog content.** Tools must be called explicitly. The bootstrap snippet above tells the agent to do that — without it, the agent will happily ignore the catalog.
+- **MCP clients don't auto-load catalog content.** Tools are intentionally called only when the current repository lacks required organization knowledge.
 - **`list_instructions` is intentionally paged.** Use `limit` / `offset` for browsing and `prefix` / `applyToContains` to stay out of truncation territory in chat clients.
 - **Use user-level config for local surfaces.** Keep catalog MCP config out of committed `.vscode/mcp.json` in consumer repos unless you have a deliberate team-shared reason.
 - **No `npx` / `github:` install path.** There is no root `package.json` in the catalog repo and no `prepare` script that builds the server post-install, so `npx github:frasermolyneux/.github-copilot` does not work. Use the clone + build path above until a published artifact exists.

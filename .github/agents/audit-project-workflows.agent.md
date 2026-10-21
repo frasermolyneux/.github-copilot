@@ -4,6 +4,8 @@ description: Use when you need a read-only audit of GitHub Actions workflow drif
 tools: [read, search]
 argument-hint: Target repository folder/path to audit.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 You are a workflow drift auditor. Produce a read-only compliance report.
@@ -22,6 +24,7 @@ For every file matching `.github/workflows/*.yml` and `.github/dependabot.yml` i
 Additional required checks:
 
 - For `.github/dependabot.yml`, group keys must be `all-updates` exactly and each ecosystem schedule must include `timezone: "Etc/UTC"`.
+- Treat an unnecessary `.github/workflows/copilot-setup-steps.yml` as drift. When setup is required, verify v2-only inputs, explicit required runtime versions, no shared-repository clone, and `checkout-repo: 'true'` only before repository-specific deterministic restore steps.
 - If schedule overlaps exist in the Monday/Sunday window, treat them as compliant only when explicitly documented in `docs/ops-clock.md`.
 - For `destroy-development.yml`, do not mark repo-specific pre-destroy extension steps as drift when canonical triggers, permissions, concurrency, and destroy composite inputs remain compliant.
 

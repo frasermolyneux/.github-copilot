@@ -6,11 +6,10 @@ import matter from "gray-matter";
 
 export type Kind = "instructions" | "prompts" | "agents" | "skills";
 
-const SUFFIX: Record<Kind, string> = {
+const SUFFIX: Record<Exclude<Kind, "skills">, string> = {
   instructions: ".instructions.md",
   prompts: ".prompt.md",
   agents: ".agent.md",
-  skills: ".skill.md",
 };
 
 export interface ItemSummary {
@@ -64,6 +63,7 @@ export interface RecommendationResult {
   instructions: SearchHit[];
   prompts: SearchHit[];
   agents: SearchHit[];
+  skills: SearchHit[];
 }
 
 export interface CatalogSummary {
@@ -86,7 +86,7 @@ const KIND_HELP: Record<Kind, string> = {
   instructions: "Rules, standards, patterns, and platform/shared contracts.",
   prompts: "Reusable guided flows for creating or updating repo content.",
   agents: "Specialist delegated workers for execution, alignment, or review.",
-  skills: "Reusable domain playbooks when the catalog publishes them.",
+  skills: "Optional reusable multi-step procedures.",
 };
 
 let cachedRoot: string | null = null;
@@ -155,22 +155,26 @@ function dirFor(kind: Kind): string {
   return join(resolveContentRoot(), ".github", kind);
 }
 
-function fileNameToBare(filename: string, kind: Kind): string | null {
+function fileNameToBare(filename: string, kind: Exclude<Kind, "skills">): string | null {
   const suffix = SUFFIX[kind];
   if (!filename.endsWith(suffix)) return null;
   return filename.slice(0, -suffix.length);
 }
 
 function normaliseName(input: string, kind: Kind): string {
-  const suffix = SUFFIX[kind];
   const base = basename(input);
-  if (base.endsWith(suffix)) return base.slice(0, -suffix.length);
+  if (kind === "skills") {
+    if (base === "SKILL.md") return basename(dirname(input));
+    if (base.endsWith(".skill.md")) return base.slice(0, -".skill.md".length);
+  } else {
+    const suffix = SUFFIX[kind];
+    if (base.endsWith(suffix)) return base.slice(0, -suffix.length);
+  }
   if (base.endsWith(".md")) return base.slice(0, -3);
   return base;
 }
 
-function readItem(kind: Kind, bareName: string): ItemFull | null {
-  const path = join(dirFor(kind), `${bareName}${SUFFIX[kind]}`);
+function readItemPath(path: string, fallbackName: string): ItemFull | null {
   if (!existsSync(path)) return null;
   const raw = readFileSync(path, "utf8");
   const parsed = matter(raw);
@@ -185,7 +189,7 @@ function readItem(kind: Kind, bareName: string): ItemFull | null {
         ? applyToRaw.join(",")
         : undefined;
   return {
-    name: fmName ?? bareName,
+    name: fmName ?? fallbackName,
     description,
     applyTo,
     path,
@@ -194,14 +198,38 @@ function readItem(kind: Kind, bareName: string): ItemFull | null {
   };
 }
 
-export function listItems(kind: Kind): ItemSummary[] {
+function itemPaths(kind: Kind): Array<{ path: string; fallbackName: string }> {
   const dir = dirFor(kind);
   if (!existsSync(dir)) return [];
-  const out: ItemSummary[] = [];
+
+  if (kind === "skills") {
+    const paths: Array<{ path: string; fallbackName: string }> = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        const path = join(dir, entry.name, "SKILL.md");
+        if (existsSync(path)) paths.push({ path, fallbackName: entry.name });
+      } else if (entry.isFile() && entry.name.endsWith(".skill.md")) {
+        paths.push({
+          path: join(dir, entry.name),
+          fallbackName: entry.name.slice(0, -".skill.md".length),
+        });
+      }
+    }
+    return paths;
+  }
+
+  const paths: Array<{ path: string; fallbackName: string }> = [];
   for (const entry of readdirSync(dir)) {
     const bare = fileNameToBare(entry, kind);
-    if (!bare) continue;
-    const full = readItem(kind, bare);
+    if (bare) paths.push({ path: join(dir, entry), fallbackName: bare });
+  }
+  return paths;
+}
+
+export function listItems(kind: Kind): ItemSummary[] {
+  const out: ItemSummary[] = [];
+  for (const candidate of itemPaths(kind)) {
+    const full = readItemPath(candidate.path, candidate.fallbackName);
     if (!full) continue;
     out.push({
       name: full.name,
@@ -251,14 +279,9 @@ export function browseInstructions(options?: {
 
 export function getItem(kind: Kind, name: string): ItemFull | null {
   const bare = normaliseName(name, kind);
-  const direct = readItem(kind, bare);
-  if (direct) return direct;
-  // Fallback: scan for a file whose frontmatter name matches.
-  for (const summary of listItems(kind)) {
-    if (summary.name === name || summary.name === bare) {
-      const refetch = readItem(kind, fileNameToBare(basename(summary.path), kind)!);
-      if (refetch) return refetch;
-    }
+  for (const candidate of itemPaths(kind)) {
+    const item = readItemPath(candidate.path, candidate.fallbackName);
+    if (item && (item.name === name || item.name === bare || candidate.fallbackName === bare)) return item;
   }
   return null;
 }
@@ -267,8 +290,8 @@ export function searchItems(kind: Kind, query: string, limit = 10): SearchHit[] 
   const q = query.trim().toLowerCase();
   if (!q) return [];
   const hits: SearchHit[] = [];
-  for (const summary of listItems(kind)) {
-    const full = readItem(kind, fileNameToBare(basename(summary.path), kind)!);
+  for (const candidate of itemPaths(kind)) {
+    const full = readItemPath(candidate.path, candidate.fallbackName);
     if (!full) continue;
 
     let score = 0;
@@ -332,10 +355,10 @@ export function getQuickstartSummary(): QuickstartSummary {
   return {
     generatedAtUtc: new Date().toISOString(),
     startHere: [
-      "Call get_catalog first for top-level counts, kind summaries, and freshness.",
-      "Call get_quickstart when you want a compact chooser between instructions, prompts, and agents.",
-      "Use list_instruction_groups or list_instructions({ prefix }) to narrow by domain before reading individual files.",
-      "Use recommend_entries({ task }) when you know the task but not the right catalog entrypoints.",
+      "Use repository-native instructions for routine work.",
+      "Call recommend_entries({ task }) when organization guidance is needed but the exact entry is unknown.",
+      "Retrieve only the selected instruction, prompt, agent, or skill.",
+      "Call get_catalog only when a top-level inventory or freshness check is needed.",
     ],
     kindHelp: KIND_HELP,
     taskRouting: [
@@ -345,7 +368,7 @@ export function getQuickstartSummary(): QuickstartSummary {
       },
       {
         task: "Review in-progress changes",
-        use: ["standards/patterns instructions", "code-review agent"],
+        use: ["standards/patterns instructions", "manually invoked code-review agent"],
       },
       {
         task: "Update README / CONTRIBUTING / SECURITY / repo instructions",
@@ -353,7 +376,11 @@ export function getQuickstartSummary(): QuickstartSummary {
       },
       {
         task: "Figure out a platform/shared contract for a repo",
-        use: ["platform.* instructions", "shared.* instructions", "get_catalog"],
+        use: ["targeted platform.* or shared.* instruction"],
+      },
+      {
+        task: "Handle an unpublished cross-repository NuGet dependency",
+        use: ["nuget-dependency-boundary skill"],
       },
     ],
     referenceInstruction: quickstart
@@ -378,6 +405,7 @@ export function recommendEntries(task: string): RecommendationResult {
     instructions: combinedSearch("instructions", terms, 5),
     prompts: combinedSearch("prompts", terms, 5),
     agents: combinedSearch("agents", terms, 5),
+    skills: combinedSearch("skills", terms, 5),
   };
 }
 
@@ -433,6 +461,7 @@ function inferFocus(loweredTask: string): string[] {
   if (/(terraform|iac|infrastructure|app service|dns|monitoring|platform|remote state)/.test(loweredTask)) focus.add("platform");
   if (/(review|audit|findings|risk)/.test(loweredTask)) focus.add("review");
   if (/(prompt|agent|instruction|catalog|discoverability|mcp)/.test(loweredTask)) focus.add("catalog");
+  if (/(nuget|package|unpublished|dependency boundary|cross-repository)/.test(loweredTask)) focus.add("package");
   if (focus.size === 0) focus.add("general");
   return Array.from(focus);
 }
@@ -465,6 +494,11 @@ function expandRecommendationTerms(loweredTask: string, focus: string[]): string
         terms.add("catalog");
         terms.add("mcp");
         break;
+      case "package":
+        terms.add("nuget");
+        terms.add("dependency");
+        terms.add("unpublished");
+        break;
       default:
         break;
     }
@@ -475,9 +509,9 @@ function expandRecommendationTerms(loweredTask: string, focus: string[]): string
 function buildRecommendedFlow(focus: string[]): string[] {
   if (focus.includes("review")) {
     return [
-      "Start with recommend_entries to shortlist relevant instructions and the code-review agent.",
+      "Start with recommend_entries to shortlist relevant instructions and optional review agents.",
       "Read the top matching standards/patterns instructions before review.",
-      "Use the code-review agent when you want a findings-first assessment.",
+      "Manually invoke the code-review agent when you want a delegated findings-first assessment.",
     ];
   }
   if (focus.includes("workflow")) {
@@ -494,10 +528,16 @@ function buildRecommendedFlow(focus: string[]): string[] {
       "Use the update-project-metadata agent if you want delegated multi-file updates.",
     ];
   }
+  if (focus.includes("package")) {
+    return [
+      "Use the nuget-dependency-boundary skill when an unpublished package blocks consumer work.",
+      "Complete the owner phase, stop at publication, and resume consumers only after the version is available.",
+    ];
+  }
   return [
-    "Start with get_catalog for the top-level map.",
-    "Use list_instruction_groups to pick the right domain.",
-    "Read the best matching instruction first, then use prompts/agents if the task needs guided authoring or delegation.",
+    "Use repository-native instructions first.",
+    "Query only the organization topic or external contract missing from the repository.",
+    "Use prompts, agents, or skills only when their optional workflow is needed.",
   ];
 }
 

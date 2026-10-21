@@ -4,6 +4,8 @@ description: Use when you need to create one canonical GitHub Actions workflow o
 tools: [read, search, edit]
 argument-hint: Target repository folder/path and canonical workflow filename to create.
 agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 You are a canonical workflow bootstrap specialist.
@@ -33,12 +35,14 @@ Bespoke workflows are out of scope — this agent will refuse to create them.
    - NuGet release workflows require `version.json` or packable csproj evidence.
    - Terraform destroy workflows require a `terraform/` folder.
    - Deploy workflows require deployable components (Terraform + at least one app/func/static project).
+   - `copilot-setup-steps.yml` requires a specific pre-agent runtime, dependency restore, runner, service, or environment customization need. Refuse to create it when normal Copilot checkout and runner-provided tools are sufficient.
 4. Inspect the repo to determine project type (.NET solution / web / functions, Terraform, etc.).
 5. Read the matching `workflows.<name>.instructions.md` for the canonical template.
 6. Look up any cron / `time:` values in `docs/ops-clock.md` for the target repo. If the repo has no allocated slot, ask the user to allocate one (and update `docs/ops-clock.md` afterwards).
 7. Create the file using the canonical template, customising only the parameters that the instructions file marks as project-specific (csproj names, Sonar keys, db project name, etc.).
 8. Verify the new file against the **Compliance checklist** in its source-of-truth instructions file before reporting completion.
 9. If the new workflow has dependencies on other workflows (e.g. `release-publish-nuget.yml` requires `release-version-and-tag.yml`), confirm those exist or flag as a follow-up.
+10. For `copilot-setup-steps.yml`, do not create or dispatch a v2 workflow until the `copilot-setup/v2` tag exists.
 
 ## Output format
 

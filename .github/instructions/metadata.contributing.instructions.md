@@ -1,5 +1,5 @@
 ---
-description: "Use when Canonical verbatim content for a repository's CONTRIBUTING.md."
+description: "Automatic canonical content rules for the repository-root CONTRIBUTING.md."
 applyTo: 'CONTRIBUTING.md'
 ---
 # CONTRIBUTING.md — Canonical Content

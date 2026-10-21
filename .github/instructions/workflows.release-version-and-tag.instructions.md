@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Release - Version and Tag workflow used by NuGet-publishing repos. Layered on top of workflows.dotnet.instructions.md."
-applyTo: '**/release-version-and-tag.yml'
+description: "Automatic canonical template rules for .github/workflows/release-version-and-tag.yml."
+applyTo: '.github/workflows/release-version-and-tag.yml,.github/workflows/release-version-and-tag.yaml'
 ---
 
 # `release-version-and-tag.yml` Pattern

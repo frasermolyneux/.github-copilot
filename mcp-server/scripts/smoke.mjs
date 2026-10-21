@@ -9,6 +9,12 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const serverPath = join(__dirname, "..", "dist", "index.js");
+const requestTimeout = process.env.MCP_SMOKE_TIMEOUT_MS ?? "15000";
+const requestTimeoutMs = Number(requestTimeout);
+
+if (!/^\d+$/.test(requestTimeout) || !Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs <= 0) {
+  throw new Error("MCP_SMOKE_TIMEOUT_MS must be a positive integer");
+}
 
 const EXPECTED_TOOLS = [
   "get_quickstart",
@@ -37,6 +43,7 @@ const child = spawn(process.execPath, [serverPath], {
 let buffer = "";
 const pending = new Map();
 let nextId = 1;
+let childExit;
 
 child.stderr.on("data", (chunk) => {
   process.stderr.write(`[server] ${chunk}`);
@@ -52,7 +59,8 @@ child.stdout.on("data", (chunk) => {
     try {
       const msg = JSON.parse(line);
       if (msg.id != null && pending.has(msg.id)) {
-        const { resolve } = pending.get(msg.id);
+        const { resolve, timer } = pending.get(msg.id);
+        clearTimeout(timer);
         pending.delete(msg.id);
         resolve(msg);
       }
@@ -63,22 +71,46 @@ child.stdout.on("data", (chunk) => {
 });
 
 child.on("error", (err) => {
-  process.stderr.write(`[smoke] spawn error: ${err.message}\n`);
-  process.exit(1);
+  markChildUnavailable(`failed to spawn: ${err.message}`);
 });
 
+child.stdin.on("error", (err) => {
+  markChildUnavailable(`closed its input stream: ${err.message}`);
+});
+
+child.on("close", (code, signal) => {
+  markChildUnavailable(signal ? `exited due to signal ${signal}` : `exited with code ${code}`);
+});
+
+function markChildUnavailable(reason) {
+  childExit ??= reason;
+  rejectPendingRequests(childExit);
+}
+
+function rejectPendingRequests(reason) {
+  for (const [id, { reject, timer }] of pending) {
+    clearTimeout(timer);
+    pending.delete(id);
+    reject(new Error(`Server ${reason} while waiting for response`));
+  }
+}
+
 function send(method, params) {
+  if (childExit) {
+    return Promise.reject(new Error(`Server ${childExit} before request ${method}`));
+  }
+
   const id = nextId++;
   const payload = { jsonrpc: "2.0", id, method, params };
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve, reject });
-    child.stdin.write(JSON.stringify(payload) + "\n");
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (pending.has(id)) {
         pending.delete(id);
-        reject(new Error(`Timed out waiting for response to ${method}`));
+        reject(new Error(`Timed out after ${requestTimeoutMs}ms waiting for response to ${method}`));
       }
-    }, 5000);
+    }, requestTimeoutMs);
+    pending.set(id, { resolve, reject, timer });
+    child.stdin.write(JSON.stringify(payload) + "\n");
   });
 }
 
@@ -173,10 +205,47 @@ async function run() {
   if (recommendResp.error) throw new Error(`tools/call recommend_entries failed: ${JSON.stringify(recommendResp.error)}`);
   const recommendText = recommendResp.result?.content?.[0]?.text ?? "{}";
   const recommend = JSON.parse(recommendText);
-  if (!Array.isArray(recommend?.instructions) || !Array.isArray(recommend?.agents) || !Array.isArray(recommend?.prompts)) {
+  if (!Array.isArray(recommend?.instructions) || !Array.isArray(recommend?.agents) || !Array.isArray(recommend?.prompts) || !Array.isArray(recommend?.skills)) {
     throw new Error("recommend_entries returned invalid grouped recommendations");
   }
-  console.log(`recommend_entries returned instructions=${recommend.instructions.length}, prompts=${recommend.prompts.length}, agents=${recommend.agents.length}`);
+  console.log(`recommend_entries returned instructions=${recommend.instructions.length}, prompts=${recommend.prompts.length}, agents=${recommend.agents.length}, skills=${recommend.skills.length}`);
+
+  const setupRecommendResp = await send("tools/call", {
+    name: "recommend_entries",
+    arguments: { task: "configure Copilot cloud agent runtime and deterministic dependency restore setup workflow" },
+  });
+  if (setupRecommendResp.error) throw new Error(`tools/call setup recommend_entries failed: ${JSON.stringify(setupRecommendResp.error)}`);
+  const setupRecommendText = setupRecommendResp.result?.content?.[0]?.text ?? "{}";
+  const setupRecommend = JSON.parse(setupRecommendText);
+  if (!setupRecommend.instructions?.some((instruction) => instruction.name === "workflows.copilot-setup-steps")) {
+    throw new Error("recommend_entries did not discover workflows.copilot-setup-steps for cloud-agent setup");
+  }
+  console.log("recommend_entries discovered workflows.copilot-setup-steps for cloud-agent setup");
+
+  const skillsResp = await send("tools/call", {
+    name: "list_skills",
+    arguments: {},
+  });
+  if (skillsResp.error) throw new Error(`tools/call list_skills failed: ${JSON.stringify(skillsResp.error)}`);
+  const skillsText = skillsResp.result?.content?.[0]?.text ?? "[]";
+  const skills = JSON.parse(skillsText);
+  const boundarySkill = skills.find((skill) => skill.name === "nuget-dependency-boundary");
+  if (!boundarySkill || !boundarySkill.path.endsWith("nuget-dependency-boundary\\SKILL.md") && !boundarySkill.path.endsWith("nuget-dependency-boundary/SKILL.md")) {
+    throw new Error("list_skills did not discover nuget-dependency-boundary/SKILL.md");
+  }
+  console.log(`list_skills discovered ${boundarySkill.name}`);
+
+  const packageRecommendResp = await send("tools/call", {
+    name: "recommend_entries",
+    arguments: { task: "consumer work blocked by an unpublished cross-repository NuGet package" },
+  });
+  if (packageRecommendResp.error) throw new Error(`tools/call package recommend_entries failed: ${JSON.stringify(packageRecommendResp.error)}`);
+  const packageRecommendText = packageRecommendResp.result?.content?.[0]?.text ?? "{}";
+  const packageRecommend = JSON.parse(packageRecommendText);
+  if (!packageRecommend.skills?.some((skill) => skill.name === "nuget-dependency-boundary")) {
+    throw new Error("recommend_entries did not discover the NuGet dependency boundary skill");
+  }
+  console.log("recommend_entries discovered nuget-dependency-boundary for an unpublished package task");
 
   console.log("SMOKE OK");
 }

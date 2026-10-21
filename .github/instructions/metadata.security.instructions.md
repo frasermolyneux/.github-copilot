@@ -1,5 +1,5 @@
 ---
-description: "Use when Canonical verbatim content for a repository's SECURITY.md."
+description: "Automatic canonical content rules for the repository-root SECURITY.md."
 applyTo: 'SECURITY.md'
 ---
 # SECURITY.md — Canonical Content

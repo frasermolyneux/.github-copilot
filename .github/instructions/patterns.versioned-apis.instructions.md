@@ -1,6 +1,5 @@
 ---
-description: "Use when API versioning pattern — namespaced controllers, APIM segment versioning, runtime OpenAPI."
-applyTo: '**/Controllers/**/*.cs,**/openapi.yaml,**/openapi.json'
+description: "Use only when implementing the organization's versioned API and APIM segment architecture."
 ---
 # Pattern — Versioned APIs
 

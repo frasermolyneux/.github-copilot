@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Deploy Dev workflow — manual deployment to the Development environment. Layered on top of workflows.terraform.instructions.md, workflows.dotnet.instructions.md, and workflows.frasermolyneux-actions.instructions.md."
-applyTo: '**/deploy-dev.yml'
+description: "Automatic canonical template rules for .github/workflows/deploy-dev.yml."
+applyTo: '.github/workflows/deploy-dev.yml,.github/workflows/deploy-dev.yaml'
 ---
 
 # `deploy-dev.yml` Pattern
@@ -68,7 +68,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Web>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 
 terraform-plan-and-apply-dev:
@@ -142,7 +142,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Functions>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 
 terraform-plan-and-apply-dev:

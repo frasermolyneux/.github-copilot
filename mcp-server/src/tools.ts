@@ -60,7 +60,7 @@ function registerListTool(server: McpServer, kind: Kind) {
       ? "List every prompt file in .github/prompts/ as { name, description, path }. Use this to browse reusable guided flows."
       : kind === "agents"
         ? "List every agent file in .github/agents/ as { name, description, path }. Use this to browse delegated specialist workers."
-        : "List every skill file in .github/skills/ as { name, description, path }. Use this to browse reusable playbooks when skills are published.";
+        : "List every .github/skills/<name>/SKILL.md procedure as { name, description, path }. Use this for optional multi-step workflows.";
 
   server.registerTool(
     `list_${kind}`,
@@ -114,7 +114,7 @@ export function registerTools(server: McpServer): void {
     "get_catalog",
     {
       description:
-        "Start here. Return a token-efficient catalog summary: item counts, kind summaries, instruction taxonomy by prefix, and freshness metadata (git SHA + last commit date).",
+        "Return a token-efficient top-level inventory: item counts, kind summaries, instruction taxonomy by prefix, and freshness metadata. Use when an inventory or freshness check is needed.",
       inputSchema: {},
     },
     async () => asJson(getCatalogSummary())
@@ -124,7 +124,7 @@ export function registerTools(server: McpServer): void {
     "get_quickstart",
     {
       description:
-        "Return a compact quickstart for choosing between instructions, prompts, and agents, including task-routing examples and the recommended first calls.",
+        "Return a compact quickstart for choosing between instructions, skills, prompts, agents, and targeted catalog retrieval.",
       inputSchema: {},
     },
     async () => asJson(getQuickstartSummary() satisfies QuickstartSummary)
@@ -144,7 +144,7 @@ export function registerTools(server: McpServer): void {
     "recommend_entries",
     {
       description:
-        "Recommend likely instructions, prompts, and agents for a natural-language task. Use this when you know the task but not the right catalog entrypoints.",
+        "Recommend likely instructions, prompts, agents, and skills for a natural-language task. Use this when organization guidance is needed but the exact entrypoint is unknown.",
       inputSchema: {
         task: z.string().min(1).describe("Natural-language description of the task you want to perform"),
       },

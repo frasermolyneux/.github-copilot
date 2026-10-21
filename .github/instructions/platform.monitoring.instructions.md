@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-monitoring — central Log Analytics workspace and severity-based action groups."
-applyTo: '**/*.tf,**/*.tfvars'
+description: "Use only when a repository consumes Log Analytics or action-group outputs from platform-monitoring."
 ---
 # platform-monitoring — Consumer Contract
 

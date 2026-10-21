@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the PR Verify workflow that runs on pull requests targeting main. Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, and workflows.terraform.instructions.md."
-applyTo: '**/pr-verify.yml'
+description: "Automatic canonical template rules for .github/workflows/pr-verify.yml."
+applyTo: '.github/workflows/pr-verify.yml,.github/workflows/pr-verify.yaml'
 ---
 
 # `pr-verify.yml` Pattern
@@ -67,7 +67,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Web>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 ```
 
@@ -84,7 +84,7 @@ build-and-test:
     - uses: frasermolyneux/actions/dotnet-func-ci@dotnet-func-ci/v2
       with:
         dotnet-project: "<MyOrg.MyApp.Functions>"
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         src-folder: "src"
 ```
 

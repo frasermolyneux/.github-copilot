@@ -1,6 +1,5 @@
 ---
-description: "Use when Layer-1 catalog of shared library and automation repos and how to find the right consumption contract."
-applyTo: '**'
+description: "Reference catalog for selecting a shared library or automation repository consumption contract."
 ---
 # Shared Library / Automation Repos — Catalog
 

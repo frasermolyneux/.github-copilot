@@ -1,6 +1,6 @@
 ---
-description: "Use when SCSS build pattern (npm-driven Sass compile alongside .NET projects)."
-applyTo: '**/package.json,**/*.scss,**/*.sass'
+description: "Automatic build conventions for SCSS and Sass source files compiled with npm alongside .NET projects."
+applyTo: '**/*.scss,**/*.sass'
 ---
 # Pattern — SCSS Build
 

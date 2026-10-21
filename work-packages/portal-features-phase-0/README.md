@@ -8,8 +8,8 @@ This folder is the **detailed, execute-it-verbatim** plan for the first phase of
 
 **No feature moves in Phase 0.** The estate keeps behaving identically. Phase 0 builds the SDK and re-shapes each host to run its **existing** logic through the new SDK contracts (parity), so Phase 1 (Maps) can then move code into packages with confidence.
 
-- **Part 1 — build & publish the SDK** ([part-1-sdk.md](part-1-sdk.md)). A new `portal-feature-sdk` repo with two packages (`FeatureSdk`, `FeatureSdk.Web`) + `.Testing` companions: the extension contracts **and** the host infrastructure (pipeline, job runner, default RCON gateway, default L0/L1 cache, context factory). **Gated on NuGet publish** — Part 2 does not start until the packages restore from NuGet.org.
-- **Part 2 — integrate the SDK into the consuming hosts** ([part-2-integration.md](part-2-integration.md)). Wire `portal-web`, `portal-server-events`, `portal-repository-func`, `portal-sync`, and `portal-repository` to the SDK contracts, registering today's implementations as in-host contributors/handlers. Proven by **characterization (golden-master)** tests and **Playwright** snapshots.
+- **Part 1 — build & publish the SDK** ([part-1-sdk.md](part-1-sdk.md)). A new `portal-feature-sdk` repo with two packages (`FeatureSdk`, `FeatureSdk.Web`) + `.Testing` companions: the extension contracts **and** the host infrastructure (pipeline, job runner, default RCON gateway, default L0/L1 cache, context factory). `FeatureSdk.Web.Testing` also supplies the reusable reference host and Playwright fixture used by every feature repository. **Gated on NuGet publish** — Part 2 does not start until the packages restore from NuGet.org.
+- **Part 2 — integrate the SDK into the consuming hosts** ([part-2-integration.md](part-2-integration.md)). Wire `portal-web`, `portal-server-events`, `portal-repository-func`, `portal-sync`, and `portal-repository` to the SDK contracts, registering today's implementations as in-host contributors/handlers. Proven by **characterization (golden-master)** tests and **Playwright semantic parity**, with a small, separately identified host-owned visual baseline.
 
 ```mermaid
 flowchart LR
@@ -44,7 +44,8 @@ Carried from the design: walking-skeleton (freeze SDK at `v1.0` **after Phase 4*
 ## Definition of done for Phase 0
 
 - SDK `0.x` published to NuGet.org and restorable by a scratch project.
-- All five hosts build/test/format green and behave **identically** (characterization + Playwright parity).
+- `FeatureSdk.Web.Testing` can launch a sample RCL in its reference host and prove route, contributor, authorization, settings, static-asset, and browser-error behaviour in Chromium.
+- All five hosts build/test/format green and behave **identically** (characterization + Playwright semantic parity); the small portal-web visual baseline is green.
 - `portal-server-events` runs every queue through the SDK pipeline; `portal-web` renders nav/profile/dashboard/settings from contributors; timer hosts run jobs via the runner; `portal-repository` does additive structural permission validation.
 - `Microsoft.FeatureManagement` is wired in every host that will need it in Phase 1; **no feature flag has been switched on**.
 - No feature code has moved into a feature repo yet (that is Phase 1).
@@ -53,8 +54,8 @@ Carried from the design: walking-skeleton (freeze SDK at `v1.0` **after Phase 4*
 
 | Doc                                            | Purpose                                                                                                                                                      |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [part-1-sdk.md](part-1-sdk.md)                 | Build the SDK: repo scaffolding, every project, every interface + default implementation, tests, and the publish gate.                                       |
-| [part-2-integration.md](part-2-integration.md) | Integrate the SDK into the five hosts: per-host seam steps, the full events-pipeline decomposition, characterization + Playwright parity, and the exit gate. |
+| [part-1-sdk.md](part-1-sdk.md)                 | Build the SDK: repo scaffolding, every project, every interface + default implementation, reusable feature-web test host, tests, and the publish gate.       |
+| [part-2-integration.md](part-2-integration.md) | Integrate the SDK into the five hosts: per-host seam steps, the full events-pipeline decomposition, discovery-driven Playwright parity, and the exit gate.   |
 
 ## Next
 

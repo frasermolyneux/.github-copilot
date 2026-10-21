@@ -26,12 +26,13 @@ Create the Maps feature repo and its three packages, moving the maps code out of
 
 **Do:** `src/XtremeIdiots.Portal.Features.Maps.sln` with:
 
-| Project                                          | SDK                       | TFMs             | Key references                                                                                       |
-| ------------------------------------------------ | ------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------- |
-| `XtremeIdiots.Portal.Features.Maps.Abstractions` | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `MX.Api.Abstractions`                                              |
-| `XtremeIdiots.Portal.Features.Maps.Web`          | `Microsoft.NET.Sdk.Razor` | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk.Web`, `.Abstractions`; `FrameworkReference Microsoft.AspNetCore.App` |
-| `XtremeIdiots.Portal.Features.Maps.Processing`   | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `.Abstractions`                                                    |
-| `XtremeIdiots.Portal.Features.Maps.*.Tests`      | test                      | `net9.0;net10.0` | the package under test + `XtremeIdiots.Portal.FeatureSdk.Testing` / `.Web.Testing`, xUnit, Moq       |
+| Project                                                   | SDK                       | TFMs             | Key references                                                                                                                       |
+| --------------------------------------------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `XtremeIdiots.Portal.Features.Maps.Abstractions`          | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `MX.Api.Abstractions`                                                                              |
+| `XtremeIdiots.Portal.Features.Maps.Web`                   | `Microsoft.NET.Sdk.Razor` | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk.Web`, `.Abstractions`; `FrameworkReference Microsoft.AspNetCore.App`                                 |
+| `XtremeIdiots.Portal.Features.Maps.Processing`            | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `.Abstractions`                                                                                    |
+| `XtremeIdiots.Portal.Features.Maps.*.Tests`               | test                      | `net9.0;net10.0` | the package under test + `XtremeIdiots.Portal.FeatureSdk.Testing` / `.Web.Testing`, xUnit, Moq                                       |
+| `XtremeIdiots.Portal.Features.Maps.Web.IntegrationTests`  | test (non-packable)       | `net9.0;net10.0` | `.Web`, `.Abstractions`, `XtremeIdiots.Portal.FeatureSdk.Web.Testing`, `Microsoft.Playwright`, xUnit, deterministic Repository fakes |
 
 Each package: `GeneratePackageOnBuild=true`, `PackageId` = project name, `Description`, `PackageReadmeFile=README.md`.
 
@@ -78,20 +79,33 @@ Each package: `GeneratePackageOnBuild=true`, `PackageId` = project name, `Descri
 4. **`MapsNavigation : INavigationContributor`** — reproduce today's maps nav entry (text "Maps", icon `fa-map`, the Servers group placement, `MapRotations.Read` policy, `data-testid`, order). Declare `SupportedGames` = all (or match today).
 5. `AddMapsFeatureWeb(this IServiceCollection s)` → `s.AddFeatureControllers(typeof(MapsController).Assembly)` (ApplicationPart) + `s.AddNavigationContributor<MapsNavigation>()`.
 
-**Acceptance:** a minimal `WebApplicationFactory` test in the package hosts the RCL, and the maps routes render; nav item appears with the correct policy + game gating.
+**Acceptance:** unit tests cover controller/contributor logic. The feature-owned integration project launches the RCL in the `FeatureSdk.Web.Testing` reference host; the maps routes, static assets, and navigation contribution are discovered without referencing `portal-web`.
 
 ---
 
 ## 1.6 — Tests
 
-Cover: `MapsPermissions` snapshot equality; both map-vote commands (via `FakeRconGateway` / fake context); each job's Repository writes vs a fixture; nav contributor output; controller routing via `WebApplicationFactory`.
+**Unit/characterization:** `MapsPermissions` snapshot equality; both map-vote commands (via `FakeRconGateway` / fake context); each job's Repository writes vs a fixture; nav contributor output; controller/view-model validation.
+
+**Feature-owned Playwright (`Web.IntegrationTests`):**
+- Start `FeatureWebTestHostBuilder` with the Maps Web assembly, seeded map/rotation data, deterministic Repository/Servers client fakes, and allowed/denied principals.
+- Prove the maps list, map manager, and map rotations routes render the expected semantic content and stable `data-testid`s.
+- Exercise the feature-owned form/table workflows that write data (including valid and invalid map-rotation edits and deploy where the fake supports it); assert the recording fake received the expected request and the refreshed UI reflects it.
+- Assert the Maps navigation item appears in the correct order for an allowed principal and is absent when policy is denied; assert protected routes enforce the policy.
+- Load any feature static asset through `_content/XtremeIdiots.Portal.Features.Maps.Web/...`.
+- Fail on browser console/page errors, same-origin request failures/5xx responses, or unexpected external requests.
+- Use role/label/test-id assertions, not screenshot baselines. Pixel compatibility with the real portal layout/design system is a small `portal-web` responsibility in Part 2.
 
 **Validate:**
 ```pwsh
 dotnet build src/XtremeIdiots.Portal.Features.Maps.sln
-dotnet test  src/XtremeIdiots.Portal.Features.Maps.sln
+dotnet test  src/XtremeIdiots.Portal.Features.Maps.sln --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Features.Maps.Web.IntegrationTests/XtremeIdiots.Portal.Features.Maps.Web.IntegrationTests.csproj --results-directory TestResults --logger "trx;LogFileName=playwright.trx"
+# The CI action installs Chromium and fails unless TestResults/playwright.trx reports Counters.total > 0.
 dotnet format src/XtremeIdiots.Portal.Features.Maps.sln --verify-no-changes
 ```
+
+CI must execute the explicit integration-test project through the Phase 0 versioned `dotnet-playwright-tests` action (`test-project` input). The action installs Chromium, emits/publishes TRX, and fails if zero tests execute. Do not use the old solution-wide name-filter mode and do not publish on a workflow path that skipped this job.
 
 ---
 
@@ -102,6 +116,7 @@ dotnet format src/XtremeIdiots.Portal.Features.Maps.sln --verify-no-changes
 **Acceptance / gate:**
 - The three packages are on NuGet.org at `0.1.x`.
 - A scratch app restores `Features.Maps.Web` (pulling `FeatureSdk.Web`) and `Features.Maps.Processing` without error.
+- The exact commit/tag being packaged passed `Web.IntegrationTests` against the published-version-compatible SDK reference host.
 
 **STOP.** Do not start [part-2-host-integration.md](part-2-host-integration.md) until this gate passes.
 
@@ -112,6 +127,7 @@ dotnet format src/XtremeIdiots.Portal.Features.Maps.sln --verify-no-changes
 - [ ] `portal-feature-maps` provisioned, scaffolded (library repo), CI green.
 - [ ] `.Abstractions` (MapsPermissions), `.Processing` (2 commands + 5 jobs), `.Web` (RCL controllers/views/nav/tag helper) build.
 - [ ] Tests reproduce legacy maps behaviour; permission snapshot exact.
+- [ ] Feature-owned Playwright proves maps routes, navigation/policy gating, workflows, assets, and browser diagnostics before publish.
 - [ ] `dotnet format --verify-no-changes` clean.
 - [ ] Maps packages published to NuGet.org `0.1.x` and restorable.
 - [ ] `code-review` sub-agent run; High/Medium findings resolved.

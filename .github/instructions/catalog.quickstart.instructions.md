@@ -1,45 +1,36 @@
 ---
-description: "Use when Quickstart index for the org catalog — how to choose between instructions, prompts, and agents, with task-routing examples."
+description: "Reference for choosing a Copilot customization primitive and retrieving organization guidance on demand."
 ---
 # Catalog Quickstart
 
-Use this guide when you are new to the org catalog or when you know the task but not the right entrypoint.
+Routine work starts with the current repository's native instructions. Use this catalog only when the task needs organization guidance or an external contract not stated locally.
 
-## Choose the right kind
+## Choose the primitive
 
-- **Instructions**: use when you need rules, standards, patterns, or platform/shared consumption contracts.
-- **Prompts**: use when you want a reusable guided flow for authoring or updating repo content.
-- **Agents**: use when you want delegated execution or review.
-- **Skills**: use when the catalog publishes reusable domain playbooks.
+- **Instructions** — path-scoped automatic rules when `applyTo` is present; manual/reference guidance when it is absent.
+- **Skills** — optional multi-step procedures, such as `nuget-dependency-boundary` when an unpublished cross-repository NuGet version blocks work.
+- **Prompt files** — manually invoked VS Code Local workflows.
+- **Custom agents** — manually selected specialist personas or tool boundaries.
+- **MCP** — targeted retrieval of this catalog from a local single-repository session.
 
-## Recommended discovery flow
+## Access path
 
-1. Call `get_catalog` for the top-level map and freshness.
-2. Call `list_instruction_groups` to find the relevant domain.
-3. Call `list_instructions({ prefix: ... })` to narrow to a manageable slice.
-4. Call `get_instruction`, `get_prompt`, or `get_agent` once you know the exact entry.
-5. Call `recommend_entries({ task: ... })` when you want the server to shortlist likely matches for a natural-language task.
+- In a multi-root workspace where `.github-copilot` is deliberately open, read the relevant files directly.
+- In a local single-repository session, query MCP only for the missing topic.
+- Treat instructions without `applyTo` as intentional on-demand references selected explicitly or through MCP discovery.
+- Do not use MCP and direct workspace files for the same information.
+- Cloud coding agents use repository-native instructions and skills; they do not need a shared-repository clone merely for guidance.
 
-## Task routing examples
+## Targeted MCP discovery
 
-- **Update a GitHub Actions workflow**
-  - Start with `workflows.*` instructions.
-  - Then check the matching workflow prompt.
-  - Use `align-project-workflows` if you want delegated workflow alignment.
+1. Use `recommend_entries({ task })` when the exact entry is unknown.
+2. Use the relevant `search_*` or focused `list_*` tool.
+3. Retrieve only the selected instruction, prompt, agent, or skill with `get_*`.
+4. Use `get_catalog` only when a top-level inventory or freshness check is actually needed.
 
-- **Review in-progress changes**
-  - Start with relevant `standards.*`, `patterns.*`, `platform.*`, or `shared.*` instructions.
-  - Then use the `code-review` agent.
+Examples:
 
-- **Update README / CONTRIBUTING / SECURITY / repo-level instructions**
-  - Start with `metadata.*` instructions.
-  - Use `update-project-metadata` for delegated metadata updates.
-
-- **Understand a repo's Azure platform/shared contracts**
-  - Start with `platform.*` and `shared.*` instructions.
-  - Use `get_catalog` to see which instruction families exist.
-
-## Notes
-
-- Prefer the MCP catalog when it is configured in the client.
-- If MCP is not configured, fall back to reading the files directly from `./.github-copilot/`.
+- Workflow alignment: retrieve the matching `workflows.*` instruction, then manually invoke a prompt or custom agent only if desired.
+- Metadata generation: retrieve the relevant `metadata.*` instruction.
+- Unpublished NuGet dependency: retrieve the `nuget-dependency-boundary` skill.
+- Review: retrieve applicable scoped instructions; manually select the `code-review` agent only when a delegated review is requested.

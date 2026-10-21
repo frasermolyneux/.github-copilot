@@ -1,5 +1,5 @@
 ---
-description: "Use when Mandatory Azure resource naming convention for the frasermolyneux organization."
+description: "Automatic Azure resource naming rules for Terraform, Terraform variable, and Bicep files."
 applyTo: '**/*.tf,**/*.tfvars,**/*.bicep'
 ---
 # Standard — Azure Resource Naming

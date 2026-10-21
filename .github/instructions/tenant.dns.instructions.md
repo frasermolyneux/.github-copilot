@@ -1,6 +1,5 @@
 ---
-description: "Use when DNS zones owned by the frasermolyneux tenant — public and private, naming, certificate sourcing."
-applyTo: '**'
+description: "Reference for frasermolyneux tenant DNS zones, private-link resolution, and certificate sourcing."
 ---
 # Tenant — DNS
 

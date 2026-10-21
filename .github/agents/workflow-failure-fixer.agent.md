@@ -3,7 +3,9 @@ name: workflow-failure-fixer
 description: Use when you need to investigate a failed GitHub Actions workflow run from a failure URL, determine root cause, implement a fix, and locally validate with build/test/format checks before reporting.
 tools: [read, search, edit, execute, agent]
 argument-hint: GitHub Actions run URL, target repository folder/path, and any known failing job/log details.
-agents: [code-review]
+agents: []
+disable-model-invocation: true
+user-invocable: true
 ---
 
 # workflow-failure-fixer
@@ -46,7 +48,6 @@ If target repo is not explicit, infer it from the URL and workspace folders; ask
    - tests (excluding integration tests when repo standard requires)
    - format/lint verification
 6. If validation still fails, iterate until resolved or clearly blocked by missing external dependency.
-7. For non-trivial changes, run the `code-review` subagent and address High/Medium findings before reporting completion.
 
 ## Validation Rules
 
@@ -76,9 +77,7 @@ Return one concise markdown report with:
 4. Local Validation
    - commands/tasks run
    - pass/fail results
-5. Review Gate
-   - `code-review` findings summary (or explicit reason it could not run)
-6. Residual Risk / Follow-ups
+5. Residual Risk / Follow-ups
    - any non-blocking risks or required CI-only verification
 
 ## Done Criteria

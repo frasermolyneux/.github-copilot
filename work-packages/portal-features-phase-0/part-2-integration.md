@@ -1,6 +1,6 @@
 # Part 2 — Integrate the SDK into the Consuming Hosts
 
-Wire the five hosts to the SDK contracts, registering **today's** logic as in-host contributors/handlers/jobs. **Behaviour must not change.** Nothing moves into a feature repo yet. Every host is proven by **characterization (golden-master)** tests and, for `portal-web`, **Playwright** snapshots.
+Wire the five hosts to the SDK contracts, registering **today's** logic as in-host contributors/handlers/jobs. **Behaviour must not change.** Nothing moves into a feature repo yet. Every host is proven by **characterization (golden-master)** tests and, for `portal-web`, **Playwright semantic parity** plus a small host-owned visual baseline.
 
 > Prerequisite: the [Part 1 publish gate](part-1-sdk.md#18--publish-gate-hard-stop) has passed — the SDK packages restore from NuGet.org. Do not bridge with project references.
 
@@ -11,7 +11,7 @@ Host scope (decision 5): `portal-web`, `portal-server-events`, `portal-repositor
 ## 2.0 — Prerequisites (do first, in order)
 
 1. **Baseline the safety net BEFORE any refactor.**
-   - `portal-web`: capture Playwright snapshots of navigation, a player profile, the dashboard, and each settings page.
+   - `portal-web`: capture the rendered semantic baseline for navigation, a player profile, the dashboard, and each settings page (routes, roles/labels, stable `data-testid`s, order, visibility, and key values). Separately capture screenshot baselines only for the high-risk shared-shell views selected for the small visual suite. Do not call semantic DOM assertions "snapshots" and do not expand screenshot coverage to every feature workflow.
    - `portal-server-events`: build the characterization harness — record representative Service Bus messages per queue and snapshot the resulting Repository API calls, RCON calls, and audit events from the **current** processors. Use a **recording `IRepositoryApiClient`** (or `portal-repository`'s `Api.Client.Testing` fakes), the SDK `FakeRconGateway`, and `FakeAuditLogger` to capture the calls; author the per-queue message **fixtures by hand** from real message shapes (`Server.Events.Abstractions.V1` DTOs).
    - timer hosts: snapshot each job's Repository writes on a fixture.
    These baselines are the pass/fail oracle for the rest of Part 2.
@@ -25,17 +25,20 @@ Host scope (decision 5): `portal-web`, `portal-server-events`, `portal-repositor
 
 ## 2.A — `portal-web` (composability refactor, decision 3)
 
-Refactor shared Razor to render from SDK contributors, registering **existing** items as in-host contributors. Do this **incrementally**, validating snapshots after each sub-step.
+Refactor shared Razor to render from SDK contributors, registering **existing** items as in-host contributors. Do this **incrementally**, validating the semantic baseline after each sub-step.
 
 1. **Bootstrap:** `AddPortalFeatureCore()` + `AddPortalFeatureRcon()` + `AddPortalFeatureWeb()` in `Program.cs`. Enable `AddFeatureControllers` plumbing (ApplicationParts) even though no external controllers exist yet.
-2. **Navigation:** refactor `Views/Shared/_Navigation.cshtml` to render the `INavigationModelBuilder` output. Create in-host `INavigationContributor`(s) that reproduce the **current** tree exactly — Home, Dashboard, the Servers group (Game Servers, Player Map, Maps), Players, Admin Actions, Chat Log, Tags, Demos, Users, Global Settings, etc. — preserving order, `fa-*` icons, `policy=` gating, and every `data-testid`. **Validate nav snapshot.**
-3. **Player profile:** refactor the profile page to loop ordered `IPlayerProfileBlock`s. Wrap the existing `AdminActionsViewComponent`, `GameServerListViewComponent`, and `PlayerTagsViewComponent` as in-host blocks with their current policies and order. **Validate profile snapshot.**
-4. **Dashboard:** wrap existing dashboard tiles as `IDashboardWidget`s (including the map-popularity tile — it becomes the Maps widget in Phase 1; for now keep it in-host). **Validate dashboard snapshot.**
-5. **Settings pages:** refactor to loop `ISettingsSection`s; register the current global and game-server namespaces as in-host sections backed by the existing `GlobalSettingsService` / `GameServerSettingsService`. As features migrate, each section becomes a thin **shell** whose contract + validator come from the feature's `.Abstractions` NuGet: reads go through the SDK `IFeatureSettingsResolver`, and **writes validate semantically with the feature's `IFeatureSettingsValidator<T>`** (the writer is where semantic validation lives now — the repository is structural-only per 2.D). **Validate settings snapshots.**
+2. **Navigation:** refactor `Views/Shared/_Navigation.cshtml` to render the `INavigationModelBuilder` output. Create in-host `INavigationContributor`(s) that reproduce the **current** tree exactly — Home, Dashboard, the Servers group (Game Servers, Player Map, Maps), Players, Admin Actions, Chat Log, Tags, Demos, Users, Global Settings, etc. — preserving order, `fa-*` icons, `policy=` gating, and every `data-testid`. **Validate nav semantic parity.**
+3. **Player profile:** refactor the profile page to loop ordered `IPlayerProfileBlock`s. Wrap the existing `AdminActionsViewComponent`, `GameServerListViewComponent`, and `PlayerTagsViewComponent` as in-host blocks with their current policies and order. **Validate profile semantic parity.**
+4. **Dashboard:** wrap existing dashboard tiles as `IDashboardWidget`s (including the map-popularity tile — it becomes the Maps widget in Phase 1; for now keep it in-host). **Validate dashboard semantic parity.**
+5. **Settings pages:** refactor to loop `ISettingsSection`s; register the current global and game-server namespaces as in-host sections backed by the existing `GlobalSettingsService` / `GameServerSettingsService`. As features migrate, each section becomes a thin **shell** whose contract + validator come from the feature's `.Abstractions` NuGet: reads go through the SDK `IFeatureSettingsResolver`, and **writes validate semantically with the feature's `IFeatureSettingsValidator<T>`** (the writer is where semantic validation lives now — the repository is structural-only per 2.D). **Validate settings semantic parity.**
 6. **Permissions:** replace the body of `AddXtremeIdiotsPolicies()` with a loop over `IPermissionCatalog` (aggregated from **one** in-host `IPermissionContributor` returning today's `AdditionalPermission.Definitions`). Keep every policy→requirement→handler mapping and register the existing handlers unchanged. Assert the composed policy set equals today's.
 7. **Client/config hygiene:** do not change how API clients or App Config are wired; the SDK consumes the host-registered clients.
+8. **Make Playwright discovery-driven:** replace manually maintained navigation/read-only/action manifests in tests with catalog data from registered SDK contributors and MVC `ApplicationPart`s. Controller discovery must include all registered RCL assemblies rather than filtering to `PortalWebApplication`. Retain a small explicit deny-list only for intentionally non-browsable infrastructure endpoints and document every entry.
+9. **Make the test host feature-flag aware:** extend the local test-host factory/Kestrel harness to accept configuration and service overrides before application composition. Add a helper that sets `FeatureManagement:<Name>` for a host instance so later phases can start independent flag-off and flag-on applications. Do not mutate configuration after `Program.cs` has selected registrations.
+10. **Separate visual compatibility:** keep semantic assertions in the main Playwright workflows. Put screenshot comparison in clearly named visual tests/baseline artifacts, restricted to the selected shared layout/navigation/profile/dashboard/settings shells. A semantic assertion failure must not require regenerating a pixel baseline, and vice versa.
 
-**Acceptance (2.A):** every Playwright snapshot matches the baseline; `dotnet build` (Release, warnings-as-errors, Razor precompile) + `dotnet test` + `dotnet format --verify-no-changes` green; the composed policy set is unchanged.
+**Acceptance (2.A):** every semantic Playwright baseline matches; the small visual suite matches its separately stored baselines; discovery includes controllers/contributors supplied by a sample external RCL; route/contributor/permission uniqueness checks are generated from discovered metadata; the test host can start deterministic flag-off and flag-on instances; `dotnet build` (Release, warnings-as-errors, Razor precompile) + unit/integration tests + `dotnet format --verify-no-changes` green; the composed policy set is unchanged.
 
 ---
 
@@ -95,13 +98,13 @@ Convert **every** queue processor into the ordered `IServerEventHandler<T>` pipe
 ## 2.E — Cross-cutting validation & exit gate
 
 **Do:**
-- Re-run the full characterization harness and all Playwright snapshots across the touched hosts.
+- Re-run the full characterization harness, portal-web semantic Playwright suite, and the separate small visual compatibility suite.
 - Confirm no feature code has moved to a feature repo; no feature flag is switched on.
 - Confirm `portal-servers-integration` and `portal-server-agent` are unchanged.
 
 ### ✅ Phase 0 exit gate
 - [ ] All five hosts build/test/format green.
-- [ ] `portal-web`: nav/profile/dashboard/settings render from contributors; Playwright parity; policy set unchanged.
+- [ ] `portal-web`: nav/profile/dashboard/settings render from contributors; controller/contributor coverage is discovery-driven; deterministic feature-flag host instances exist; semantic Playwright parity + small visual baseline green; policy set unchanged.
 - [ ] `portal-server-events`: every queue runs through the SDK pipeline; characterization parity; ordering + **connection-orchestration coupling** + dead-letter behaviour preserved (connect/ip-resolved run as single core orchestration handlers, not split).
 - [ ] Timer hosts: jobs run via the runner; parity + idempotency + reconciliation order preserved.
 - [ ] `portal-repository`: additive structural permission **and settings** validation; platform-namespace typed validation unchanged; no feature/SDK reference.
@@ -119,6 +122,7 @@ Convert **every** queue processor into the ordered `IServerEventHandler<T>` pipe
 # portal-web
 dotnet build src/XtremeIdiots.Portal.Web/XtremeIdiots.Portal.Web.csproj
 dotnet test  src --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Web.IntegrationTests/XtremeIdiots.Portal.Web.IntegrationTests.csproj
 dotnet format src/XtremeIdiots.Portal.Web.sln --verify-no-changes
 
 # portal-server-events

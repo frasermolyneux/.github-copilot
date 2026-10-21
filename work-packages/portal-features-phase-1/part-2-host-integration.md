@@ -12,7 +12,7 @@ The flag is **evaluated at startup** (DI registration + MVC controller exclusion
 
 1. **Create the flag** `Feature.Maps.V2` in Azure App Configuration for **both** `dev` and `prd` labels, default **off**. The feature name is the bare string `Maps.V2` (key `FeatureManagement:Maps.V2`, matching `IsEnabled("Maps.V2")`; `Feature.Maps.V2` is the prose label). **Seed it once** (default off) as a `portal-environments` change; **flips are manual** App Config edits per label — no Terraform apply, no redeploy.
 2. **Reference the Maps packages** at `0.1.x`: `portal-web` → `.Abstractions` + `.Web`; `portal-server-events` → `.Abstractions` + `.Processing`; `portal-repository-func` + `portal-sync` → `.Abstractions` + `.Processing`.
-3. **Baselines:** with the flag **off**, capture Playwright snapshots (maps list, map manager, map rotations, maps in nav) and the characterization snapshots for the map-vote commands and the five jobs. These are the parity oracle.
+3. **Baselines:** first confirm the published Maps commit passed its feature-owned Playwright suite. With the host flag **off**, capture semantic host-composition baselines for discovery of the maps routes, maps-in-nav visibility, real portal authorization, and real layout rendering; retain only the selected shared-shell screenshots in portal-web's small visual suite. Capture characterization snapshots for the map-vote commands and five jobs. Do not duplicate Maps CRUD/deploy workflows in `portal-web`.
 
 **Acceptance:** flag exists (off); packages restore in each host; baselines captured; hosts build/test/format green.
 
@@ -31,7 +31,7 @@ The flag is **evaluated at startup** (DI registration + MVC controller exclusion
 4. **Permissions:** when the flag is on, `AddMapsFeatureContracts()` registers `MapsPermissions`; **exclude the maps entries** from the legacy in-host `IPermissionContributor` (the one added in Phase 0 that returns the full `AdditionalPermission.Definitions`) so the catalog does not throw on duplicate claim types. The claim-type strings and the composed policy set must be **identical** in both flag states.
 5. Do not touch API-client / App-Config wiring.
 
-**Acceptance (2.A):** with the flag **off**, everything matches the baseline. With the flag **on** (in dev), Playwright snapshots of the maps pages + nav match the baseline; the composed policy set is identical; no route collisions; `dotnet build` (Release) + test + format green.
+**Acceptance (2.A):** start independent test hosts with `FeatureManagement:Maps.V2=false` and `true`. Off matches the legacy semantic baseline; on proves the RCL `ApplicationPart` is discovered, the same routes resolve exactly once, Maps nav is not duplicated, real host policies allow/deny correctly, and representative pages render in the real portal layout. The composed policy set is identical and the small shared-shell visual baseline remains green. Feature CRUD/deploy workflows are not repeated here. `dotnet build` (Release) + unit/integration tests + format green.
 
 ---
 
@@ -82,7 +82,7 @@ The flag is **evaluated at startup** (DI registration + MVC controller exclusion
 ## 2.E — Cutover (enable, validate, soak)
 
 1. **Enable in dev** — set `Feature.Maps.V2 = on` (dev label); restart the five hosts.
-2. **Validate in dev** — run the full characterization harness and Playwright suite with the flag **on**; then flip **off** + restart and confirm legacy parity. Both states must match the baseline.
+2. **Validate in dev** — run the full characterization harness and thin host-composition Playwright suite with the flag **on**; then flip **off** + restart and confirm legacy parity. Both states must match the semantic baseline. The Maps feature-repository Playwright suite remains the workflow oracle.
 3. **Enable in prd** — set the flag on (prd label); restart; **soak** for the agreed window, monitoring App Insights (errors, dependency calls, job telemetry).
 4. **Do not remove legacy** — that is Phase 2.
 
@@ -95,7 +95,7 @@ The flag is **evaluated at startup** (DI registration + MVC controller exclusion
 - [ ] Five hosts reference the Maps packages and register them behind `Feature.Maps.V2`.
 - [ ] Flag **off** = legacy (unchanged); flag **on** = feature packages; **exactly one path** runs.
 - [ ] No route collisions (exclusion convention working); nav not duplicated; policy set identical; no duplicate commands/jobs.
-- [ ] Characterization + Playwright parity in **both** flag states.
+- [ ] Characterization + host-composition Playwright parity in **both** flag states; published Maps feature-owned Playwright suite green.
 - [ ] `Feature.Maps.V2` on in dev and prd, soaked, no regressions.
 - [ ] Legacy maps code still present and functional when the flag is off.
 - [ ] Build/test/format green in all five hosts; `code-review` run per repo.
@@ -110,6 +110,7 @@ The flag is **evaluated at startup** (DI registration + MVC controller exclusion
 # portal-web
 dotnet build src/XtremeIdiots.Portal.Web/XtremeIdiots.Portal.Web.csproj
 dotnet test  src --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Web.IntegrationTests/XtremeIdiots.Portal.Web.IntegrationTests.csproj
 dotnet format src/XtremeIdiots.Portal.Web.sln --verify-no-changes
 
 # portal-server-events

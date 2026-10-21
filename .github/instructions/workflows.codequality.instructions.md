@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Code Quality workflow (Sonar + DevOps secure scanning + dependency review). Layered on top of workflows.instructions.md, workflows.dotnet.instructions.md, workflows.security.instructions.md, and workflows.scheduling.instructions.md."
-applyTo: '**/codequality.yml'
+description: "Automatic canonical template rules for .github/workflows/codequality.yml."
+applyTo: '.github/workflows/codequality.yml,.github/workflows/codequality.yaml'
 ---
 
 # `codequality.yml` Pattern
@@ -114,7 +114,7 @@ quality:
     build-target: dotnet-web-ci
     skip-format-check: true
     dotnet-project: <MyOrg.MyApp.Web>
-    dotnet-version: 9.0.x
+    dotnet-version: 10.0.x
     src-folder: src
   secrets:
     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

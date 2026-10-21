@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for the actions repo — composite GitHub Actions catalog (conceptual). Pinned versions are in workflows.frasermolyneux-actions.instructions.md."
-applyTo: '.github/workflows/**/*.yml'
+description: "Use only when selecting a composite action or reusable workflow provided by the frasermolyneux/actions repository."
 ---
 # actions/ — Consumer Contract
 
@@ -124,19 +123,26 @@ Deploys Logic App definitions.
   ```
 
 #### `copilot-setup`
-- **Purpose**: Standard pre-session setup for Copilot coding-agent workflows (`copilot-setup-steps.yml`) including repository checkout, `.github-copilot` checkout, and optional runtime installation.
-- **Key inputs**: `checkout-repo`, `checkout-shared-copilot`, `shared-copilot-repository`, `shared-copilot-path`, `setup-dotnet`, `dotnet-version`, `setup-node`, `node-version`, `setup-python`, `python-version`.
-- **Sample**:
+- **Purpose**: Optional pre-session repository checkout and runtime installation for Copilot coding-agent workflows. Repository-specific restore commands remain separate workflow steps.
+- **v2 inputs**: `checkout-repo` (default `'false'`), `checkout-fetch-depth` (default `'1'`), `setup-dotnet`, `dotnet-version`, `setup-node`, `node-version`, `setup-python`, `python-version`. Runtime versions are required when their setup toggle is enabled.
+- **Runtime-only sample**:
   ```yaml
-  - uses: frasermolyneux/actions/copilot-setup@copilot-setup/v1
+  - uses: frasermolyneux/actions/copilot-setup@copilot-setup/v2
+    with:
+      setup-dotnet: 'true'
+      dotnet-version: 'REPLACE_WITH_REQUIRED_DOTNET_SDK_VERSION'
+  ```
+- **Restore-required sample**:
+  ```yaml
+  - uses: frasermolyneux/actions/copilot-setup@copilot-setup/v2
     with:
       checkout-repo: 'true'
-      checkout-shared-copilot: 'true'
-      setup-dotnet: 'true'
-      dotnet-version: |
-        9.0.x
-        10.0.x
+      setup-node: 'true'
+      node-version: 'REPLACE_WITH_REQUIRED_NODE_VERSION'
+
+  - run: npm ci --prefix REPLACE_WITH_PACKAGE_DIRECTORY
   ```
+- **Release prerequisite**: v2 is prepared but must not be used by consumers until the `copilot-setup/v2` tag exists. Repositories needing no pre-agent customization should omit `copilot-setup-steps.yml`.
 
 ### Logic Apps & Bicep
 

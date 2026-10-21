@@ -1,5 +1,5 @@
 ---
-description: "Use when Mandatory Azure resource tagging convention for the frasermolyneux organization."
+description: "Automatic Azure resource tagging rules for Terraform and Bicep files."
 applyTo: '**/*.tf,**/*.bicep'
 ---
 # Standard — Azure Resource Tagging

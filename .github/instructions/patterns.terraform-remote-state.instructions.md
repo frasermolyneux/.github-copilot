@@ -1,6 +1,5 @@
 ---
-description: "Use when Pattern for consuming upstream Terraform stacks via terraform_remote_state."
-applyTo: '**/*.tf'
+description: "Use only when Terraform consumes an upstream stack through terraform_remote_state."
 ---
 # Pattern — Terraform Remote State
 

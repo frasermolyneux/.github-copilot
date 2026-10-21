@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Release - Publish NuGet workflow that runs after Release - Version and Tag completes successfully. Layered on top of workflows.dotnet.instructions.md."
-applyTo: '**/release-publish-nuget.yml'
+description: "Automatic canonical template rules for .github/workflows/release-publish-nuget.yml."
+applyTo: '.github/workflows/release-publish-nuget.yml,.github/workflows/release-publish-nuget.yaml'
 ---
 
 # `release-publish-nuget.yml` Pattern

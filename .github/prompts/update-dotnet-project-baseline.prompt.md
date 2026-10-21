@@ -29,8 +29,9 @@ If this prompt is not applicable to the target repository, report the reason and
    - keep package metadata repo-specific
 9. For legacy .NET Framework projects, do not force incompatible SDK-style settings; record explicit exceptions.
 10. Validate against the baseline-related compliance checklist items in `standards.dotnet-project.instructions.md` before finishing.
-11. If the target repo contains `.github/workflows/{build-and-test,pr-verify,codequality,deploy-dev,deploy-prd,release-version-and-tag,release-publish-nuget,copilot-setup-steps}.yml`, ensure each relevant workflow enforces:
+11. If the target repo contains `.github/workflows/{build-and-test,pr-verify,codequality,deploy-dev,deploy-prd,release-version-and-tag,release-publish-nuget}.yml`, ensure each relevant workflow enforces:
     - `dotnet format <solution-or-src-path> --verify-no-changes`
     - when workflows pin `frasermolyneux/actions/dotnet-ci`, `dotnet-web-ci`, or `dotnet-func-ci` at v2 or later, treat the composite-integrated format gate as compliant
     - add or update an explicit workflow-level format step only when .NET commands run outside those composites, when pinned below v2, or when `skip-format-check: "true"` is intentionally set
-12. Return a concise summary of files changed (including workflow files when updated), whether NuGet profile alignment was applied or not applicable, exceptions kept, workflow format-gate status, and any follow-up needed.
+12. Do not add build, test, format, or lint commands to `copilot-setup-steps.yml`; that workflow is limited to prerequisites under `workflows.copilot-setup-steps.instructions.md`.
+13. Return a concise summary of files changed (including workflow files when updated), whether NuGet profile alignment was applied or not applicable, exceptions kept, workflow format-gate status, and any follow-up needed.

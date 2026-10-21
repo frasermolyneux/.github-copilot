@@ -1,6 +1,6 @@
 ---
-description: "Use when standardizing VS Code .NET task definitions across repositories."
-applyTo: '**/.vscode/tasks.json'
+description: "Automatic .NET task conventions for VS Code tasks.json files."
+applyTo: '.vscode/tasks.json,**/.vscode/tasks.json'
 ---
 # Standard - VS Code .NET Tasks
 

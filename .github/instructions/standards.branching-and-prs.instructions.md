@@ -1,6 +1,6 @@
 ---
-description: "Use when Branch strategy, PR rules, and label-driven workflow gates for the frasermolyneux organization."
-applyTo: '.github/workflows/**/*.yml,.github/dependabot.yml'
+description: "Automatic branch, pull-request, and label-gate rules for GitHub Actions and Dependabot configuration."
+applyTo: '.github/workflows/**/*.yml,.github/workflows/**/*.yaml,.github/dependabot.yml,.github/dependabot.yaml'
 ---
 # Standard — Branching and Pull Requests
 

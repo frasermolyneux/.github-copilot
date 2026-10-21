@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-registry — shared Azure Container Registry and published Bicep modules."
-applyTo: '**/*.tf,**/*.tfvars,.github/workflows/**/*.yml'
+description: "Use only when a repository consumes the shared Azure Container Registry or published Bicep modules from platform-registry."
 ---
 # platform-registry — Consumer Contract
 

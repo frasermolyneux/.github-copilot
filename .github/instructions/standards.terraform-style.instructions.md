@@ -1,5 +1,5 @@
 ---
-description: "Use when Terraform style and configuration conventions for the frasermolyneux organization."
+description: "Automatic organization style and configuration rules for Terraform and tfvars files."
 applyTo: '**/*.tf,**/*.tfvars'
 ---
 # Standard — Terraform Style

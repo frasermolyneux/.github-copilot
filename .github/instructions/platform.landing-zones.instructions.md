@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-landing-zones — management group hierarchy and subscription placement."
-applyTo: '**/*.tf,**/*.tfvars'
+description: "Use only when a repository consumes subscription or management-group outputs from platform-landing-zones."
 ---
 # platform-landing-zones — Consumer Contract
 

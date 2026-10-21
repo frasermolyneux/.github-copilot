@@ -74,12 +74,13 @@ The platform **`ResetSystemAssignedPlayerTags`** stays as today: it clears tags 
 
 **Do:** `src/XtremeIdiots.Portal.Features.AutoAdmin.sln` with:
 
-| Project                                               | SDK                       | TFMs             | Key references                                                                                                                                                                                                                             |
-| ----------------------------------------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `XtremeIdiots.Portal.Features.AutoAdmin.Abstractions` | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `MX.Api.Abstractions` (owns the `vpnProtection` + `moderation` contracts + validators)                                                                                                                   |
-| `XtremeIdiots.Portal.Features.AutoAdmin.Web`          | `Microsoft.NET.Sdk.Razor` | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk.Web`, `.Abstractions`; `FrameworkReference Microsoft.AspNetCore.App`                                                                                                                                       |
-| `XtremeIdiots.Portal.Features.AutoAdmin.Processing`   | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `.Abstractions`; `Azure.AI.ContentSafety` (the feature **provides** the client from host-supplied config via its options builder), `MX.GeoLocation.Api.Client.V1` if the VPN evaluator needs it directly |
-| `XtremeIdiots.Portal.Features.AutoAdmin.*.Tests`      | test                      | `net9.0;net10.0` | package under test + `FeatureSdk.Testing` / `.Web.Testing`, xUnit, Moq                                                                                                                                                                     |
+| Project                                                        | SDK                       | TFMs             | Key references                                                                                                                                                                                                                             |
+| -------------------------------------------------------------- | ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `XtremeIdiots.Portal.Features.AutoAdmin.Abstractions`          | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `MX.Api.Abstractions` (owns the `vpnProtection` + `moderation` contracts + validators)                                                                                                                   |
+| `XtremeIdiots.Portal.Features.AutoAdmin.Web`                   | `Microsoft.NET.Sdk.Razor` | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk.Web`, `.Abstractions`; `FrameworkReference Microsoft.AspNetCore.App`                                                                                                                                       |
+| `XtremeIdiots.Portal.Features.AutoAdmin.Processing`            | `Microsoft.NET.Sdk`       | `net9.0;net10.0` | `XtremeIdiots.Portal.FeatureSdk`, `.Abstractions`; `Azure.AI.ContentSafety` (the feature **provides** the client from host-supplied config via its options builder), `MX.GeoLocation.Api.Client.V1` if the VPN evaluator needs it directly |
+| `XtremeIdiots.Portal.Features.AutoAdmin.*.Tests`               | test                      | `net9.0;net10.0` | package under test + `FeatureSdk.Testing` / `.Web.Testing`, xUnit, Moq                                                                                                                                                                     |
+| `XtremeIdiots.Portal.Features.AutoAdmin.Web.IntegrationTests`  | test (non-packable)       | `net9.0;net10.0` | `.Web`, `.Abstractions`, `FeatureSdk.Web.Testing`, `Microsoft.Playwright`, xUnit, deterministic Repository/settings fakes                                                                                                                 |
 
 Each package: `GeneratePackageOnBuild=true`, `PackageId` = project name, `Description`, `PackageReadmeFile=README.md`.
 
@@ -127,22 +128,36 @@ Move from `portal-web`:
    Each section owns its view model + validators + partial view and binds against the **feature-owned** contract types in `AutoAdmin.Abstractions` (the wire-compatible copies). **This is the hardest step** — see the risk note in [README.md](README.md#main-risk-to-watch).
 4. `AddAutoAdminFeatureWeb(this IServiceCollection s)` → `s.AddFeatureControllers(typeof(ProtectedNamesController).Assembly)` + `s.AddPlayerProfileBlock<ProtectedNamesProfileBlock>()` + `s.AddSettingsSection<VpnProtectionSettingsSection>()` + `s.AddSettingsSection<ChatModerationSettingsSection>()`.
 
-**Acceptance:** `WebApplicationFactory` test hosts the RCL; the protected-names routes render; the profile block + the two settings sections render with correct policy + game gating; VPN/moderation settings round-trip against the **feature-owned** contracts and persist JSON identical to today.
+**Acceptance:** unit tests cover contributors, binding, and validators. The feature-owned integration project launches the RCL in the `FeatureSdk.Web.Testing` reference host; protected-names routes, the profile block, and both settings sections are discovered without referencing `portal-web`; Playwright proves the workflows described below.
 
 ---
 
 ## 1.6 — Tests & 1.7 — Publish gate
 
-**Tests:** permission snapshot; VPN **guard** collaborator (via `FakeRconGateway` + a fake `IPlayerTagService`, incl. `GuardWasDestructive` on kick); moderation records an `Observation` (mock Content Safety) with **no effect on other handlers**; protected-name **enforcer**; the VPN-detected-tags reconcile (mock `IPlayerTagService`); profile block + settings-section rendering + round-trip.
+**Unit/characterization tests:** permission snapshot; VPN **guard** collaborator (via `FakeRconGateway` + a fake `IPlayerTagService`, incl. `GuardWasDestructive` on kick); moderation records an `Observation` (mock Content Safety) with **no effect on other handlers**; protected-name **enforcer**; the VPN-detected-tags reconcile (mock `IPlayerTagService`); profile block/settings contributor output; contract serialization and validators.
+
+**Feature-owned Playwright (`Web.IntegrationTests`):**
+- Start `FeatureWebTestHostBuilder` with the AutoAdmin Web assembly, deterministic protected-name/API fakes, seeded global/per-server settings, and allowed/denied principals.
+- Prove the Protected Names route/table workflow, including valid and invalid writes, expected recording-fake requests, and refreshed semantic UI.
+- Prove the protected-names profile block renders for the supported game and allowed policy, and is absent for unsupported/denied contexts.
+- Render VPN Protection and Chat Moderation sections in both global and game-server scopes. Exercise valid and invalid posts, field validation, override behaviour, and POST→GET persistence.
+- Assert persisted `vpnProtection` and `moderation` JSON remains wire-compatible with fixtures from the legacy contract.
+- Assert protected routes and contributed surfaces enforce their declared policies.
+- Fail on browser console/page errors, same-origin request failures/5xx responses, or unexpected external requests.
+- Use role/label/test-id assertions. Screenshot parity of portal-web's shared settings/profile layout remains a small host-owned check in Part 2.
 
 **Validate:**
 ```pwsh
 dotnet build src/XtremeIdiots.Portal.Features.AutoAdmin.sln
-dotnet test  src/XtremeIdiots.Portal.Features.AutoAdmin.sln
+dotnet test  src/XtremeIdiots.Portal.Features.AutoAdmin.sln --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test  src/XtremeIdiots.Portal.Features.AutoAdmin.Web.IntegrationTests/XtremeIdiots.Portal.Features.AutoAdmin.Web.IntegrationTests.csproj --results-directory TestResults --logger "trx;LogFileName=playwright.trx"
+# The CI action installs Chromium and fails unless TestResults/playwright.trx reports Counters.total > 0.
 dotnet format src/XtremeIdiots.Portal.Features.AutoAdmin.sln --verify-no-changes
 ```
 
-**Publish gate (hard stop):** publish `.Abstractions` / `.Web` / `.Processing` to **NuGet.org** at `0.1.x` via the release flow (requester performs/reviews). Confirm a scratch app restores `Features.AutoAdmin.Web` + `.Processing`. **STOP** until this passes.
+CI must execute the explicit integration-test project through the Phase 0 versioned `dotnet-playwright-tests` action (`test-project` input). The action installs Chromium, emits/publishes TRX, and fails if zero tests execute. Do not use the old solution-wide name-filter mode and do not publish on a workflow path that skipped this job.
+
+**Publish gate (hard stop):** publish `.Abstractions` / `.Web` / `.Processing` to **NuGet.org** at `0.1.x` via the release flow (requester performs/reviews). Confirm a scratch app restores `Features.AutoAdmin.Web` + `.Processing`, and that the exact commit/tag being packaged passed `Web.IntegrationTests` against the published-version-compatible SDK reference host. **STOP** until this passes.
 
 ---
 
@@ -152,6 +167,7 @@ dotnet format src/XtremeIdiots.Portal.Features.AutoAdmin.sln --verify-no-changes
 - [ ] `.Abstractions` (`AutoAdminPermissions` + feature-owned `vpnProtection`/`moderation` contracts + validators), `.Processing` (VPN **guard collaborator**, protected-name **enforcer collaborator**, moderation **handler** [observation-only], **plus the VPN-detected-tags reconcile job**; ContentSafety via options builder incl. `NewPlayerWindowDays` + `BotAdminId`), `.Web` (protected-names UI + profile block + 2 settings sections) build.
 - [ ] Feature contracts are **wire-compatible copies** — round-trip proven against existing persisted JSON; central `Settings.Contracts.V1` copies still present (removed in Phase 4).
 - [ ] Tests reproduce legacy behaviour incl. moderation as a passive `Observation` (no effect on the command) and the VPN-detected-tags reconcile; permission snapshot exact.
+- [ ] Feature-owned Playwright proves Protected Names, profile-block gating, both settings scopes, validation, wire-compatible round-trip, and browser diagnostics before publish.
 - [ ] `dotnet format --verify-no-changes` clean.
 - [ ] Packages published to NuGet.org `0.1.x` and restorable.
 - [ ] `code-review` sub-agent run; High/Medium findings resolved.

@@ -6,8 +6,8 @@ This folder is the **execute-it-verbatim** plan for migrating **Maps** into its 
 
 ## What Phase 1 delivers
 
-- **Part 1 — build & publish `portal-feature-maps`** ([part-1-feature-build.md](part-1-feature-build.md)): three packages (`.Abstractions`, `.Web`, `.Processing`) containing the maps code moved out of the five hosts. **Gated on NuGet publish.**
-- **Part 2 — integrate behind `Feature.Maps.V2`** ([part-2-host-integration.md](part-2-host-integration.md)): the five hosts reference the Maps packages and register them **flag-gated**, running side-by-side with legacy (flag off = legacy, on = feature). Validated by characterization + Playwright in **both** flag states, then enabled dev → prd → soak.
+- **Part 1 — build & publish `portal-feature-maps`** ([part-1-feature-build.md](part-1-feature-build.md)): three packages (`.Abstractions`, `.Web`, `.Processing`) containing the maps code moved out of the five hosts, plus a non-packable feature-owned Playwright project using the SDK reference host. **Feature browser tests are part of the NuGet publish gate.**
+- **Part 2 — integrate behind `Feature.Maps.V2`** ([part-2-host-integration.md](part-2-host-integration.md)): the five hosts reference the Maps packages and register them **flag-gated**, running side-by-side with legacy (flag off = legacy, on = feature). Host Playwright covers only discovery/composition, real authorization/layout, route uniqueness, and flag parity in **both** states; feature workflows remain owned by the Maps repo.
 
 At the end of Phase 1: with `Feature.Maps.V2` **on**, Maps is served entirely from packages; with it **off**, legacy still works. Legacy code still exists (removed in Phase 2).
 
@@ -41,7 +41,7 @@ At the end of Phase 1: with `Feature.Maps.V2` **on**, Maps is served entirely fr
 ## Golden rules for the executing agent
 
 - No git write ops / no secrets unless the requester asks; follow each repo's `AGENTS.md`.
-- **Behaviour must be identical** in both flag states; characterization + Playwright are the oracle.
+- **Behaviour must be identical** in both flag states; feature-repo functional Playwright plus host characterization/composition Playwright are the oracle.
 - Surface the **publish gate**: finish Part 1, publish/review the Maps packages, then start Part 2. No cross-repo project references.
 - Build + test + `dotnet format --verify-no-changes` must pass in every touched repo before a step is "done".
 - **Exactly one path runs per environment** — when the flag is on, the legacy path must be fully disabled (controllers excluded, commands/jobs/nav/permissions not registered).
@@ -49,7 +49,8 @@ At the end of Phase 1: with `Feature.Maps.V2` **on**, Maps is served entirely fr
 ## Phase 1 definition of done
 
 - `portal-feature-maps` published to NuGet.org `0.1.x` and restorable.
-- Five hosts reference the Maps packages, flag-gated; **flag off = legacy, flag on = feature**, both behaviourally identical (characterization + Playwright).
+- Maps feature-owned functional Playwright suite passes against `FeatureSdk.Web.Testing` before publish.
+- Five hosts reference the Maps packages, flag-gated; **flag off = legacy, flag on = feature**, both behaviourally identical (characterization + feature-owned functional Playwright + host-composition Playwright).
 - `Feature.Maps.V2` enabled in **dev** and **prd** and soaked with no regressions.
 - Legacy maps code **still present** and still works when the flag is off.
 - `code-review` sub-agent run per repo; High/Medium findings resolved.

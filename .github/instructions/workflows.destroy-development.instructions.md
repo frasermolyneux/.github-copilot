@@ -1,6 +1,6 @@
 ---
-description: "Use when Canonical pattern for the Destroy Development workflow (nightly cron + manual dispatch that wipes the dev Terraform state). Layered on top of workflows.terraform.instructions.md and workflows.scheduling.instructions.md."
-applyTo: '**/destroy-development.yml'
+description: "Automatic canonical template rules for .github/workflows/destroy-development.yml."
+applyTo: '.github/workflows/destroy-development.yml,.github/workflows/destroy-development.yaml'
 ---
 
 # `destroy-development.yml` Pattern

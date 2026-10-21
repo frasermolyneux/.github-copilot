@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for invision-api-client — typed API client for Invision Community."
-applyTo: '**/*.cs,**/*.csproj'
+description: "Use only when consuming the MX.InvisionCommunity.Api.Client NuGet package."
 ---
 # invision-api-client — Consumer Contract
 

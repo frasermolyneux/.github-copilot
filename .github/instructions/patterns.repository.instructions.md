@@ -1,6 +1,5 @@
 ---
-description: "Use when Repository pattern for data access — interfaces, DI registration, cache-first reads."
-applyTo: '**/*.cs'
+description: "Use only when implementing the organization's optional C# repository and cache-first data-access pattern."
 ---
 # Pattern — Repository
 

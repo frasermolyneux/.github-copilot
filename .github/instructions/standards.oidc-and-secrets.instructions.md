@@ -1,6 +1,6 @@
 ---
-description: "Use when Mandatory authentication rules — OIDC federation only, managed identities preferred, no client secrets."
-applyTo: '**/*.tf,.github/workflows/**/*.yml,**/azure-pipelines*.yml'
+description: "Automatic OIDC, managed-identity, and no-client-secret rules for Terraform and CI pipeline files."
+applyTo: '**/*.tf,.github/workflows/**/*.yml,.github/workflows/**/*.yaml,**/azure-pipelines*.yml,**/azure-pipelines*.yaml,**/.azuredevops/**/*.yml,**/.azuredevops/**/*.yaml'
 ---
 # Standard — OIDC and Secrets
 

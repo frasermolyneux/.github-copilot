@@ -1,6 +1,5 @@
 ---
-description: "Use when Consumption contract for platform-hosting — shared Azure App Service Plans."
-applyTo: '**/*.tf,**/*.tfvars'
+description: "Use only when a repository consumes shared App Service Plan outputs from platform-hosting."
 ---
 # platform-hosting — Consumer Contract
 
