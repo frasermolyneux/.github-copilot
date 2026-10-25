@@ -49,7 +49,7 @@ teardown are distinct evidence; receipts never contain state, plans or outputs.
 - **Key inputs**: `terraform-folder` (default `terraform`), `terraform-var-file`, `terraform-backend-file`, `AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID`.
 - **Sample**:
   ```yaml
-  - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2
+  - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2.0.0
     with:
       terraform-folder: terraform
       terraform-var-file: tfvars/dev.tfvars
@@ -165,7 +165,7 @@ Runs `.NET` integration test suites against a deployed environment.
 
 ## Tag pinning rules
 
-- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v2`, `@terraform-plan/v2`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
+- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v2`, `@terraform-plan/v2.0.0`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
 - Do **not** use `@main` outside of the `actions/` repo's own internal CI.
 - See `workflows.frasermolyneux-actions.instructions.md` for the canonical pinned-tag list.
 

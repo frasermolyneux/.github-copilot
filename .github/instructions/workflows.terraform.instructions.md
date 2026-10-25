@@ -94,9 +94,9 @@ In `deploy-prd.yml` (and `deploy-dev.yml` for state-checked repos), the Terrafor
 
 ```yaml
 - if: needs.detect-changes.outputs.terraform == 'true'
-  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2
+  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
 - if: needs.detect-changes.outputs.terraform != 'true'
-  uses: frasermolyneux/actions/terraform-output@terraform-output/v2
+  uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.0
 ```
 
 Both leave the working dir initialised so the `terraform output -raw` step works either way. See `workflows.deploy-prd.instructions.md` for the full pattern.
