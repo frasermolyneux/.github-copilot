@@ -23,7 +23,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/dotnet-func-ci` | `@dotnet-func-ci/v2` | Build & publish a .NET Azure Functions project |
 | `frasermolyneux/actions/cmake-ci` | `@cmake-ci/v1` | Configure, build, and test a CMake project |
 | `frasermolyneux/actions/terraform-setup` | `@terraform-setup/v1.0.0` | Require root CLI pin and provider lock before installing |
-| `frasermolyneux/actions/terraform-execution-receipt` | `@terraform-execution-receipt/v1` | Bounded operation evidence for bespoke Terraform jobs |
+| `frasermolyneux/actions/terraform-receipt` | `@terraform-receipt/v1.0.0` | Bounded operation evidence; standalone callers are not yet imported by Radar |
 | `frasermolyneux/actions/terraform-plan` | `@terraform-plan/v2.0.0` | `init` + `validate` + `plan`, with PR commenting |
 | `frasermolyneux/actions/terraform-apply` | `@terraform-apply/v2.0.0` | Apply a source/pin/lock-bound saved plan |
 | `frasermolyneux/actions/terraform-plan-readonly` | `@terraform-plan-readonly/v2.0.0` | Read-only environment plan |

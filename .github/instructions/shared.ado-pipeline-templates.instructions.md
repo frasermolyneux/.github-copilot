@@ -16,6 +16,7 @@ resources:
       type: github
       name: frasermolyneux/ado-pipeline-templates
       endpoint: frasermolyneux
+      ref: refs/heads/main
 
 stages:
   - template: stages/build-function-app.yml@ado-pipeline-templates
@@ -60,6 +61,10 @@ stages:
 Terraform templates no longer install `1.0.7` or default to `latest`. Consumers
 must commit their root pin and provider lock before upgrading the template revision;
 an explicit `terraformVersion` must match that pin. Normal init is read-only.
+These guarantees require a published owner revision containing both toolchain
+helpers, introduced in `ado-pipeline-templates` PR #9. Verify the selected
+repository revision contains them before adoption; older revisions retain the
+legacy behavior.
 Legacy stage templates retain TerraformTaskV2 and are not verified for modern
 OIDC service connections. Validate expansion and extension compatibility in the
 actual ADO project. ADO receipts are separate from GitHub's trust contract and
