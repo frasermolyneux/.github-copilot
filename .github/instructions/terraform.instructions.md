@@ -53,6 +53,11 @@ applies and teardown are different evidence. A CI tool is not an application run
 a newly merged pin does not prove the last deployment used it. Never publish state,
 plans, outputs, tfvars, backend values, environment dumps or credentials as receipts.
 
+Radar currently verifies static main-branch callers of the versioned operation
+wrappers with literal roots and environment identity. Matrix callers and
+standalone receipt-helper calls remain explicitly unsupported; do not add those
+producers merely to manufacture Radar coverage.
+
 ## Standard Variables
 
 - `workload_name` — always use this name (not `workload`). The value matches the repository name (e.g. `platform-hosting`, `geo-location`).
@@ -74,12 +79,14 @@ Stacks that depend on shared org infrastructure consume `platform-workloads` rem
 
 ```bash
 # First install/select the version in terraform/.terraform-version.
-terraform -chdir=terraform init -lockfile=readonly -backend-config=backends/dev.backend.hcl
-terraform -chdir=terraform plan -var-file=tfvars/dev.tfvars
-terraform fmt -recursive
+terraform -chdir=terraform fmt -check -recursive
+terraform -chdir=terraform init -backend=false -input=false -lockfile=readonly
+terraform -chdir=terraform validate
 ```
 
-Substitute `prd` for `dev` for production validation. Stacks with only a production environment (e.g. `platform-landing-zones`, `platform-workloads`, `demo-manager`) use `prd` directly.
+Repeat for each auxiliary root using its own pin and lock. Run state-backed
+environment plans through the protected PR workflows with matching backend and
+tfvars files; production-only stacks use their existing production route.
 
 ## Conventions
 

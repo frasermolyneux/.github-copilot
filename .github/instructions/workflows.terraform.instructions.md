@@ -118,6 +118,11 @@ Receipts describe the actual operation; output/state-check/plan success is not a
 successful apply. Upload only the producer's bounded allowlisted receipt, never
 the Terraform directory or private state/plan/output data.
 
+Radar currently accepts static main-branch operation-wrapper callers with
+literal root/environment inputs. Matrix callers and standalone validation or
+receipt-helper steps do not establish trusted execution coverage yet. Keep
+backend-disabled root validation even where execution evidence remains unknown.
+
 ## `terraform-state-check-dev` (idempotent dev environments)
 
 Dev environments are destroyed nightly by `destroy-development.yml`, so any deploy must rebuild from scratch when state is empty. Add a `terraform-state-check-dev` job in parallel with `detect-changes` and OR its `has_resources != 'true'` output into the change conditions for dev jobs. **Never** state-check prd — production is permanent.

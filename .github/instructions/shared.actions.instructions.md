@@ -43,6 +43,9 @@ All v2 Terraform operations require committed per-root `.terraform-version` and
 operation receipts. Use `terraform-setup` for bespoke commands and the receipt
 helper only with the actual operation outcome. Source, plan, successful apply and
 teardown are distinct evidence; receipts never contain state, plans or outputs.
+Radar currently imports supported static operation-wrapper callers only, not
+matrix callers or standalone helpers. Producer capability does not imply trusted
+consumer coverage.
 
 #### `terraform-plan`
 - **Purpose**: `init`, `validate`, `plan` against an environment with Azure OIDC; uploads plan artefact and posts results to PR.
