@@ -13,6 +13,8 @@ Terraform-bearing repos use this layout:
 
 ```
 terraform/
+  .terraform-version       # exact CLI selected before every command
+  .terraform.lock.hcl      # committed provider versions and verified checksums
   *.tf                     # root module
   tfvars/
     dev.tfvars
@@ -92,12 +94,34 @@ In `deploy-prd.yml` (and `deploy-dev.yml` for state-checked repos), the Terrafor
 
 ```yaml
 - if: needs.detect-changes.outputs.terraform == 'true'
-  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
 - if: needs.detect-changes.outputs.terraform != 'true'
-  uses: frasermolyneux/actions/terraform-output@terraform-output/v1.0
+  uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.0
 ```
 
 Both leave the working dir initialised so the `terraform output -raw` step works either way. See `workflows.deploy-prd.instructions.md` for the full pattern.
+
+## Toolchain and evidence
+
+Every root, including auxiliary roots, follows the
+[shared Terraform dependency policy](terraform.instructions.md#provider-requirements).
+Use the v2 Terraform actions only after their release tags exist. Bespoke commands
+use `terraform-setup` for the root pin and `init -lockfile=readonly`; do not retain
+an independent `latest` or literal CLI version in a workflow.
+
+Pin/lock-only changes must trigger the same validation and environment plans as
+other Terraform changes. Preserve existing state concurrency, OIDC identities,
+environment approvals and publication guards. Split plan/apply must use the
+same source commit, root, CLI pin and lock identity.
+
+Receipts describe the actual operation; output/state-check/plan success is not a
+successful apply. Upload only the producer's bounded allowlisted receipt, never
+the Terraform directory or private state/plan/output data.
+
+Radar currently accepts static main-branch operation-wrapper callers with
+literal root/environment inputs. Matrix callers and standalone validation or
+receipt-helper steps do not establish trusted execution coverage yet. Keep
+backend-disabled root validation even where execution evidence remains unknown.
 
 ## `terraform-state-check-dev` (idempotent dev environments)
 

@@ -71,11 +71,11 @@ The Terraform job always runs (it must produce outputs for downstream jobs) but 
 
 ```yaml
 - if: needs.detect-changes.outputs.terraform == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true'
-  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+  uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
   ...
 
 - if: needs.detect-changes.outputs.terraform != 'true' && needs.terraform-state-check-dev.outputs.has_resources == 'true'
-  uses: frasermolyneux/actions/terraform-output@terraform-output/v1.0
+  uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.0
   ...
 
 - id: terraform-output-<env>
@@ -103,7 +103,7 @@ terraform-state-check-dev:
     has_resources: ${{ steps.state-check.outputs.has_resources }}
   steps:
     - id: state-check
-      uses: frasermolyneux/actions/terraform-state-check@terraform-state-check/v1.1
+      uses: frasermolyneux/actions/terraform-state-check@terraform-state-check/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -272,7 +272,7 @@ terraform-plan-and-apply-prd:
     (needs.terraform-plan-and-apply-dev.result == 'success' || github.event_name == 'schedule')
   steps:
     - if: needs.detect-changes.outputs.terraform == 'true'
-      uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+      uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/prd.tfvars"
@@ -282,7 +282,7 @@ terraform-plan-and-apply-prd:
         AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
     - if: needs.detect-changes.outputs.terraform != 'true'
-      uses: frasermolyneux/actions/terraform-output@terraform-output/v1.0
+      uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/prd.tfvars"

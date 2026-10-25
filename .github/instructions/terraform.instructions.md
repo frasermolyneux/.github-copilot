@@ -22,15 +22,41 @@ Every Terraform stack uses the same root-module layout under `terraform/` (some 
 
 ## Provider Requirements
 
-Always pin to **major.minor** (no patch lock) so Dependabot can track patches automatically.
+Keep compatibility constraints in `providers.tf`; commit the exact selected CLI
+in each root's `.terraform-version` and provider selections/checksums in that
+root's `.terraform.lock.hcl`. A constraint is not an installed version.
 
-- Terraform `>= 1.14`
-- `azurerm` `~> 4.69` (baseline; some stacks may lag by one or two minor versions during a Dependabot cycle)
-- `azuread` `~> 3.8` — include only if the stack manages identities, groups, or app registrations
+- Select the root CLI pin before invoking Terraform, including local `-chdir` commands.
+- Preserve the repository's reviewed provider constraints and authentication ceilings;
+  the estate currently uses AzureRM 5.x, not the obsolete 4.x baseline.
+- Declare only providers actually needed. Reusable child modules do not own deployment locks.
+- Normal initialization uses `-lockfile=readonly`, never `-upgrade`.
+- Regenerate locks only in a reviewed dependency-update PR using `init -upgrade`
+  and `providers lock -platform=linux_amd64 -platform=windows_amd64`; review both
+  development and production plans before merging.
+- Dependabot owns provider/module version-update PRs for every root. It does not
+  update `.terraform-version`, and Terraform security updates are not supported.
+  The scoped `platform-devex` controller proposes approved CLI patch updates;
+  minor-line changes require a reviewed controller-policy change.
+- Terraform/toolchain updates require deliberate review, including updates grouped
+  with otherwise auto-mergeable dependencies. Radar monitors official security and
+  release intelligence independently of the weekly update schedule.
 - Backend: `azurerm` (Azure Blob) with `storage_use_azuread = true`
 - Authentication: OIDC — workflows set `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`. Backend `.hcl` files include `use_oidc = true`, `use_azuread_auth = true`, and `tenant_id`.
 
-Other providers (`azapi`, `azuredevops`, `github`, `cloudflare`, `google`, `time`, `random`) appear in stacks that need them; pin them to major.minor as well.
+Provider locks do not lock remote modules: pin registry modules to exact versions
+and Git modules to immutable commit references when introducing them.
+
+The shared v2 Terraform actions require pins/locks and publish bounded execution
+receipts. Source selections, validation/plan observations, successful environment
+applies and teardown are different evidence. A CI tool is not an application runtime;
+a newly merged pin does not prove the last deployment used it. Never publish state,
+plans, outputs, tfvars, backend values, environment dumps or credentials as receipts.
+
+Radar currently verifies static main-branch callers of the versioned operation
+wrappers with literal roots and environment identity. Matrix callers and
+standalone receipt-helper calls remain explicitly unsupported; do not add those
+producers merely to manufacture Radar coverage.
 
 ## Standard Variables
 
@@ -52,17 +78,21 @@ Stacks that depend on shared org infrastructure consume `platform-workloads` rem
 ## Local Validation Commands
 
 ```bash
-terraform -chdir=terraform init -backend-config=backends/dev.backend.hcl
-terraform -chdir=terraform plan -var-file=tfvars/dev.tfvars
-terraform fmt -recursive
+# First install/select the version in terraform/.terraform-version.
+terraform -chdir=terraform fmt -check -recursive
+terraform -chdir=terraform init -backend=false -input=false -lockfile=readonly
+terraform -chdir=terraform validate
 ```
 
-Substitute `prd` for `dev` for production validation. Stacks with only a production environment (e.g. `platform-landing-zones`, `platform-workloads`, `demo-manager`) use `prd` directly.
+Repeat for each auxiliary root using its own pin and lock. Run state-backed
+environment plans through the protected PR workflows with matching backend and
+tfvars files; production-only stacks use their existing production route.
 
 ## Conventions
 
 - Run `terraform fmt -recursive` before every commit.
-- Run `terraform validate` and `terraform plan` locally before opening a PR.
+- Run backend-disabled validation locally; use the existing OIDC PR workflows for
+  environment-backed plans and preserve their environment/review gates.
 - Never apply directly from a local machine — all changes flow through GitHub Actions workflows.
 - One resource type per `.tf` file (preferred); use `data.*` prefix or a dedicated file for data-source-only files.
 - Use `locals` for computed values; avoid hardcoding resource names.

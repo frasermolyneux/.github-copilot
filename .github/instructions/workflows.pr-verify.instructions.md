@@ -103,7 +103,7 @@ terraform-plan-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v1.4
+    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -134,7 +134,7 @@ terraform-plan-and-apply-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -163,7 +163,7 @@ terraform-plan-prd:
   concurrency:
     group: ${{ github.repository }}-prd
   steps:
-    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v1.4
+    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/prd.tfvars"

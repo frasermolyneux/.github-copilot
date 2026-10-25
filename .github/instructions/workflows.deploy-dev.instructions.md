@@ -46,7 +46,7 @@ terraform-plan-and-apply-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -84,7 +84,7 @@ terraform-plan-and-apply-dev:
     web_app_name: ${{ steps.terraform-output.outputs.web_app_name }}
     web_app_resource_group: ${{ steps.terraform-output.outputs.web_app_resource_group }}
   steps:
-    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -157,7 +157,7 @@ terraform-plan-and-apply-dev:
   outputs:
     func_apps: ${{ steps.terraform-output.outputs.func_apps }}
   steps:
-    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"
@@ -242,7 +242,7 @@ terraform-plan-and-apply-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+    - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.0
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"

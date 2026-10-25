@@ -21,6 +21,10 @@ This document defines the weekly operations schedule for all automated workflows
 
 ### Sunday — Dependabot (all repos)
 
+At **00:37 UTC**, `platform-devex` checks approved Terraform CLI patch releases and
+proposes bounded per-repository pin-update PRs using its scoped installation token.
+This is separate from provider/module Dependabot and never auto-merges changes.
+
 All 33 repositories run Dependabot on Sunday. Most schedules are staggered every 15 minutes from 01:00 to 08:00, with limited overlap where estate volume exceeds available 15-minute slots. Each repo's Dependabot time matches its Monday codequality time. All ecosystems use `groups` with `patterns: ["*"]` to batch updates into a single PR per ecosystem.
 
 ### Monday — Code Quality (all repos)
