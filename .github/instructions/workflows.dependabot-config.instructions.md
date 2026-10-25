@@ -18,7 +18,7 @@ Include only the ecosystems present in the repo:
 | Ecosystem | When to include | Directory |
 |---|---|---|
 | `nuget` | .NET projects | `/src` |
-| `terraform` | `terraform/` folder | `/terraform` |
+| `terraform` | Every deployable Terraform root | One entry per root, including auxiliary roots |
 | `github-actions` | Any `.github/workflows/*.yml` | `/` |
 | `devcontainers` | `.devcontainer/` exists | `/` |
 | `npm` | `package.json` exists | `/src/<project>` (where the package lives) |
@@ -32,6 +32,12 @@ All ecosystems use the same weekly Sunday schedule. The `time:` must match the r
 All ecosystems must include `groups.all-updates.patterns: ["*"]` to batch updates into a single PR per ecosystem.
 
 The group key name is a strict contract: use `all-updates` exactly. Ecosystem-specific keys like `nuget`, `terraform`, or `github-actions` are non-compliant even when patterns are identical.
+
+Terraform groups update committed provider locks and compatible constraints/modules,
+not the CLI pin. Terraform security-update support is not available; Radar's
+proactive advisory monitoring is independent. The scoped `platform-devex` controller
+owns CLI-pin PRs. Both Terraform and toolchain-action changes are excluded from
+auto-merge by file/reference-aware policy, even in mixed dependency groups.
 
 ## Canonical config
 

@@ -20,7 +20,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.78.0"
+      version = "~> 5.10.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -46,7 +46,10 @@ terraform {
 }
 ```
 
-The `azurerm` provider is at `~> 4.x` org-wide. Only declare providers actually used.
+The example is not an instruction to rewrite existing constraints. Preserve reviewed
+repository bounds, particularly provider authentication ceilings. Exact CLI pins,
+committed provider locks, update ownership and execution evidence are defined in
+[Terraform conventions](terraform.instructions.md#provider-requirements).
 
 ## Backend configuration
 
@@ -66,7 +69,7 @@ terraform/
 └── providers.tf
 ```
 
-Initialise with `terraform -chdir=terraform init -backend-config=backends/<env>.backend.hcl` and plan with `-var-file=tfvars/<env>.tfvars`. Never commit a backend block with hardcoded values inside `.tf` files — the backend block stays empty and is filled at `init` time.
+Select the root `.terraform-version`, then initialise with `terraform -chdir=terraform init -lockfile=readonly -backend-config=backends/<env>.backend.hcl` and plan with `-var-file=tfvars/<env>.tfvars`. Never commit a backend block with hardcoded values inside `.tf` files — the backend block stays empty and is filled at `init` time.
 
 ## File layout
 

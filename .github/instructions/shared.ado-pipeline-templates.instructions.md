@@ -54,6 +54,16 @@ stages:
 | Template | Purpose |
 |---|---|
 | `terraform-plan-and-apply.yml` | Step template using Azure CLI with OIDC; captures `terraform output` as pipeline variables + JSON artefact |
+| `terraform-toolchain.yml` | Require committed per-root CLI pin/provider lock and install the exact selected CLI |
+| `terraform-execution-receipt.yml` | Publish bounded operation metadata, never state/plan/output contents |
+
+Terraform templates no longer install `1.0.7` or default to `latest`. Consumers
+must commit their root pin and provider lock before upgrading the template revision;
+an explicit `terraformVersion` must match that pin. Normal init is read-only.
+Legacy stage templates retain TerraformTaskV2 and are not verified for modern
+OIDC service connections. Validate expansion and extension compatibility in the
+actual ADO project. ADO receipts are separate from GitHub's trust contract and
+are not currently imported into Radar.
 
 ## Conventions
 

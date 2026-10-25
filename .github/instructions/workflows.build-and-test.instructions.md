@@ -92,7 +92,7 @@ terraform-plan-dev:
   concurrency:
     group: ${{ github.repository }}-dev
   steps:
-    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v1.4
+    - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2
       with:
         terraform-folder: "terraform"
         terraform-var-file: "tfvars/dev.tfvars"

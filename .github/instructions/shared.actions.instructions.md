@@ -38,12 +38,18 @@ Runs Playwright integration tests against a deployed app.
 
 ### Terraform
 
+All v2 Terraform operations require committed per-root `.terraform-version` and
+`.terraform.lock.hcl`, enforce read-only provider selection and publish bounded
+operation receipts. Use `terraform-setup` for bespoke commands and the receipt
+helper only with the actual operation outcome. Source, plan, successful apply and
+teardown are distinct evidence; receipts never contain state, plans or outputs.
+
 #### `terraform-plan`
 - **Purpose**: `init`, `validate`, `plan` against an environment with Azure OIDC; uploads plan artefact and posts results to PR.
 - **Key inputs**: `terraform-folder` (default `terraform`), `terraform-var-file`, `terraform-backend-file`, `AZURE_CLIENT_ID/TENANT_ID/SUBSCRIPTION_ID`.
 - **Sample**:
   ```yaml
-  - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v1.4
+  - uses: frasermolyneux/actions/terraform-plan@terraform-plan/v2
     with:
       terraform-folder: terraform
       terraform-var-file: tfvars/dev.tfvars
@@ -159,7 +165,7 @@ Runs `.NET` integration test suites against a deployed environment.
 
 ## Tag pinning rules
 
-- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v2`, `@terraform-plan/v1.4`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
+- Always pin to the specific tag listed in `workflows.frasermolyneux-actions.instructions.md` (e.g. `@dotnet-ci/v2`, `@terraform-plan/v2`). Never use `@main` or floating refs. Sample tags in this file are illustrative — the **canonical pinned versions live in `workflows.frasermolyneux-actions.instructions.md`**.
 - Do **not** use `@main` outside of the `actions/` repo's own internal CI.
 - See `workflows.frasermolyneux-actions.instructions.md` for the canonical pinned-tag list.
 
