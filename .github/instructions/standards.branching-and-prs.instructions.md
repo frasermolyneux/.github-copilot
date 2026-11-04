@@ -29,14 +29,14 @@ The `pr-verify.yml` workflow runs on every PR to `main` and is the gate before m
 
 PRs authored by `dependabot[bot]` or `Copilot` (the cloud agent) follow the same **dev Terraform plan gate** as other PRs. Dev plan remains the default safety guardrail.
 
-Dependabot auto-merge is controlled by a dedicated policy check (`dependabot-policy`) and only enables auto-merge for approved update classes (for example patch/minor by default). High-risk updates (for example major) stay in governed manual review and can be labeled for prd planning (`run-prd-plan`).
+Bot auto-merge is controlled by a dedicated policy check (`dependabot-policy`) and enables auto-merge only for pull requests authored by `dependabot[bot]` or the `mx-io-idp-bot` bot account. Dependency version type, changed file type (including Terraform), and dependency metadata/evidence do not affect eligibility. Required checks and branch protection still determine when an eligible pull request can merge.
 
 ## Labels
 
 | Label | Effect |
 |---|---|
 | `run-prd-plan` | Run prd Terraform plan on any PR |
-| `auto-merge` | Optional triage label; Dependabot merge eligibility is enforced by `dependabot-policy` |
+| `auto-merge` | Optional triage label; bot merge eligibility is enforced by `dependabot-policy` |
 | `coding-agent` | Auto-applied by the `delegate-to-agent` issue template. Signals that the PR was created through the coding-agent flow and should include the completed agent attestation section in the PR template. |
 | `breaking-contract` | Apply when a PR changes a published API/NuGet contract (Abstractions / Api.Client paths) in a non-backwards-compatible way and the package major version must bump. This label is a reviewer/agent signal for triage and changelog automation. |
 | `needs-decision` | Applied by the cloud coding agent (and by humans) when a PR is blocked on a human decision. PRs with this label stay in **draft**. Humans triage these before other PRs. See per-repo `AGENTS.md` Escalation section. |
@@ -54,5 +54,5 @@ Dependabot auto-merge is controlled by a dedicated policy check (`dependabot-pol
 - Workflows use the branch globs above as `on.push.branches`
 - `pr-verify.yml` follows the canonical pattern in `workflows.pr-verify.instructions.md`
 - Dependabot/Copilot PRs run the default dev plan gate
-- Dependabot auto-merge is gated by a required `dependabot-policy` check
+- Bot auto-merge is gated by a required `dependabot-policy` check
 - `deploy-prd.yml` includes the weekly schedule and skip-dev-on-schedule guards (see `workflows.scheduling.instructions.md`)

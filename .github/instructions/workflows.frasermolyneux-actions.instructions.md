@@ -38,7 +38,7 @@ All workflows consume composite actions and reusable workflows from the `fraserm
 | `frasermolyneux/actions/deploy-app-service` | `@deploy-app-service/v1.3` | Deploy a built artifact to an App Service |
 | `frasermolyneux/actions/deploy-function-app` | `@deploy-function-app/v1.2` | Deploy a built artifact to a Function App |
 | `frasermolyneux/actions/deploy-sql-database` | `@deploy-sql-database/v1.3` | Deploy a DACPAC to Azure SQL |
-| `frasermolyneux/actions/dependabot-policy` | `@dependabot-policy/v1.2.0` | Evaluate Dependabot auto-merge policy and major-update labeling |
+| `frasermolyneux/actions/dependabot-policy` | `@dependabot-policy/v2` | Evaluate whether a pull request author is eligible for auto-merge |
 | `frasermolyneux/actions/publish-nuget-packages` | `@publish-nuget-packages/v2.0` | Download artifact + push to NuGet.org |
 | `frasermolyneux/actions/nbgv-metadata` | `@nbgv-metadata/v1` | Export Nerdbank.GitVersioning build metadata |
 | `frasermolyneux/actions/wait-for-version` | `@wait-for-version/v1.0` | Poll an `info-url` until `expected-version` is live |
