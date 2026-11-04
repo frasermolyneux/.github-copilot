@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Evaluate auto-merge policy
         id: evaluate
-        uses: frasermolyneux/actions/dependabot-policy@dependabot-policy/v2
+        uses: frasermolyneux/actions/dependabot-policy@dependabot-policy/v2.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,7 +62,7 @@ jobs:
 3. `dependabot-policy` job exists and completes successfully on non-draft PRs.
 4. `dependabot-policy` emits `auto_merge_allowed`, based only on PR author (`pull_request.user.login`), not event actor.
 5. Approved authors are `dependabot[bot]` and the `mx-io-idp-bot` bot account (`mx-io-idp-bot[bot]`, or `mx-io-idp-bot` when GitHub reports its type as `Bot`); all other authors are denied.
-6. `dependabot-policy` uses `frasermolyneux/actions/dependabot-policy@dependabot-policy/v2`, verified published before adoption.
+6. `dependabot-policy` uses `frasermolyneux/actions/dependabot-policy@dependabot-policy/v2.0.0`, verified published before adoption.
 7. Dependency version type, changed file type (including Terraform), and dependency metadata/evidence do not affect eligibility.
 8. Auto-merge job is gated only by `needs.dependabot-policy.outputs.auto_merge_allowed`.
 9. Auto-merge command remains `gh pr merge --auto --squash`; do not use admin merge or bypass branch protection.
